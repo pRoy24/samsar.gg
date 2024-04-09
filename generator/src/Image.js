@@ -1,6 +1,7 @@
 import { getGenerationsDB, getSessionsDB } from './db.js';
 import { getImageFromText } from './OpenAI.js';
 export async function processPendingImageRequests() {
+  
   const generationsDB = await getGenerationsDB();
   const sessionsDB = await getSessionsDB();
 

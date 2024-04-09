@@ -18,11 +18,12 @@ import 'dotenv/config'
 let GENERATIONS_DB_URL = "/orbitdb/zdpuAwUegzkVbTb4wkEVxVg8MMrhRmb8tsui3h2E7BDUjkJjK"
 let SESSIONS_DB_URL = "/orbitdb/zdpuAwwYGrMnHdcxgFiYwJFURRyJvrphodfSMFEv8iwFS285o"
 let USERS_DB_URL = "/orbitdb/zdpuAstipCiRXpUpRetY8VAc7tRt8nXtfn2bCEH1op3B6yiU7"
-
+let PRODUCTS_DB_URL = "/orbitdb/zdpuArecSeYybe1FGKYS2ZVJ4xKmHyDG8Ps9fq9Mu6jogKEyC"
 
 let usersDB;
 let generationsdDB;
 let sessionsDB;
+let productsDB;
 
 let orbitdb;
 
@@ -58,6 +59,17 @@ export async function getSessionsDB() {
     const sessionDB = await runReplica(2);
     sessionsDB = sessionDB;
     return sessionsDB;
+
+  }
+}
+
+export async function getProductsDB() {
+  if (productsDB) {
+    return new Promise((resolve) => (resolve(productsDB)));
+  } else {
+    const productDB = await runReplica(3);
+    productsDB = productDB;
+    return productsDB;
 
   }
 }
@@ -101,6 +113,8 @@ export async function runReplica(dbIndex) {
       dbAddress = SESSIONS_DB_URL
     } else if (dbIndex === 2) {
       dbAddress = GENERATIONS_DB_URL
+    } else if (dbIndex === 3) {
+      dbAddress = PRODUCTS_DB_URL
     }
 
     const libp2p = await createLibp2p({
@@ -184,6 +198,9 @@ export async function runReplica(dbIndex) {
     } else if (dbIndex === 2) {
       generationsdDB = db;
       return generationsdDB;
+    } else if (dbIndex === 3) {
+      productsDB = db;
+      return productsDB;
     }
 
 }
@@ -193,6 +210,7 @@ export async function createReplicas() {
   await runReplica(0);
   await runReplica(1);
   await runReplica(2);
+  await runReplica(3);
 }
 
 async function handleTerminationSignal() {

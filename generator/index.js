@@ -12,6 +12,8 @@ export async function listenToGenerationRequests() {
 
     while (true) {
       console.log("Processing");
+      // await createReplicas();
+
       await processPendingImageRequests();
       await getTimeout(1000);
     }

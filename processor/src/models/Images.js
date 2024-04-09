@@ -5,6 +5,7 @@ export async function addImageGeneratorRequest(payload) {
 
   const uuid = uuidv4();
   const db = await getGenerationsDB();
+
   const generationPayload = {
     _id: uuid,
     ...payload,
@@ -14,4 +15,5 @@ export async function addImageGeneratorRequest(payload) {
   await db.put(generationPayload);
   return generationPayload;
 }
+
 

@@ -17,11 +17,15 @@ import 'dotenv/config'
 const USERS_DB_URL = "samsar_users"
 const SESSIONS_DB_URL = "samsar_sessions"
 const GENERATIONS_DB_URL = "samsar_generations"
+const PRODUCTS_DB_URL = "samsar_products"
 
 let usersDB;
 let sessionsDB;
 let generationdDB;
+let productDB;
+
 let orbitdb;
+
 
 process.on('SIGTERM', handleTerminationSignal);
 process.on('SIGINT', handleTerminationSignal);
@@ -76,6 +80,24 @@ export async function getGenerationsDocument() {
     generationdDB = generationDBInstance;
     console.log("GENERATOR ADDRESS", generationdDB.address.toString());
     return generationdDB;
+
+  }
+}
+
+export async function getProductsDocument() {
+  if (productDB) {
+    return productDB;
+  } else {
+    const orbitdb = await getDBLib(3);
+    const productDBInstance = await orbitdb.open(PRODUCTS_DB_URL,
+      {
+        type: 'documents',
+        AccessController: OrbitDBAccessController({ write: ["*"], sync: false }),
+      })
+
+    productDB = productDBInstance;
+    console.log("PRODUCT ADDRESS", productDB.address.toString());
+    return productDB;
 
   }
 }
@@ -150,6 +172,11 @@ async function handleTerminationSignal() {
   }
   try {
     await generationdDB.close()
+  } catch (e) {
+
+  }
+  try {
+    await productDB.close()
   } catch (e) {
 
   }

@@ -1,6 +1,6 @@
 
 import express from 'express';
-import { requestGenerateImage, createNewSession, getSessionGenerationStatus} from '../models/Session.js';
+import { requestGenerateImage, createNewSession, getSessionGenerationStatus, publishSession} from '../models/Session.js';
 
 
 const router = express.Router();
@@ -29,6 +29,8 @@ router.post('/publish', async function(req, res) {
   const sessionData = await publishSession(payload);
   res.json(sessionData);
 });
+
+
 
 // You can add more session-related routes here
 

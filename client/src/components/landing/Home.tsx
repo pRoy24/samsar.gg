@@ -2,6 +2,7 @@ import React from "react";
 import CommonContainer from "../common/CommonContainer.tsx";
 import { useEffect } from "react";
 import EditorHome from "../editor/EditorHome.tsx";
+import ListProduct from "../product/ListProduct.tsx";
 import axios from "axios";
 import { useUser } from "../../contexts/UserContext";
 
@@ -26,10 +27,11 @@ export default function Home() {
   return (
     <CommonContainer>
       <Routes>
-
+        <Route path="/" element={<ListProduct />} />
         <Route path="/session/:id" element={<EditorHome />} />
         {/* Add more routes as needed */}
       </Routes>
+
     </CommonContainer>
   );
 }
