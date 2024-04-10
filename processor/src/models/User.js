@@ -1,6 +1,7 @@
 import { getUsersDB } from '../storage/Documents.js';
 import { v4 as uuidv4 } from 'uuid';
 
+
 export async function setUserData(payload) {
   console.log("SETTING USER");
   console.log(payload);
@@ -28,21 +29,19 @@ export async function setUserData(payload) {
 
 export async function getUserData(fid) {
 
-  console.log("GETTING USER");
-  console.log("UNFORTUNATELY");
-  console.log(fid);
-
   fid = fid.toString();
 
   const db = await getUsersDB();
-
-  console.log("SUCH AN ");
-  
 
   const userData = await db.get(fid);
   // This function should return a session object
   if (userData && userData.value) {
     return userData.value;
   }
+
+}
+
+export async function generateAttestationForUser(payload) {
+  console.log("GENERATING ATTESTATION");
 
 }

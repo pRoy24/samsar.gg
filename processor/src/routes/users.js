@@ -29,6 +29,14 @@ router.get('/profile', async (req, res) => {
   res.send(session);
 });
 
+router.post('/attestation', async (req, res) => {
+  console.log("GETTING ATTESTATION");
+
+  const payload = req.body;
+  const attestation = await generateAttestationForUser(payload);
+  res.send(attestation);
+});
+
 
 
 // You can add more session-related routes here

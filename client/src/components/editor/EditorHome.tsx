@@ -1,4 +1,4 @@
-import React, { useEffect, useState , useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { render } from 'react-dom';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import Konva from 'konva';
@@ -68,11 +68,11 @@ export default function EditorHome() {
         image: dataURL,
         sessionId: id
       }
-      axios.post(`${PROCESSOR_API_URL}/sessions/publish`, sessionPayload).then(function(dataResponse) {
+      axios.post(`${PROCESSOR_API_URL}/sessions/publish`, sessionPayload).then(function (dataResponse) {
         console.log(dataResponse);
-      
+
       })
-      
+
 
     }
   }
@@ -80,18 +80,25 @@ export default function EditorHome() {
 
   return (
     <div>
-      <div className="flex flex-row justify-center h-screen">
-        <div className="basis-5/6">
-          <SMSCanvas ref={canvasRef} sessionDetails={sessionDetails}/>
+
+
+      <div className='flex '>
+        <div className='text-center w-[85%] inline-flex h-[100vh] overflow-scroll'>
+
+          <SMSCanvas ref={canvasRef} sessionDetails={sessionDetails} />
 
         </div>
-        <div className='basis-1/6'>
+
+        <div className='w-[15%] inline-flex bg-green-500 '>
           <EditorToolbar promptText={promptText} setPromptText={setPromptText}
-           submitGenerateRequest={submitGenerateRequest}
-           publishCanvas={publishCanvas} />
+            submitGenerateRequest={submitGenerateRequest}
+            publishCanvas={publishCanvas} />
         </div>
-
       </div>
+
+
+
+
 
     </div>
   )

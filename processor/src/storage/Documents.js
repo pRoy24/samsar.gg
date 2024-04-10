@@ -15,10 +15,11 @@ import 'dotenv/config'
 
 
 
-let GENERATIONS_DB_URL = "/orbitdb/zdpuAwUegzkVbTb4wkEVxVg8MMrhRmb8tsui3h2E7BDUjkJjK"
-let SESSIONS_DB_URL = "/orbitdb/zdpuAwwYGrMnHdcxgFiYwJFURRyJvrphodfSMFEv8iwFS285o"
-let USERS_DB_URL = "/orbitdb/zdpuAstipCiRXpUpRetY8VAc7tRt8nXtfn2bCEH1op3B6yiU7"
-let PRODUCTS_DB_URL = "/orbitdb/zdpuArecSeYybe1FGKYS2ZVJ4xKmHyDG8Ps9fq9Mu6jogKEyC"
+const USERS_DB_URL = "samsar_users"
+const SESSIONS_DB_URL = "samsar_sessions"
+const GENERATIONS_DB_URL = "samsar_generations"
+const PRODUCTS_DB_URL = "samsar_products"
+
 
 let usersDB;
 let generationsdDB;

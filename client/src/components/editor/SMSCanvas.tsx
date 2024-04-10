@@ -15,13 +15,10 @@ const SMSCanvas = forwardRef((props: any, ref) => {
   const imageSrc = `${IMAGE_BASE}/generations/${sessionDetails?.activeSelectedImage}`;
   console.log(imageSrc);
   const [image, status] = useImage(imageSrc, 'anonymous');
-
-
   const [selectedId, selectImage] = React.useState(null);
 
-
   return (
-    <div>
+    <div className="">
 
       <Stage width={STAGE_DIMENSIONS.width} height={STAGE_DIMENSIONS.height} ref={ref}>
         <Layer>

@@ -5,7 +5,7 @@ export default function CommonContainer(props) {
   const { children } = props;
 
   return (
-    <div>
+    <div className='h-[100vh] overflow-hidden'>
       <TopNav />
       <div>
         {children}

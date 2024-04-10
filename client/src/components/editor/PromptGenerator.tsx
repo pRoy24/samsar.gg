@@ -7,7 +7,7 @@ export default function PromptGenerator(props) {
 
   return (
     <div>
-      <h1>PromptGenerator</h1>
+  
       <textarea onChange={(evt) => setPromptText((evt.target.value))}/>
       <div>
         <CommonButton onClick={submitGenerateRequest}>

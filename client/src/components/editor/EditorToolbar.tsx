@@ -3,7 +3,7 @@ import CommonButton from '../common/CommonButton.tsx';
 import PromptGenerator from './PromptGenerator.tsx';
 
 export default function EditorToolbar(props: any) {
-  const { promptText, publishCanvas } = props;
+  const { promptText, publishCanvas , showTemplates} = props;
 
   const [showGenerateDisplay, setShowGenerateDisplay] = useState(false);
 
@@ -21,13 +21,18 @@ export default function EditorToolbar(props: any) {
   }
 
   return (
-    <div className='bg-green-500 h-[100vh]'>
+    <div className='bg-green-500 h-full m-auto'>
       <div>
         <div>
           <CommonButton onClick={toggleShowgenerateDisplay}>
             Generate
           </CommonButton>
           {generateDisplay}
+        </div>
+        <div>
+          <div onClick={showTemplates}>
+            Templates
+          </div>
         </div>
         <div>
           <CommonButton>
