@@ -9,16 +9,16 @@ export async function processPendingImageRequests() {
 
 
   for (let request of pendingRequests) {
+    let requestId;
     try {
 
       let pendingRequestData = request.value;
-      const requestId = pendingRequestData._id;
+      requestId = pendingRequestData._id;
       const prompt = pendingRequestData.prompt;
       console.log(requestId);
       let genDBData = await generationsDB.get(requestId);
       const imageURL = await getImageFromText(prompt);
-      console.log(imageURL);
-      console.log("GERMANS DONT WANT");
+
 
       const genRowValue = genDBData.value;
       const sessionData = await sessionsDB.get(genRowValue.sessionId);
@@ -41,8 +41,6 @@ export async function processPendingImageRequests() {
       }
       sessionDataValue.generations = sessionGenerations;
 
-      console.log("FEEE");
-      console.log(sessionDataValue);
       sessionDataValue._id = genRowValue.sessionId;
       console.log(genRowValue.sessionId);
 
@@ -50,6 +48,7 @@ export async function processPendingImageRequests() {
         await sessionsDB.put(sessionDataValue);
       } catch (e) {
         console.log(e);
+        
       }
       console.log("DELETING GEN ROW");
 
@@ -59,7 +58,13 @@ export async function processPendingImageRequests() {
       console.log(`Processed request ${requestId}`);
     } catch (e) {
       console.log("CAUGHT ERROR");
-
+      if (requestId) {
+        try {
+        await generationsDB.del(requestId);
+        } catch (e) {
+          
+        }
+      }
     }
 
 

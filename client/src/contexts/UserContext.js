@@ -6,7 +6,7 @@ const PROCESSOR_SERVER = process.env.REACT_APP_PROCESSOR_API || 'http://localhos
 // Step 2: Define the User Context
 const UserContext = createContext({
   user: null,
-  setUser: () => { },
+  setUser: (profile) => { },
   getUser: () => { },
   setUserApi: (profile) => { },
   resetUser: () => { },
@@ -37,6 +37,10 @@ export const UserProvider = ({ children }) => {
 
   };
 
+  const setUser= (profile) => {
+    setUserState(profile);
+  }
+
   // Function to retrieve the current user state
   const getUser = () => {
     return user;
@@ -52,6 +56,9 @@ export const UserProvider = ({ children }) => {
     console.log("GETTING PROFILE");
     console.log(fid);
 
+    if (!fid || fid === "undefined" || fid.length === 0) {
+      return null;
+    }
 
     axios.get(`${PROCESSOR_SERVER}/users/profile?fid=${fid}`).then((res) => {
     const userProfile = res.data;
@@ -65,7 +72,7 @@ export const UserProvider = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider value={{ user, setUserApi, getUser, getUserAPI, resetUser }}>
+    <UserContext.Provider value={{ user, setUserApi, getUser, getUserAPI, resetUser, setUser }}>
       {children}
     </UserContext.Provider>
   );

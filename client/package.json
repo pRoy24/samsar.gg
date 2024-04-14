@@ -15,13 +15,16 @@
     "@types/react-dom": "^18.2.24",
     "axios": "^1.6.8",
     "konva": "^9.3.6",
+    "pinata-fdk": "^3.6.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-konva": "^18.2.10",
     "react-konva-utils": "^1.0.6",
+    "react-qr-code": "^2.0.12",
     "react-router-dom": "^6.22.3",
     "react-scripts": "5.0.1",
-    "viem": "^2.9.9",
+    "thirdweb": "^5.4.1",
+    "viem": "^2.9.15",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

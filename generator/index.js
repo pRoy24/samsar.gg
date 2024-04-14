@@ -5,13 +5,10 @@ import { createReplicas } from './src/db.js';
 export async function listenToGenerationRequests() {
   await createReplicas();
 
-
-    console.log("LOGGINGING LISTEN");
-
     await getTimeout(10000);
 
     while (true) {
-      console.log("Processing");
+      console.log("Waiting for records");
       // await createReplicas();
 
       await processPendingImageRequests();

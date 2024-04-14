@@ -2,9 +2,10 @@
 import express from 'express';
 import cors from 'cors';
 import sessionsRouter from './src/routes/sessions.js';
-import productsRouter from './src/routes/products.js';
+import publicationsRouter from './src/routes/publications.js';
 import usersRouter from './src//routes/users.js';
 import adminRouter from './src/routes/admin.js';
+import utilsRouter from './src/routes/utils.js';
 
 import {  createReplicas } from './src/storage/Documents.js';
 const app = express();
@@ -34,8 +35,9 @@ createReplicas();
 
 app.use('/users', usersRouter);
 app.use('/sessions', sessionsRouter);
-app.use('/products', productsRouter);
+app.use('/publications', publicationsRouter);
 app.use('/admin', adminRouter);
+app.use('/utils', utilsRouter);
 
 app.listen(PORT, () => {
   console.log(`Web server running on http://localhost:${PORT}`);

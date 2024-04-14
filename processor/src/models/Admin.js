@@ -1,11 +1,13 @@
-import { getUsersDB, getGenerationsDB, getSessionsDB, getProductsDB } from '../storage/Documents.js';
+import { getUsersDB, getGenerationsDB, getSessionsDB, getPublicationsDB } from '../storage/Documents.js';
+import { getSignersForUser } from '../utils/PinataUtils.js';
+import { createEthSignSchema } from './Attestation.js';
 
 export async function deleteAllRows() {
   // Implement the deleteAllRows function here
   const usersDB = await getUsersDB();
   const generationsDB = await getGenerationsDB();
   const sessionsDB = await getSessionsDB();
-  const productsDB = await getProductsDB();
+  const productsDB = await getPublicationsDB();
 
   const userList = await usersDB.all();
   for (const user of userList) {
@@ -31,16 +33,26 @@ export async function deleteAllRows() {
   }
   console.log("All sessions deleted");
 
-  const productList = await productsDB.all();
+  const productList = await getPublicationsDB.all();
   for (const product of productList) {
     const productId = product.value._id;
     console.log(`Deleting product ${productId}`);
-    await productsDB.del(productId);
+    await getPublicationsDB.del(productId);
   }
-
-
-
   console.log("All rows deleted");
 
+}
 
+export async function updateSigners(fid) {
+  fid = parseInt(fid);
+  const signers = await getSignersForUser(fid);
+  console.log(signers);
+
+}
+
+
+export async function createAttestationSignerSchema() {
+  const resData = await createEthSignSchema();
+  console.log(resData);
+  return  resData;
 }

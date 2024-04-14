@@ -12,14 +12,21 @@
   "license": "ISC",
   "dependencies": {
     "@chainsafe/libp2p-gossipsub": "^13.0.0",
-    "@ethsign/sp-sdk": "^0.3.14",
+    "@ethsign/sp-sdk": "^0.3.19",
+    "@farcaster/hub-nodejs": "^0.11.8",
     "@lighthouse-web3/sdk": "^0.3.0",
+    "@noble/ed25519": "^2.1.0",
     "@orbitdb/core": "^2.1.0",
+    "@witnessco/client": "^0.1.16",
     "blockstore-level": "^1.1.8",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "hat": "^0.0.3",
     "helia": "^4.1.0",
-    "uuid": "^9.0.1"
+    "pinata-fdk": "^3.7.2",
+    "thirdweb": "^5.5.0",
+    "uuid": "^9.0.1",
+    "viem": "^2.9.16"
   }
 }

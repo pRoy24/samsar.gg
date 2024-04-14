@@ -18,12 +18,13 @@ import 'dotenv/config'
 const USERS_DB_URL = "samsar_users"
 const SESSIONS_DB_URL = "samsar_sessions"
 const GENERATIONS_DB_URL = "samsar_generations"
-const PRODUCTS_DB_URL = "samsar_products"
+const PUBLICATIONS_DB_URL = "samsar_publications"
 
 
 let usersDB;
 let generationsdDB;
 let sessionsDB;
+let publicationsDB;
 
 let orbitdb;
 
@@ -64,6 +65,16 @@ export async function getSessionsDB() {
   }
 }
 
+export async function getPublicationsDB() {
+  if (publicationsDB) {
+    return new Promise((resolve) => (resolve(publicationsDB)));
+  } else {
+    const pubDB = await runReplica(3);
+    publicationsDB = pubDB;
+    return publicationsDB;
+
+  }
+}
 
 export async function runReplica(dbIndex) {
     console.log("running replica te" + dbIndex); 
@@ -103,6 +114,8 @@ export async function runReplica(dbIndex) {
       dbAddress = SESSIONS_DB_URL
     } else if (dbIndex === 2) {
       dbAddress = GENERATIONS_DB_URL
+    } else if (dbIndex === 3) {
+      dbAddress = PUBLICATIONS_DB_URL
     }
 
     const libp2p = await createLibp2p({
@@ -186,6 +199,9 @@ export async function runReplica(dbIndex) {
     } else if (dbIndex === 2) {
       generationsdDB = db;
       return generationsdDB;
+    } else if (dbIndex === 3) {
+      publicationsDB = db;
+      return publicationsDB;
     }
 
 }

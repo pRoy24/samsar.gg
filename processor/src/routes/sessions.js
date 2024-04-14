@@ -1,6 +1,8 @@
 
 import express from 'express';
-import { requestGenerateImage, createNewSession, getSessionGenerationStatus, publishSession} from '../models/Session.js';
+import { requestGenerateImage, createNewSession, getSessionGenerationStatus, publishSession,
+  saveIntermediate, getSessionDetails, publishSessionAndSetURI,
+  createAttestation} from '../models/Session.js';
 
 
 const router = express.Router();
@@ -30,6 +32,31 @@ router.post('/publish', async function(req, res) {
   res.json(sessionData);
 });
 
+router.post('/publish_and_set_uri', async function(req, res) {
+  const payload = req.body;
+  const sessionData = await publishSessionAndSetURI(payload);
+  res.json(sessionData);
+});
+
+router.post('/save_intermediate', async function(req, res) {
+  const payload = req.body;
+  const sessionData = await saveIntermediate(payload);
+  res.json(sessionData);
+
+});
+
+router.get('/details', async function(req, res) {
+  const sessionId = req.query.id;
+  const sessionData = await getSessionDetails(sessionId);
+  res.json(sessionData);
+});
+
+router.post('/create_attestation', async function(req, res) {
+  const payload = req.body;
+  const sessionData = await createAttestation(payload);
+  res.json(sessionData);
+
+});
 
 
 // You can add more session-related routes here

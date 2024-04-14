@@ -7,7 +7,7 @@ export default function ListProduct() {
   const [productList, setProductList] = useState([]);
 
   useEffect(() => {
-    axios.get(`${PROCESSOR_SERVER}/products/list`).then(function (response) {
+    axios.get(`${PROCESSOR_SERVER}/publications/list`).then(function (response) {
       console.log(response.data);
       setProductList(response.data);
       

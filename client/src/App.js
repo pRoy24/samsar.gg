@@ -1,6 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { UserProvider } from './contexts/UserContext';
+import { AlertDialogProvider } from './contexts/AlertDialogContext';
 
 import Home from './components/landing/Home.tsx'
 import '@farcaster/auth-kit/styles.css';
@@ -18,11 +19,13 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-      <UserProvider>
-      <AuthKitProvider config={config}>
-        <Home />
-      </AuthKitProvider>
-      </UserProvider>
+        <UserProvider>
+        <AlertDialogProvider>
+          <AuthKitProvider config={config}>
+            <Home />
+          </AuthKitProvider>
+          </AlertDialogProvider>
+        </UserProvider>
       </BrowserRouter>
     </div>
   );

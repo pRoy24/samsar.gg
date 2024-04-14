@@ -18,13 +18,13 @@ import 'dotenv/config'
 const USERS_DB_URL = "samsar_users"
 const SESSIONS_DB_URL = "samsar_sessions"
 const GENERATIONS_DB_URL = "samsar_generations"
-const PRODUCTS_DB_URL = "samsar_products"
+const PUBLICATIONS_DB_URL = "samsar_publications"
 
 
 let usersDB;
 let generationsdDB;
 let sessionsDB;
-let productsDB;
+let publicationsDB;
 
 let orbitdb;
 
@@ -64,13 +64,13 @@ export async function getSessionsDB() {
   }
 }
 
-export async function getProductsDB() {
-  if (productsDB) {
-    return new Promise((resolve) => (resolve(productsDB)));
+export async function getPublicationsDB() {
+  if (publicationsDB) {
+    return new Promise((resolve) => (resolve(publicationsDB)));
   } else {
-    const productDB = await runReplica(3);
-    productsDB = productDB;
-    return productsDB;
+    const publicationsDB = await runReplica(3);
+    publicationsDB = publicationsDB;
+    return publicationsDB;
 
   }
 }
@@ -115,7 +115,7 @@ export async function runReplica(dbIndex) {
     } else if (dbIndex === 2) {
       dbAddress = GENERATIONS_DB_URL
     } else if (dbIndex === 3) {
-      dbAddress = PRODUCTS_DB_URL
+      dbAddress = PUBLICATIONS_DB_URL
     }
 
     const libp2p = await createLibp2p({
@@ -125,11 +125,11 @@ export async function runReplica(dbIndex) {
     })
     const blockstore = new LevelBlockstore(`./ipfs/2_${dbIndex}/blocks`)
     const ipfs = await createHelia({ blockstore: blockstore, libp2p: libp2p, blockBrokers: [bitswap()] })
-    const identities = await Identities({ ipfs, path: `~/orbitdb/2_${dbIndex}/identities` })
+    const identities = await Identities({ ipfs, path: `./orbitdb/2_${dbIndex}/identities` })
     const id = "2"
     const identity = identities.createIdentity({ id })
   
-    orbitdb = await createOrbitDB({ ipfs: ipfs, identities, id: `2`, directory: `~/orbitdb/2_${dbIndex}` })
+    orbitdb = await createOrbitDB({ ipfs: ipfs, identities, id: `2`, directory: `./orbitdb/2_${dbIndex}` })
   
     let db = await orbitdb.open(dbAddress,
       {
@@ -200,10 +200,9 @@ export async function runReplica(dbIndex) {
       generationsdDB = db;
       return generationsdDB;
     } else if (dbIndex === 3) {
-      productsDB = db;
-      return productsDB;
+      publicationsDB = db;
+      return publicationsDB;
     }
-
 }
 
 export async function createReplicas() {

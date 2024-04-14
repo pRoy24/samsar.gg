@@ -1,9 +1,11 @@
 import React from "react";
+import Landing from "@/app/components/home/Landing";
+import '@/app/globals.css';
 
 export default function Index() {
   return (
     <div>
-      <h1>Index Page</h1>
+      <Landing />
     </div>
   )
 }

@@ -1,16 +1,12 @@
 import express from 'express';
-import { setUserData, getUserData } from '../models/User.js';
+import { setUserData, getUserData, createSponsoredSigner, pollSignerForUser } from '../models/User.js';
 
 const router = express.Router();
 
 
 router.post('/set_user', async (req, res) => {
-  console.log("SETTING USER");
-
   try {
     const payload = req.body;
-    console.log(payload);
-
     const session = await setUserData(payload);
 
     res.send(session);
@@ -22,19 +18,29 @@ router.post('/set_user', async (req, res) => {
 
 
 router.get('/profile', async (req, res) => {
-  console.log("GETTING USER");
-  
   const fid = req.query.fid;
   const session = await getUserData(fid);
   res.send(session);
 });
 
 router.post('/attestation', async (req, res) => {
-  console.log("GETTING ATTESTATION");
-
   const payload = req.body;
   const attestation = await generateAttestationForUser(payload);
   res.send(attestation);
+});
+
+
+router.post('/create_signer', async (req, res) => {
+  const payload = req.body;
+  const signerData = await createSponsoredSigner(payload);
+  res.json(signerData);
+});
+
+
+router.post('/poll_signer', async (req, res) => {
+  const payload = req.body;
+  const responseData = await pollSignerForUser(payload);
+  res.json(responseData);
 });
 
 
