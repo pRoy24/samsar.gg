@@ -14,7 +14,7 @@ const PORT = 3002;
 
 
 
-app.use(express.json({ limit: '50mb' })); 
+app.use(express.json({ limit: '50mb', extended: true  })); 
 
 // CORS options
 const corsOptions = {
