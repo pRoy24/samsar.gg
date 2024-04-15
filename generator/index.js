@@ -1,4 +1,6 @@
-import { resolve } from 'path';
+import { EventEmitter } from 'events';
+EventEmitter.defaultMaxListeners = 100;
+
 import { processPendingImageRequests } from './src/Image.js';
 import { createReplicas } from './src/Database.js';
 
