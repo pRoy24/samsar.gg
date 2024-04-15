@@ -39,8 +39,6 @@ pnpm-debug.log
 **/test-results.json
 
 **/assets/
-**/public/
-
 
 **/.DS_Store
 
