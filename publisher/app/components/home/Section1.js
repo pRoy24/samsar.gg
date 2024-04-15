@@ -38,7 +38,7 @@ export default function Section1(props) {
 
               </span>
               <span className='inline-block'>
-                <img src={'./ethGlobal.svg'} className="inline-flex ml-2 h-[58px] mt-[-10px]" />
+                <img src={'/ethGlobal.svg'} className="inline-flex ml-2 h-[58px] mt-[-10px]" />
               </span>
             </div>
           </div>

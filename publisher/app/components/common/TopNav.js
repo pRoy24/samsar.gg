@@ -8,9 +8,7 @@ export default function TopNav() {
          <img src={'./logo.png'} />
         </div>
         <div>
-
-
-
+          
         </div>
       </div>
     </div>
