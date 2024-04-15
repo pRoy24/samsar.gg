@@ -5,7 +5,7 @@ export default function TopNav() {
     <div className='bg-green-600 h-[50px]'>
       <div className='grid grid-cols-4'>
         <div>
-         <img src={'logo.png'} />
+         <img src={'./logo.png'} />
         </div>
         <div>
 
