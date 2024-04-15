@@ -1,4 +1,4 @@
-import { getGenerationsDB, getSessionsDB } from './db.js';
+import { getGenerationsDB, getSessionsDB } from './Database.js';
 import { getImageFromText } from './OpenAI.js';
 export async function processPendingImageRequests() {
   

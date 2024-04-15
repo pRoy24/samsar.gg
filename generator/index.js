@@ -1,6 +1,6 @@
 import { resolve } from 'path';
 import { processPendingImageRequests } from './src/Image.js';
-import { createReplicas } from './src/db.js';
+import { createReplicas } from './src/Database.js';
 
 export async function listenToGenerationRequests() {
   await createReplicas();
