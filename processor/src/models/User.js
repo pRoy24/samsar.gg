@@ -20,8 +20,8 @@ export async function setUserData(payload) {
 
   if (!userExistsData) {
     payload.attesterPrivateKey = generateAttesterPrivateKey();
-    await db.put(userInit);
-    return userInit;
+    await db.put(payload);
+    return payload;
   } else {
     const userExistsDataValue = userExistsData.value;
     if (!userExistsDataValue.attesterPrivateKey) {
