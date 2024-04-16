@@ -24,37 +24,6 @@ export default function Page(props) {
   }
   return (
     <div>
-      <Head>
-        <FrameMetadata
-          buttons={[
-            {
-              label: 'Mint',
-              action: 'tx',
-              target: `${HOST_URL}/api/frame/get-mint-tx`
-            },
-            {
-              label: 'Burn',
-              action: 'tx',
-              target: `${HOST_URL}/api/frame/get-burn-tx`
-            },
-            {
-              label: 'Info',
-              action: 'post_redirect',
-            },
-          ]}
-          image={{
-            src: imgSrc,
-            aspectRatio: '1:1'
-          }}
-          state={{
-            counter: 1,
-          }}
-
-        />
-      </Head>
-
-  
-
           <PublicationHome meta={meta} />
  
     </div>
