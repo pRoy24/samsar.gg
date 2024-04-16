@@ -15,7 +15,8 @@ const IPFS_BASE = 'https://cloudflare-ipfs.com/ipfs/';
 export default function Page(props) {
 
   const { meta } = props;
-
+  const IPFS_BASE = 'https://cloudflare-ipfs.com/ipfs/';
+  
   return (
     <div>
       <Head>
@@ -43,7 +44,6 @@ export default function Page(props) {
           state={{
             counter: 1,
           }}
-          postUrl="https://zizzamia.xyz/api/frame"
         />
       </Head>
 
