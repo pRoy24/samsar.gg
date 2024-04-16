@@ -11,6 +11,7 @@ import { useAlertDialog } from '../../contexts/AlertDialogContext.js';
 import SelectTemplate from './SelectTemplate.tsx';
 import AttestationDialog from './utils/AttestationDialog.tsx';
 import PublishDialog from './utils/PublishDialog.tsx';
+import CommonContainer from '../common/CommonContainer.tsx';
 
 const PUBLISHER_URL = process.env.REACT_APP_PUBLISHER_URL;
 
@@ -278,6 +279,9 @@ export default function EditorHome() {
     )
   }
   return (
+    <CommonContainer>
+
+   
     <div className='m-auto'>
 
 
@@ -312,5 +316,6 @@ export default function EditorHome() {
 
 
     </div>
+    </CommonContainer>
   )
 }

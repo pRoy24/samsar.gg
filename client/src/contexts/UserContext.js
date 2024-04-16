@@ -10,8 +10,9 @@ const UserContext = createContext({
   getUser: () => { },
   setUserApi: (profile) => { },
   resetUser: () => { },
-  getUserAPI: () => ({ user: null })
-  
+  getUserAPI: () => ({ user: null }),
+  userFetching: false
+
 
 });
 
@@ -19,25 +20,30 @@ const UserContext = createContext({
 export const UserProvider = ({ children }) => {
 
   const [user, setUserState] = useState(null);
+  const [userFetching, setUserFetching] = useState(false);
 
 
   // Function to update the user state
   const setUserApi = (profile) => {
 
-   axios.post(`${PROCESSOR_SERVER}/users/set_user`, profile).then((res) => {
-    const userProfile = res.data;
-    console.log(userProfile);
-    
-    localStorage.setItem('fid', userProfile.fid);
-    setUserState(userProfile);
+
+    axios.post(`${PROCESSOR_SERVER}/users/set_user`, profile).then((res) => {
+      const userProfile = res.data;
+      console.log(userProfile);
+
+      localStorage.setItem('fid', userProfile.fid);
+      setUserState(userProfile);
+
 
     }).catch((err) => {
+      console.log(err);
+
 
     });
 
   };
 
-  const setUser= (profile) => {
+  const setUser = (profile) => {
     setUserState(profile);
   }
 
@@ -53,26 +59,29 @@ export const UserProvider = ({ children }) => {
 
   const getUserAPI = () => {
     let fid = localStorage.getItem("fid");
-    console.log("GETTING PROFILE");
-    console.log(fid);
+
 
     if (!fid || fid === "undefined" || fid.length === 0) {
       return null;
     }
 
+    setUserFetching(true);
     axios.get(`${PROCESSOR_SERVER}/users/profile?fid=${fid}`).then((res) => {
-    const userProfile = res.data;
-    setUserState(userProfile);
-    localStorage.setItem('fid', userProfile.fid);
-    return userProfile;
+      const userProfile = res.data;
+      setUserState(userProfile);
+      localStorage.setItem('fid', userProfile.fid);
+      setUserFetching(false);
+      return userProfile;
 
     }).catch((err) => {
+      
+      setUserFetching(false);
 
     });
   }
 
   return (
-    <UserContext.Provider value={{ user, setUserApi, getUser, getUserAPI, resetUser, setUser }}>
+    <UserContext.Provider value={{ user, setUserApi, getUser, getUserAPI, resetUser, setUser, userFetching }}>
       {children}
     </UserContext.Provider>
   );
