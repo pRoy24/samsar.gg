@@ -16,11 +16,47 @@ export default function Page(props) {
 
   const { meta } = props;
 
+  console.log(meta);
+  console.log(IPFS_BASE);
+  let imgSrc = ``;
+  if (meta.imageHash) {
+    imgSrc = `${IPFS_BASE}${meta.imageHash}`;
+  }
   return (
     <div>
+      <Head>
+        <FrameMetadata
+          buttons={[
+            {
+              label: 'Mint',
+              action: 'tx',
+              target: `${HOST_URL}/api/frame/get-mint-tx`
+            },
+            {
+              label: 'Burn',
+              action: 'tx',
+              target: `${HOST_URL}/api/frame/get-burn-tx`
+            },
+            {
+              label: 'Info',
+              action: 'post_redirect',
+            },
+          ]}
+          image={{
+            src: imgSrc,
+            aspectRatio: '1:1'
+          }}
+          state={{
+            counter: 1,
+          }}
 
-      <PublicationHome meta={meta} />
+        />
+      </Head>
 
+  
+
+          <PublicationHome meta={meta} />
+ 
     </div>
   )
 
