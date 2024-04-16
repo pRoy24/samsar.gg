@@ -1,5 +1,6 @@
 import React from 'react';
 import CommonContainer from '../common/CommonContainer.js';
+const IPFS_BASE = 'https://cloudflare-ipfs.com/ipfs/';
 
 export default function PublicationHome(props) {
   const { meta } = props;
