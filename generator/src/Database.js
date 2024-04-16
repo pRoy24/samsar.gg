@@ -114,8 +114,6 @@ export async function runReplica(dbIndex) {
       dbAddress = SESSIONS_DB_URL
     } else if (dbIndex === 2) {
       dbAddress = GENERATIONS_DB_URL
-    } else if (dbIndex === 3) {
-      dbAddress = PUBLICATIONS_DB_URL
     }
 
     const libp2p = await createLibp2p({
@@ -199,10 +197,7 @@ export async function runReplica(dbIndex) {
     } else if (dbIndex === 2) {
       generationsdDB = db;
       return generationsdDB;
-    } else if (dbIndex === 3) {
-      publicationsDB = db;
-      return publicationsDB;
-    }
+    } 
 
 }
 
@@ -217,7 +212,7 @@ async function handleTerminationSignal() {
   console.info('received termination signal, cleaning up and exiting...');
 
   try {
-    await generationdDB.close()
+    await generationsdDB.close()
   } catch (e) {
 
   }

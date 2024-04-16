@@ -1,79 +1,75 @@
-import React, { forwardRef, useRef, useEffect } from "react";
+import React, { forwardRef, useRef, useEffect , useState} from "react";
 import { Stage, Layer, Star, Text, Image, Transformer } from 'react-konva';
 import { useImage } from 'react-konva-utils';
+import ResizableImage from "./ResizableImage.tsx";
+import ResizableText from "./ResizableText.tsx";
 const IMAGE_BASE = `${process.env.REACT_APP_PROCESSOR_API}`;
 
 const STAGE_DIMENSIONS = {
-  width: 1048,
-  height: 1048,
+  width: 1080,
+  height: 1080,
 }
 
 
 
-const SMSCanvas = forwardRef((props: any, ref) => {
-  const { sessionDetails } = props;
+const SMSCanvas = forwardRef((props: any, ref: any) => {
+  const { sessionDetails, activeItemList } = props;
   const imageSrc = `${IMAGE_BASE}/generations/${sessionDetails?.activeSelectedImage}`;
-  console.log(imageSrc);
   const [image, status] = useImage(imageSrc, 'anonymous');
-  const [selectedId, selectImage] = React.useState(null);
+  const [selectedId, selectImage] = useState(null);
+
+  const handleStageClick = (e) => {
+    // Check if the click is on empty stage area
+    if (e.target === e.target.getStage()) {
+      selectImage(null); // Deselect any selected image
+    }
+  };
+
+  let imageStackList = <span />;
+  if (activeItemList && activeItemList.length > 0) {
+    imageStackList = activeItemList.map(function(item, index){
+      if (item.type === 'image') {
+        return (
+          <ResizableImage
+          key={index}
+          image={item}
+          isSelected={selectedId === item.id}
+          onSelect={() => selectImage(item.id)}
+          onUnselect={() => selectImage(null)}
+        />
+        )
+      } else if (item.type === 'text') {
+        console.log("INVOKE THE TEXT");
+        console.log(item);
+        
+        return (
+          <ResizableText 
+          key={index}
+          text={item.text}
+          isSelected={selectedId === item.id}
+          onSelect={() => selectImage(item.id)}
+          onUnselect={() => selectImage(null)}
+          />
+        )
+      }
+    }).filter(Boolean);
+  }
 
   return (
-    <div className="">
-
-      <Stage width={STAGE_DIMENSIONS.width} height={STAGE_DIMENSIONS.height} ref={ref}>
+    <div className="m-auto">
+      <Stage
+        width={STAGE_DIMENSIONS.width}
+        height={STAGE_DIMENSIONS.height}
+        ref={ref}
+        onMouseDown={handleStageClick}  // Listen for mouse down events on the stage
+      >
         <Layer>
-          {
-            image &&
-
-            <URLImage
-              image={{ src: imageSrc }}
-              x={20}
-              y={20}
-              isSelected={selectedId === 'unique-id'}
-              onSelect={() => {
-                selectImage('unique-id');
-              }}
-            />
-
-
-          }
+          {imageStackList}
 
         </Layer>
       </Stage>
-
     </div>
   );
 });
-
-
-
-const URLImage = ({ image, isSelected, onSelect, ...props }) => {
-  const [img] = useImage(image.src, "anonymous");
-  const shapeRef = useRef();
-  const trRef = useRef();
-
-  useEffect(() => {
-    if (isSelected) {
-      // we need to attach transformer manually
-      trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer().batchDraw();
-    }
-  }, [isSelected]);
-
-  return (
-    <>
-      <Image
-        {...props}
-        image={img}
-        ref={shapeRef}
-        onClick={onSelect}
-        onTap={onSelect}
-        draggable
-      />
-      {isSelected && <Transformer ref={trRef} />}
-    </>
-  );
-};
-
 
 export default SMSCanvas;

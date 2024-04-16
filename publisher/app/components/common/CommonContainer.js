@@ -4,7 +4,7 @@ import TopNav from './TopNav';
 export default function CommonContainer(props) {
   const { children } = props;
   return (
-    <div className="">
+    <div className="font-sans">
       <TopNav />
       {children}
     </div>

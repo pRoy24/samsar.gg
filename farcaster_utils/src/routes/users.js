@@ -1,5 +1,6 @@
 import express from 'express';
 import {getFidFromUsername, createDeveloperAccount , viewAccountDetails, updateUsername} from '../models/User.js';
+import { uploadTemplateFolder } from '../models/Pinata.js';
 
 const router = express.Router();
 
@@ -47,6 +48,19 @@ router.post('/update_username', async function(req, res) {
     res.send({});
   }
 });
+
+
+router.get('/upload_templates', async function(req, res) {
+  try {
+    console.log("uploading temTTTpaltes");
+    await uploadTemplateFolder();
+    res.send({status: 'success'});
+  } catch (e) {
+
+  }
+});
+
+
 
 // You can add more session-related routes here
 

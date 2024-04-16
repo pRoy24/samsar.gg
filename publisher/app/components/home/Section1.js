@@ -6,34 +6,32 @@ export default function Section1(props) {
   return (
     <div className="flex align-center m-auto ">
       <div className="w-full">
-        <div className="text-[30px] text-center mt-[20px] mb-8">
-          <span className='text-green-700 font-bold'>S</span>ociety for&nbsp;
-          <span className='text-green-700 font-bold'>A</span>dvanced&nbsp;
-          <span className='text-green-700 font-bold'>M</span>emery,&nbsp;
-          <span className='text-green-700 font-bold'>S</span>hitposting,&nbsp;
-          <span className='text-green-700 font-bold'>A</span>nalytics and&nbsp;
-          <span className='text-green-700 font-bold'>R</span>easoning&nbsp;
+        <div className="text-[32px] text-center mt-16 mb-8 font-serif italic">
+          <span className='text-green-700 font-bold italic'>S</span>ociety for&nbsp;
+          <span className='text-green-700 font-bold italic'>A</span>dvancement of&nbsp;
+          <span className='text-green-700 font-bold italic'>M</span>emery,&nbsp;
+          <span className='text-green-700 font-bold italic'>S</span>hitposting,&nbsp;
+          <span className='text-green-700 font-bold italic'>A</span>nalytics and&nbsp;
+          <span className='text-green-700 font-bold italic'>R</span>easoning&nbsp;
         </div>
-        <div className='w-[400px] m-auto align-center text-center'>
- 
-            <button className='bg-gray-200 rounded-lg w-full h-[80px] shadow-lg' onClick={gotoCreatorApp}>
-              <div className='text-xl font-bold '>
+        <div className='w-[400px] m-auto align-center text-center mt-16 mb-16'>
+          <button className='bg-green-900 rounded-lg w-full h-[80px] shadow-lg text-neutral-100 hover:bg-green-950' onClick={gotoCreatorApp}>
+            <div className='text-xl font-bold '>
               Go To App <FaExternalLinkAlt className="inline-block ml-2" />
               <div className='text-xs font-normal'>
                 Pre-alpha release. For testing only.
               </div>
-              </div>
-             
-            </button>
-     
-        </div>
-        <div className='w-[400px] m-auto align-center text-center'>
+            </div>
 
-          <div className="text-lg mt-8 text-center mb-2">
+          </button>
+
+        </div>
+        <div className='w-[400px] m-auto align-center text-center mt-8'>
+          <div className="text-lg text-center mb-2">
             <div className='block'>
               <span className="text-[28px] inline-block">
                 <div className='mt-2'>
-                  Participant in
+                  Participating in
                 </div>
 
               </span>
@@ -63,7 +61,30 @@ export default function Section1(props) {
             </div>
 
             <div className='mt-2'>
+              <div className='font-bold'>
+                In the following tracks-
+              </div>
+              <div className='grid grid-cols-4 cols-gap-1 mt-2'>
+                <div>
+                  <img src={`./partner/arbitrum.png`} className='w-[60px] m-auto  ' />
+                </div>
+                <div>
+                  <img src={`./partner/filecoin.jpeg`} className='w-[60px] m-auto' />
+                </div>
+                <div>
+                  <img src={`./partner/gnosis.png`} className='w-[60px] m-auto' />
+                </div>
+                <div>
+                  <img src={`./partner/witness.png`} className='w-[80px] m-auto mt-[-20px]' />
 
+                </div>
+                <div>
+                  <img src={`./partner/curvegrid.png`} className='w-[60px] m-auto' />
+                </div>
+                <div>
+                  <img src={`./partner/sign.svg`} className='w-[60px] m-auto mt-[20px]' />
+                </div>
+              </div>
             </div>
 
           </div>
@@ -112,7 +133,7 @@ function CountdownTimer({ targetDate }) {
     <div className='text-[14px]  text-gray-950 leading-[1em]'>
       <div className=''>
         <span className='font-bold '>
-        {timeLeft}
+          {timeLeft}
         </span> to deadline
       </div>
     </div>

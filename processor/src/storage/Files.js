@@ -34,11 +34,13 @@ export async function uploadImageToFileSystem(imageFile, imageName) {
 
   const imageData = decodeBase64Image(imageFile);
 
-  const imageBaseDirectory = './assets/generations/';
+  const imageBaseDirectory = './assets/intermediates/';
+  if (!fs.existsSync(imageBaseDirectory)) {
+    fs.mkdirSync(imageBaseDirectory, { recursive: true });
+  }
+
   const imageFileName = `${imageBaseDirectory}${imageName}`;
-  fs.writeFileSync(imageFileName, imageData);
-  console.log(imageFileName);
-  
+  fs.writeFileSync(imageFileName, imageData);  
   return imageFileName;
   
 }

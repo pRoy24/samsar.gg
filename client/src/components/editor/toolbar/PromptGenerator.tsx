@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import CommonButton from "../common/CommonButton.tsx";
-import axios from "axios";
+import CommonButton from "../../common/CommonButton.tsx";
+
 
 export default function PromptGenerator(props) {
   const { promptText, setPromptText, submitGenerateRequest } = props;

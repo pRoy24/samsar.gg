@@ -134,7 +134,7 @@ export default function TopNav() {
           <h1>{user.displayName}</h1>
         </div>
 
-        <img src={user.pfpUrl} alt={user.username} className='w-[60px] rounded-[50%] inline-flex' />
+        <img src={user.pfpUrl} alt={user.username} className='w-[50px] rounded-[50%] inline-flex' />
       </div>
     );
   } else {
@@ -160,7 +160,7 @@ export default function TopNav() {
   }
 
   return (
-    <div className='bg-emerald-500 h-[60px]'>
+    <div className='bg-green-600 h-[50px]'>
       <div className='grid grid-cols-4'>
         <div>
           <h1>SAMSAR</h1>

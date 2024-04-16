@@ -9,4 +9,7 @@ export function getChainByKey(chainKey) {
   return CHAIN_DEFINITIONS.find((chain) => chain.key === chainKey);
 }
 
+export function getChainById(chainId) {
+  return CHAIN_DEFINITIONS.find((chain) => chain.id === chainId);
+}
 

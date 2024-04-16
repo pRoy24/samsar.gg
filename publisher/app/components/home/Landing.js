@@ -10,6 +10,7 @@ export default function Landing() {
     <div>
       <CommonContainer>
        <Section1 gotoCreatorApp={gotoCreatorApp}/>
+     
       </CommonContainer>
     </div>
   )

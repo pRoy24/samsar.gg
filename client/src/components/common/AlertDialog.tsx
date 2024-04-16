@@ -24,7 +24,8 @@ export function AlertDialog(props) {
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="my-modal"
     style={{zIndex: 100}}>
       
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-slate-800">
+      <div className="relative top-20 mx-auto pt-1 pb-5 p-5 border w-96 shadow-lg rounded-md bg-neutral-100">
+
         <button 
           className="absolute top-2 right-2 text-gray-400 hover:text-gray-500 focus:outline-none"
           onClick={closeAlertDialog}
@@ -37,7 +38,8 @@ export function AlertDialog(props) {
             />
           </svg>
         </button>
-        <div className="mt-3 text-center">
+
+        <div className="mt-1 text-center">
             {alertDialogContent}
         </div>
       </div>

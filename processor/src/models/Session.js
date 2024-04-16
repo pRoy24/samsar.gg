@@ -5,7 +5,7 @@ import hat from 'hat';
 import { uploadImageToIpfs, uploadImageToFileSystem, uploadMetadataToIpfs } from "../storage/Files.js";
 import { generateWitnessForFile, createEthSignAttestation } from './Attestation.js';
 import { setUrlForNextToken, mintTokensForCreator } from './Contract.js';
-import { getChainByKey } from './Utility.js';
+import { getChainById } from './Utility.js';
 
 
 import { getNFTMetaData } from './Metadata.js';
@@ -95,7 +95,7 @@ export async function saveIntermediate(payload) {
 
   const random_string = hat();
   // Generate a new image name and upload the image
-  const imageName = `${sessionDataValue._id}_${random_string}`;
+  const imageName = `${sessionDataValue._id}_${random_string}.png`;
   const imageData = payload.image;
   const imageFile = await uploadImageToFileSystem(imageData, imageName);
 
@@ -114,7 +114,9 @@ export async function saveIntermediate(payload) {
 
   // Save the updated intermediates back to the database
   sessionDataValue.intermediates = intermediates;
+  sessionDataValue.activeSelectedImage = imageName;
   await db.put(sessionDataValue);
+
 }
 
 async function updateWitnessForIntermediate(sessionId, imageName, imageData) {
@@ -216,9 +218,13 @@ export async function publishSessionAndSetURI(payload) {
   const publicationsDB = await getPublicationsDB();
 
 
-  const selectedChainKey = payload.selectedChain;
+  const selectedChainId = payload.selectedChain;
 
-  const chain = getChainByKey(selectedChainKey);
+  console.log(selectedChainId);
+
+  const chain = getChainById(selectedChainId);
+
+
   const publicationId = `${chain.id}_${tokenId}`;
 
   console.log("PUBLICATION ID", publicationId);
@@ -236,10 +242,6 @@ export async function publishSessionAndSetURI(payload) {
     creatorInitAllocation: allocation
 
   }
-
-  console.log(publicationsPayload);
-  console.log("ME NE SEEE TEE SERR");
-
 
   await publicationsDB.put(publicationsPayload);
 
