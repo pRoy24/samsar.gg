@@ -7,11 +7,12 @@ import Home from './components/landing/Home.tsx'
 import '@farcaster/auth-kit/styles.css';
 import { AuthKitProvider } from '@farcaster/auth-kit';
 import { BrowserRouter } from 'react-router-dom';
+const RPC_URL = process.env.REACT_APP_RPC_URL;
 
 const config = {
-  rpcUrl: 'https://optimism-mainnet.infura.io/v3/cbf1c4121d61444f826aa0d9e29697fa',
-  domain: 'samsaraboard.com',
-  siweUri: 'https://samsaraboard.com/login',
+  rpcUrl: RPC_URL,
+  domain: 'samsar.gg',
+  siweUri: 'https://samsr.gg/',
 };
 
 

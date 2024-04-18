@@ -22,7 +22,7 @@ export default function TopNav() {
     <div className='bg-gradient-to-r from-green-700 to-green-400  h-[50px]'>
       <div className='grid grid-cols-4'>
         <div>
-         <img src={'./logo.png'} />
+         <img src={'/logo.png'} />
         </div>
         <div>
           

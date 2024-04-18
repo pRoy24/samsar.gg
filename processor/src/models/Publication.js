@@ -7,9 +7,12 @@ export async function getPublicationsList() {
 }
 
 export async function getPublicationMeta(publicationId) {
+  try {
   const db = await getPublicationsDB();
   const publication = await db.get(publicationId);
   const publicationValue = publication.value;
   console.log(publicationValue);
   return publicationValue;
+  } catch (error) {
+  }
 }

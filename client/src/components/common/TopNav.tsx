@@ -16,6 +16,7 @@ export default function TopNav() {
 
 
   const { user } = useUser();
+  const navigate = useNavigate();
 
 
 
@@ -38,14 +39,17 @@ export default function TopNav() {
 
   }
 
+  const gotoHome = () => {
+    navigate('/');
+  }
   let addFarcasterWallet = <span />;
 
 
   return (
-    <div className='bg-gradient-to-r from-green-700 to-green-400  h-[50px]'>
+    <div className='bg-gradient-to-r from-green-700 to-green-400  h-[50px] fixed w-[100vw] shadow-lg z-10'>
       <div className='grid grid-cols-4'>
         <div>
-        <img src={'/logo.png'} />
+        <img src={'/logo.png'} className='cursor-pointer' onClick={() => gotoHome()} />
         </div>
         <div>
 

@@ -2,6 +2,7 @@
 import express from 'express';
 import { requestGenerateImage, createNewSession, getSessionGenerationStatus, publishSession,
   saveIntermediate, getSessionDetails, publishSessionAndSetURI,
+  requestOutpaintImage, getSessionOutpaintStatus,
   createAttestation} from '../models/Session.js';
 
 
@@ -20,11 +21,18 @@ router.post('/request_generate', async function(req, res) {
   res.json(sessionData);
 });
 
+router.post('/request_outpaint', async function(req, res) {
+  const payload = req.body;
+  const sessionData = await requestOutpaintImage(payload);
+  res.json(sessionData);
+});
+
 router.get('/generate_status', async function(req, res) {
   const sessionId = req.query.id;
   const sessionData = await getSessionGenerationStatus(sessionId);
   res.json(sessionData);
 });
+
 
 router.post('/publish', async function(req, res) {
   const payload = req.body;

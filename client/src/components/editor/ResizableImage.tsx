@@ -8,6 +8,7 @@ export default function ResizableImage({ image, isSelected, onSelect, onUnselect
   const [img] = useImage(image.src, "anonymous");
   const shapeRef = useRef();
   const trRef = useRef();
+  const { showMask } = props;
 
   const imageDimensions = {
     width: img?.width,
@@ -38,7 +39,7 @@ export default function ResizableImage({ image, isSelected, onSelect, onUnselect
         }}
         scaleX={scalingFactor}
         scaleY={scalingFactor}
-        draggable
+        draggable={showMask ?  false : true}
       />
       {isSelected && <Transformer ref={trRef} />}
     </>

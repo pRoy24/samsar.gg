@@ -30,15 +30,11 @@ export async function uploadImageToIpfs(fileData) {
 
 
 export async function uploadImageToFileSystem(imageFile, imageName) {
-
-
   const imageData = decodeBase64Image(imageFile);
-
   const imageBaseDirectory = './assets/intermediates/';
   if (!fs.existsSync(imageBaseDirectory)) {
     fs.mkdirSync(imageBaseDirectory, { recursive: true });
   }
-
   const imageFileName = `${imageBaseDirectory}${imageName}`;
   fs.writeFileSync(imageFileName, imageData);  
   return imageFileName;
@@ -48,15 +44,31 @@ export async function uploadImageToFileSystem(imageFile, imageName) {
 export async function uploadMetadataToIpfs(payload) {
   try {
     const metadata = JSON.stringify(payload);
-    console.log("METADATA");
-    console.log(metadata);
-
     const uploadResponse = await lighthouse.uploadText(metadata, LT_API_KEY)
-    console.log("UPLOADED METADATA TO IPFS");
-    console.log(uploadResponse);
-
     return uploadResponse;
   } catch (error) {
     console.log(error);
   }
+}
+
+export async function uploadTempEditImageToFileSystem(payload) {
+  const imageData = decodeBase64Image(payload.image);
+  const maskImageData = decodeBase64Image(payload.maskImage);
+  const imageBaseDirectory = './assets/temp/';
+  if (!fs.existsSync(imageBaseDirectory)) {
+    fs.mkdirSync(imageBaseDirectory, { recursive: true });
+  }
+
+  const imageName = `${payload.sessionId}_edit.png`;
+  const imageFileName = `${imageBaseDirectory}${imageName}`;
+  fs.writeFileSync(imageFileName, imageData);
+
+  const maskImageName = `${payload.sessionId}_mask.png`;
+  const maskImageFileName = `${imageBaseDirectory}${maskImageName}`;
+  fs.writeFileSync(maskImageFileName, maskImageData);
+  return {
+    image: imageName,
+    maskImage: maskImageName
+  }
+
 }

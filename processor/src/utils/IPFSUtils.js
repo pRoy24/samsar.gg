@@ -10,8 +10,6 @@ const pinata = new pinataSDK({ pinataJWTKey: PINATA_JWT});
 
 export async function getPinnedTemplatesList() {
 
-  console.log("GETTIN ITEM LIST");
-
   try {
 
     const filters = {
@@ -22,12 +20,9 @@ export async function getPinnedTemplatesList() {
             op: "eq"
         }
       }
-    }
+    },
+    pageLimit: 50,
   }
-
-    console.log(filters);
-
-
 
     const fileList = await pinata.pinList(filters)
 

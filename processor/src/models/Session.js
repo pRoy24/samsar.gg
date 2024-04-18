@@ -1,6 +1,6 @@
 import { getSessionsDB, getPublicationsDB, getUsersDB } from "../storage/Documents.js";
 import { v4 as uuidv4 } from 'uuid';
-import { addImageGeneratorRequest } from "./Images.js";
+import { addImageGeneratorRequest , addImageOutpaintRequest } from "./Images.js";
 import hat from 'hat';
 import { uploadImageToIpfs, uploadImageToFileSystem, uploadMetadataToIpfs } from "../storage/Files.js";
 import { generateWitnessForFile, createEthSignAttestation } from './Attestation.js';
@@ -30,8 +30,6 @@ export async function createNewSession(payload) {
 
 export async function requestGenerateImage(payload) {
   const db = await getSessionsDB();
-
-
   const sessionId = payload.sessionId;
   const sessionData = await db.get(sessionId);
 
@@ -43,7 +41,23 @@ export async function requestGenerateImage(payload) {
   sessionDataValue.prompt = payload.prompt;
   await addImageGeneratorRequest(payload);
   await db.put(sessionDataValue);
+  return sessionDataValue;
+}
 
+export async function requestOutpaintImage(payload) {
+  const db = await getSessionsDB();
+  const sessionId = payload.sessionId;
+  const sessionData = await db.get(sessionId);
+
+  if (!sessionData) {
+    return;
+  }
+  const sessionDataValue = sessionData.value;
+  sessionDataValue.outpaintStatus = "PENDING";
+  sessionDataValue.prompt = payload.prompt;
+  await addImageOutpaintRequest(payload);
+  
+  await db.put(sessionDataValue);
   return sessionDataValue;
 
 }
@@ -55,6 +69,8 @@ export async function getSessionGenerationStatus(sessionId) {
     return sessionData.value;
   }
 }
+
+
 
 export async function publishSession(payload) {
   const db = await getSessionsDB();
@@ -80,11 +96,8 @@ export async function publishSession(payload) {
   return sessionDataValue;
 }
 
-
-
 export async function saveIntermediate(payload) {
   const db = await getSessionsDB();
-
 
   // Fetch existing session data from the database
   const sessionData = await db.get(payload.sessionId);
@@ -98,8 +111,6 @@ export async function saveIntermediate(payload) {
   const imageName = `${sessionDataValue._id}_${random_string}.png`;
   const imageData = payload.image;
   const imageFile = await uploadImageToFileSystem(imageData, imageName);
-
-
 
   // Add the new item (imageName in this case) to the beginning of the queue
   intermediates.unshift(imageFile);
@@ -163,22 +174,15 @@ export async function createAttestation(payload) {
   }
   const attestation = await createEthSignAttestation(attestationPayload);
 
-  console.log("ATTESTATION ATTESTATION");
-  console.log(attestation);
   const attestationId = attestation.attestationId;
 
-
-
   sessionDataValue.attestationId = attestationId;
-  console.log("FEE");
 
   await db.put(sessionDataValue);
   return sessionDataValue;
 }
 
 export async function publishSessionAndSetURI(payload) {
-
-  console.log("PUBLISH SESSION AND SET URI");
 
   const db = await getSessionsDB();
   const userDB = await getUsersDB();
@@ -220,16 +224,11 @@ export async function publishSessionAndSetURI(payload) {
 
   const selectedChainId = payload.selectedChain;
 
-  console.log(selectedChainId);
 
   const chain = getChainById(selectedChainId);
 
 
   const publicationId = `${chain.id}_${tokenId}`;
-
-  console.log("PUBLICATION ID", publicationId);
-
-
 
   const publicationsPayload = {
     _id: publicationId,

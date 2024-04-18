@@ -5,10 +5,7 @@ import { Text, Transformer } from 'react-konva';
 const ResizableText = ({ text, isSelected, onSelect, ...props }) => {
   const textRef = useRef();
   const trRef = useRef();
-
-  console.log("INSIDE RESIZBALE TEXT");
-  console.log(text);
-
+  const { config } = props;
 
   useEffect(() => {
     if (isSelected && textRef.current) {
@@ -21,6 +18,10 @@ const ResizableText = ({ text, isSelected, onSelect, ...props }) => {
     <>
       <Text
         {...props}
+
+        fontFamily={config.fontFamily}
+        fontSize={config.fontSize}
+        fill={config.fillColor}
         text={text}
         ref={textRef}
         onClick={onSelect}
