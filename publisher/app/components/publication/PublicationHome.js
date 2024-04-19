@@ -2,8 +2,32 @@ import React from 'react';
 import CommonContainer from '../common/CommonContainer.js';
 const IPFS_BASE = 'https://cloudflare-ipfs.com/ipfs/';
 
+const HOST_URL = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:3005';
+
 export default function PublicationHome(props) {
   const { meta } = props;
+  const getTransactionFrame = () => {
+    console.log("Getting transaction frame");
+    const URL = `${HOST_URL}/api/frame/get-mint-tx`;
+    console.log(URL);
+    fetch(URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        interactor: '0x1234567890123456789012345678901234567890'
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+
+  }
   return (
     <CommonContainer>
       <div className="m-auto">
@@ -19,17 +43,17 @@ export default function PublicationHome(props) {
 
           <p>{meta.description}</p>
           <div className="grid grid-cols-4">
-            <div>
+            <div onClick={() => getTransactionFrame()}>
               Mint
             </div>
             <div>
-              Tip
-            </div>
-            <div>
-              Like
+              Burn
             </div>
             <div>
               Info
+            </div>
+            <div>
+              Like
             </div>
           </div>
         </div>

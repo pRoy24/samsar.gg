@@ -18,9 +18,9 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
 
 
     address public adminWallet;
-    uint256 private constant FEE_RATE = 50; // Basis points of the total value (0.05%)
-    uint256 private constant BASE_PRICE = 0.000001 ether; // Example base price for each mint
-    uint256 private constant PRICE_FACTOR = 105000; // Price increase factor (scaled up for precision)
+    uint256 private constant FEE_RATE = 50; 
+    uint256 private constant BASE_PRICE = 0.000001 ether;
+    uint256 private constant PRICE_FACTOR = 105000;
 
     mapping(uint256 => bool) public creatorMinted;
 

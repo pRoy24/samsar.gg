@@ -51,11 +51,7 @@ export default function Page(props) {
 
         />
       </Head>
-
-  
-
-          <PublicationHome meta={meta} />
- 
+      <PublicationHome meta={meta} />
     </div>
   )
 
