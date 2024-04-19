@@ -12,6 +12,7 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
 
     uint256 public constant MAX_SUPPLY = 10000;
     mapping(uint256 => uint256) public totalSupply;
+    mapping(uint256 => uint256) public effectiveSupply;
     
 
     mapping(uint256 => uint256) public currentMintPrice;
@@ -60,19 +61,20 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
     function mint(uint256 tokenId) public payable nonReentrant {
         uint256 amount = 1;
         require(creatorMinted[tokenId], "Creator mint must occur first.");
-        uint256 price = calculatePrice(totalSupply[tokenId], amount);
+        uint256 price = calculatePrice(effectiveSupply[tokenId], amount);
         require(msg.value >= price, "Insufficient funds for minting");
 
         if (totalSupply[tokenId] + amount > MAX_SUPPLY) {
             revert("Total supply exceeds the maximum supply");
         }
 
-        uint256 adminFee = (price * FEE_RATE) / 10000;
         totalSupply[tokenId] += amount;
-        currentMintPrice[tokenId] = calculatePrice(totalSupply[tokenId], 1);
+        effectiveSupply[tokenId] += amount;
+
+        currentMintPrice[tokenId] = calculatePrice(effectiveSupply[tokenId], 1);
 
         _mint(msg.sender, tokenId, amount, "");
-        payable(adminWallet).transfer(adminFee);
+  
 
         if (msg.value > price) {
             payable(msg.sender).transfer(msg.value - price);
@@ -120,10 +122,11 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
             "Insufficient balance for burning"
         );
 
-        uint256 burnPrice = calculatePrice(totalSupply[tokenId], amount);
+        uint256 burnPrice = calculatePrice(effectiveSupply[tokenId], amount);
         uint256 adminFee = (burnPrice * FEE_RATE) / 10000;
 
         totalSupply[tokenId] -= amount;
+        effectiveSupply[tokenId] -= amount;
         _burn(msg.sender, tokenId, amount);
 
         payable(msg.sender).transfer(burnPrice - adminFee);

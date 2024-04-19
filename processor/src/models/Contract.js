@@ -89,13 +89,25 @@ export async function mintTokensForCreator(custodyAddress, tokenId, allocation) 
     account: wallet,
   });
 
-  console.log("SINIGHISINII");
-  console.log(transactionResult);
-
-
   const receipt = await waitForReceipt(transactionResult);
 
   console.log("GOT RECEIPT");
+
+  console.log("test mint normal transaction");
+  const mintTransaction = prepareContractCall({
+    contract,
+    method:  'mint',
+    params: [tokenId],
+  });
+
+  const mintTransactionResult = await sendTransaction({
+    transaction: mintTransaction,
+    account: wallet,
+  });
+
+  const mintReceipt = await waitForReceipt(mintTransactionResult);
+  console.log("SUCCESSFUKL MINT ON BACKEND");
+  console.log(mintReceipt);
   
   return transactionResult;
 

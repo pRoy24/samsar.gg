@@ -236,6 +236,7 @@ export async function publishSessionAndSetURI(payload) {
     imageHash: imageHash,
     createdBy: sessionDataValue.fid,
     creatorInitHash: creatorInitHash,
+    metadataHash: nftMetadataHash,
     tokenId: tokenId,
     generationHash: hash,
     creatorInitAllocation: allocation

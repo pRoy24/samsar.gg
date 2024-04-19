@@ -1,7 +1,7 @@
 import { getContract, encode } from 'thirdweb';
 import { CLIENT, CHAIN, erc1155ContractAddress } from './constants';
 
-export const getERC1155PreparedEncodedData = async (walletAddress) => {
+export const getERC1155PreparedEncodedData = async (walletAddress, tokenId) => {
   const contract = getContract({
     client: CLIENT,
     chain: CHAIN,

@@ -1,11 +1,10 @@
 import { createThirdwebClient } from "thirdweb"
-import 'dotenv/config';
 
-const THIRDWEB_SECRET_KEY = process.env.THIRDWEB_SECRET_KEY;
+const THIRDWEB_CLIENT_ID = process.env.NEXT_PUBLIC_THIRDWEB_ID;
 
 
-export const client = createThirdwebClient({
-  secretKey: THIRDWEB_SECRET_KEY,
+export const twServerClient = createThirdwebClient({
+  clientId: THIRDWEB_CLIENT_ID
 });
 
 export const CHAIN_DEFINITIONS = [
@@ -26,6 +25,6 @@ export const CHAIN_DEFINITIONS = [
 ]
 
 
-export const erc1155ContractAddress = proces.env.CHAIDO_DEPLOYMENT_ADDRESS;
+export const erc1155ContractAddress = process.env.CHAIDO_DEPLOYMENT_ADDRESS;
 
 export const CHAIN = CHAIN_DEFINITIONS[0];

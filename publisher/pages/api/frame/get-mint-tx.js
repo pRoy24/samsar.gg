@@ -6,8 +6,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' })
   }
 
-  console.log(req.body)
-
   const { isValid, message} = validateMessage(req.body); 
 
   if (!isValid || !message) {
