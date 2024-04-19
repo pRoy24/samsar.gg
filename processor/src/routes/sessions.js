@@ -2,7 +2,7 @@
 import express from 'express';
 import { requestGenerateImage, createNewSession, getSessionGenerationStatus, publishSession,
   saveIntermediate, getSessionDetails, publishSessionAndSetURI,
-  requestOutpaintImage, getSessionOutpaintStatus,
+  requestOutpaintImage,
   createAttestation} from '../models/Session.js';
 
 
