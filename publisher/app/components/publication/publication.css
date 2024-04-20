@@ -4,5 +4,8 @@
 }
 
 .tw-connected-wallet {
-  height: 50px !important;
+  height: 46px !important;
+  margin-bottom: 2px !important;
+  background-color: #1f2937 !important;
+  border-radius: 6px !important;
 }

@@ -5,6 +5,8 @@ import FrameActionButton from '../common/FrameActionButton.js';
 import { prepareMintTransaction, burnTransaction, getContractObject } from '../../../utils/ContractOperations.js';
 import { HeartBit, useHeartBit , HeartBitProvider} from "@fileverse/heartbit-react";
 import './publication.css';
+import { FaTwitter } from 'react-icons/fa';
+import { SiFarcaster } from "react-icons/si";
 
 import { sendTransaction, readContract, prepareContractCall, toWei } from 'thirdweb';
 import { useActiveAccount, useSendTransaction, useReadContract, useSwitchActiveWalletChain,  useActiveWalletChain} from "thirdweb/react";
@@ -96,8 +98,6 @@ export default function PublicationHome(props) {
 
     const signature = await activeAccount.signMessage({ 'message': message });
 
-    console.log(signature);
-
     return {
       message,
       signature,
@@ -115,11 +115,22 @@ export default function PublicationHome(props) {
 
   if (activeWalletChain && chainId && activeWalletChain.id !== chainId) {
    const newChain = CHAIN_DEFINITIONS.find(chain => chain.id.toString() === chainId.toString());
-   console.log("NEW CHAIN");
-   console.log(CHAIN_DEFINITIONS);
-    console.log(newChain);
    switchChain(newChain);
     //switchChain(chainId);
+  }
+
+  const gotoFarcasterLink = () => {
+    const currentLink = window.location.href;
+    const message = 'Check out this NFT on Samsar.gg';
+    const farcasterURL = `https://warpcast.com/~/compose?text=${message}&embeds[]=${currentLink}`;
+    window.open(farcasterURL, '_blank');
+  }
+
+  const gotoTwitterLink = () => {
+    const currentLink = window.location.href;
+    const message = 'Check out this NFT on Samsar.gg';
+    const twitterURL = `https://twitter.com/intent/tweet?text=${message}&url=${currentLink}`;
+    window.open(twitterURL, '_blank');
   }
 
   
@@ -128,7 +139,22 @@ export default function PublicationHome(props) {
     <CommonContainer>
       <div className="w-[640px] m-auto p-4 bg-slate-50 mt-2 rounded-lg border-2 border-color-neutral-400 shadow-lg">
         <div>
-          {descriptionBlock}
+          <div className='flex flex-row w-full'>
+            <div className='basis-3/4'>
+            {descriptionBlock}
+            </div>
+            <div className='basis-1/4 '>
+                <div className='inline-flex ml-2 mr-2 text-lg' onClick={gotoFarcasterLink}>
+                  <SiFarcaster />
+                </div>
+                <div className='inline-flex ml-2 mr-2 text-lg' onClick={gotoTwitterLink}>
+                <FaTwitter />
+                </div>
+                
+
+              </div>
+          </div>
+          
         </div>
         <img src={`${IPFS_BASE}${meta.imageHash}`} className="m-auto w-[640px]" />
         <p>{meta.description}</p>
@@ -152,6 +178,7 @@ export default function PublicationHome(props) {
           </div>
         </div>
       </div>
+      
     </CommonContainer>
   )
 }
