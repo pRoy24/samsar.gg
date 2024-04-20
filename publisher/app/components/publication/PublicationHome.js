@@ -58,8 +58,6 @@ export default function PublicationHome(props) {
     sendTransaction(transaction);
   }
 
-
-
   useEffect(() => {
     if (meta.generationHash) {
       console.log("Generation hash found");
