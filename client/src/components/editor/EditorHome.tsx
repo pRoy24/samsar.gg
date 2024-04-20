@@ -79,6 +79,13 @@ export default function EditorHome() {
         nImageList.push({ src: activeSelectedImageURL, id: nImageList.length, type: 'image' });
 
         setActiveItemList(nImageList);
+      } else {
+        console.log("NO LAYERS YET");
+        const nImageList: any = Object.assign([], activeItemList);
+        if (nImageList.length === 0) {
+          nImageList.push({id: 0, type: 'shape', shape: 'rect', config: { x: 0, y: 0, width: 1024, height: 1024, fill: 'white' }});
+          setActiveItemList(nImageList);
+        } 
       }
 
       setSessionDetails(response.data);

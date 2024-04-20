@@ -1,4 +1,4 @@
-export const abi = [
+export const abi =  [
   {
     "inputs": [
       {
@@ -425,6 +425,25 @@ export const abi = [
       }
     ],
     "name": "currentMintPrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "effectiveSupply",
     "outputs": [
       {
         "internalType": "uint256",

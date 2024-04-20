@@ -186,6 +186,16 @@ export default function EditorToolbar(props: any) {
           {addTextDisplay}
         </div>
         <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm text-left pl-2 pr-2'>
+          <div className='text-lg font-bold  m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_ADD_TEXT_DISPLAY)}>
+            <div className='inline-flex ml-4 pl-4'>
+              Add Shape
+            </div>
+            <FaChevronDown className='inline-flex float-right mr-4 mt-2 text-sm' />
+          </div>
+       
+        </div>
+
+        <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm text-left pl-2 pr-2'>
           <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => setComingSoon()}>
             <div className='inline-flex ml-4 pl-4'>
               Layers

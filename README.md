@@ -2,6 +2,24 @@
 
 ## Open-source AI enabled image-editor with tokenized incentives and on-chain verifiability of original-content.
 
+
+Contract Addresses-
+Currently the contracts have been deployed to the following two testnets-
+
+* Testnet Integrations
+1. Arbitrum Sepolia
+0xB7d50B44c923FBd15614bf2b15602575f623BC72
+https://sepolia.arbiscan.io/address/0xB7d50B44c923FBd15614bf2b15602575f623BC72#code
+
+
+2. Gnosis Chaido 
+0x1aC3f8F965310e3aa1E7f4D25909843DB04De90f
+https://gnosis-chiado.blockscout.com/address/0x1aC3f8F965310e3aa1E7f4D25909843DB04De90f
+
+
+* Mainnet integrations-
+Comoing soon
+
 ## This repository contains the following 7 projects -
 
 1. client: Client is a typescript React app implementation of image editor over konva.js

@@ -1,15 +1,12 @@
 require("@nomicfoundation/hardhat-toolbox");
 
-//https://hardhat.org/hardhat-runner/docs/config#json-rpc-based-networks
-
-//Note: keep your mnemonic and private keys securely
-//Read more: https://hardhat.org/hardhat-runner/docs/config#hd-wallet-config
-//1) You can configure private keys or mnemonic:
-//let accounts = ["your private key here"]
 require('dotenv').config();
 
 
 let accounts = { mnemonic: process.env.SIGNER_MNEMONIC}
+
+const ARBI_KEY = process.env.ARBISCAN_API_KEY;
+const BLOCKSCOUT_API_KEY = process.env.BLOCKSCOUT_API_KEY;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -28,6 +25,14 @@ module.exports = {
       gasPrice: 1000000000,
       accounts: accounts,
     },
+    arbitrum: {
+      url: "https://arb1.arbitrum.io/rpc",
+      accounts: accounts,
+    },
+    arbitrum_sepolia: {
+      url: "https://sepolia-rollup.arbitrum.io/rpc",
+      accounts: accounts,
+    }
   },
   etherscan: {
     customChains: [
@@ -35,7 +40,6 @@ module.exports = {
         network: "chiado",
         chainId: 10200,
         urls: {
-          //Blockscout
           apiURL: "https://blockscout.com/gnosis/chiado/api",
           browserURL: "https://blockscout.com/gnosis/chiado",
         },
@@ -44,21 +48,34 @@ module.exports = {
         network: "gnosis",
         chainId: 100,
         urls: {
-          // 3) Select to what explorer verify the contracts
-          // Gnosisscan
           apiURL: "https://api.gnosisscan.io/api",
           browserURL: "https://gnosisscan.io/",
-          // Blockscout
-          //apiURL: "https://blockscout.com/xdai/mainnet/api",
-          //browserURL: "https://blockscout.com/xdai/mainnet",
+        },
+      },
+      {
+        network: "arbitrum_sepolia",
+        chainId: 421614,
+        urls: {
+          apiURL: "https://api-sepolia.arbiscan.io/api",
+          browserURL: "https://sepolia.arbiscan.io",
+        },
+      },
+      {
+        network: "arbitrum",
+        chainId: 42161,
+        urls: {
+          apiURL: "https://api.arbiscan.io/api",
+          browserURL: "https://arbiscan.io",
         },
       },
     ],
     apiKey: {
       //4) Insert your Gnosisscan API key
       //blockscout explorer verification does not require keys
-      chiado: "your key",
-      gnosis: "your key",
+      chiado: BLOCKSCOUT_API_KEY,
+      gnosis: BLOCKSCOUT_API_KEY,
+      arbitrum: ARBI_KEY,
+      arbitrum_sepolia: ARBI_KEY,
     },
   }
 };

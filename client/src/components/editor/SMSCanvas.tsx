@@ -4,6 +4,7 @@ import { CURRENT_TOOLBAR_VIEW } from '../../constants/Types.ts';
 import { useImage } from 'react-konva-utils';
 import ResizableImage from "./ResizableImage.tsx";
 import ResizableText from "./ResizableText.tsx";
+import ResizableShape from "./ResizableShape.js";
 
 const IMAGE_BASE = `${process.env.REACT_APP_PROCESSOR_API}`;
 
@@ -85,6 +86,17 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
 
           />
         )
+      } else if (item.type === 'shape') {
+        return (
+          <ResizableShape
+            key={index}
+            shape={item.shape}
+            config={item.config} 
+            isSelected={selectedId === item.id}
+            onSelect={() => selectImage(item.id)}
+            onUnselect={() => selectImage(null)}
+          />
+        )
       }
     }).filter(Boolean);
   }
@@ -118,7 +130,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
   let currentCursor = 'default';
 
   return (
-    <div className={`m-auto bg-neutral-50 rounded-lg mb-8 mt-[50px] `}>
+    <div className={`m-auto bg-stone-400 pt-8 pb-8  shadow-lg  `}>
       <Stage
         width={STAGE_DIMENSIONS.width}
         height={STAGE_DIMENSIONS.height}
