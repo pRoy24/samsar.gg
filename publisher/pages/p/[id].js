@@ -5,8 +5,6 @@ import { FrameMetadata } from '@coinbase/onchainkit/frame';
 import '@/app/globals.css';
 import PLanding from "@/app/components/publication/PLanding.js";
 
-import { ThirdwebProvider } from "thirdweb/react";
-
 const HOST_URL = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:3005';
 
 const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER || 'http://localhost:3002';
