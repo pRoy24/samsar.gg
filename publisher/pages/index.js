@@ -17,6 +17,7 @@ export default function Index() {
         <meta property="og:description" content="Open-source AI enabled image-editor with tokenized incentives and on-chain verifiability of original-content." />
 
       </Head>
+      
       <Landing />
     </div>
   )

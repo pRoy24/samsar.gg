@@ -1,11 +1,4 @@
-import { createThirdwebClient } from "thirdweb"
 
-const THIRDWEB_CLIENT_ID = process.env.NEXT_PUBLIC_THIRDWEB_ID;
-
-
-export const twServerClient = createThirdwebClient({
-  clientId: THIRDWEB_CLIENT_ID
-});
 
 export const CHAIN_DEFINITIONS = [
   {

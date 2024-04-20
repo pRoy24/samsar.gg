@@ -7,6 +7,7 @@ import { createThirdwebClient, getContract, prepareContractCall, toWei , sendTra
 
 const THIRDWEB_CLIENT_ID = process.env.NEXT_PUBLIC_THIRDWEB_ID;
 
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CHAIDO_DEPLOYMENT_ADDRESS;
 const client = createThirdwebClient({
   clientId: THIRDWEB_CLIENT_ID
 });
@@ -14,12 +15,18 @@ const client = createThirdwebClient({
 export function getContractObject() {
 
   const chainId = CHAIN.id;
+  console.log("CONTRACT ADDRESS");
+  console.log(CONTRACT_ADDRESS);
+  console.log("CHAIN ID");
+  console.log(chainId);
+
   const contract = getContract({
     client,
-    chainId,
     chain: CHAIN,
+    chainId,
     // The ABI for the contract is defined here
-    abi: abi
+    abi: abi,
+    address:CONTRACT_ADDRESS
   });
 
 

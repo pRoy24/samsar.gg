@@ -20,8 +20,7 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
 
     address public adminWallet;
     uint256 private constant FEE_RATE = 50; 
-    uint256 private constant BASE_PRICE = 0.000001 ether;
-    uint256 private constant PRICE_FACTOR = 105000;
+
 
     mapping(uint256 => bool) public creatorMinted;
 
@@ -109,11 +108,16 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
         uint256 amount
     ) public pure returns (uint256) {
         uint256 price = 0;
+        uint256 BASE_PRICE = 1; // Assuming BASE_PRICE is in the smallest unit of currency (e.g., wei in Ethereum)
+        uint256 PRICE_FACTOR = 10001; // Slightly above 1 to ensure a slow growth
+        uint256 DIVISOR = 1000000; // Increase the divisor to reduce price increment
+
         for (uint256 i = 0; i < amount; i++) {
-            price += BASE_PRICE * (PRICE_FACTOR ** (_totalSupply + i) / 100000); // Adjust the exponentiation and division properly
+            price += BASE_PRICE * (PRICE_FACTOR ** (_totalSupply + i) / DIVISOR);
         }
         return price;
     }
+
 
     // Burn function with full mint price and admin fee
     function burn(uint256 tokenId, uint256 amount) public nonReentrant {
@@ -123,14 +127,13 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
         );
 
         uint256 burnPrice = calculatePrice(effectiveSupply[tokenId], amount);
-        uint256 adminFee = (burnPrice * FEE_RATE) / 10000;
+        // uint256 adminFee = (burnPrice * FEE_RATE) / 10000;
 
         totalSupply[tokenId] -= amount;
         effectiveSupply[tokenId] -= amount;
         _burn(msg.sender, tokenId, amount);
-
-        payable(msg.sender).transfer(burnPrice - adminFee);
-        payable(adminWallet).transfer(adminFee);
+        payable(msg.sender).transfer(burnPrice);
+        // payable(adminWallet).transfer(adminFee);
     }
 
     function setBaseURI(string memory baseURI) public onlyOwner {

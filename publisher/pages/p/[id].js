@@ -5,6 +5,7 @@ import { FrameMetadata } from '@coinbase/onchainkit/frame';
 import '@/app/globals.css';
 import PublicationHome from "@/app/components/publication/PublicationHome.js";
 
+import { ThirdwebProvider } from "thirdweb/react";
 
 const HOST_URL = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:3005';
 
@@ -51,7 +52,9 @@ export default function Page(props) {
 
         />
       </Head>
-      <PublicationHome meta={meta} />
+      <ThirdwebProvider>
+        <PublicationHome meta={meta} />
+      </ThirdwebProvider>
     </div>
   )
 
