@@ -3,7 +3,7 @@ import axios from "axios";
 import Head from 'next/head';
 import { FrameMetadata } from '@coinbase/onchainkit/frame';
 import '@/app/globals.css';
-import PublicationHome from "@/app/components/publication/PublicationHome.js";
+import PLanding from "@/app/components/publication/PLanding.js";
 
 import { ThirdwebProvider } from "thirdweb/react";
 
@@ -52,9 +52,7 @@ export default function Page(props) {
 
         />
       </Head>
-      <ThirdwebProvider>
-        <PublicationHome meta={meta} />
-      </ThirdwebProvider>
+        <PLanding meta={meta}/>
     </div>
   )
 

@@ -60,32 +60,6 @@ export default function Section1(props) {
 
             </div>
 
-            <div className='mt-2'>
-              <div className='font-bold'>
-                In the following tracks-
-              </div>
-              <div className='grid grid-cols-4 cols-gap-1 mt-2'>
-                <div>
-                  <img src={`./partner/arbitrum.png`} className='w-[60px] m-auto  ' />
-                </div>
-                <div>
-                  <img src={`./partner/filecoin.jpeg`} className='w-[60px] m-auto' />
-                </div>
-                <div>
-                  <img src={`./partner/gnosis.png`} className='w-[60px] m-auto' />
-                </div>
-                <div>
-                  <img src={`./partner/witness.png`} className='w-[80px] m-auto mt-[-20px]' />
-
-                </div>
-                <div>
-                  <img src={`./partner/curvegrid.png`} className='w-[60px] m-auto' />
-                </div>
-                <div>
-                  <img src={`./partner/sign.svg`} className='w-[60px] m-auto mt-[20px]' />
-                </div>
-              </div>
-            </div>
 
           </div>
 
