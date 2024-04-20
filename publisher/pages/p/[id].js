@@ -13,8 +13,11 @@ const IPFS_BASE = 'https://cloudflare-ipfs.com/ipfs/';
 
 export default function Page(props) {
 
-  const { meta } = props;
+  const { meta, id } = props;
 
+  const idTokens = id.split('_');
+  const tokenId = idTokens[1];
+  const chainId = idTokens[0];
 
   let imgSrc = ``;
   if (meta.imageHash) {
@@ -50,7 +53,9 @@ export default function Page(props) {
 
         />
       </Head>
-        <PLanding meta={meta}/>
+      <PLanding meta={meta}
+        chainId={chainId} tokenId={tokenId}
+      />
     </div>
   )
 
@@ -74,5 +79,5 @@ export async function getStaticProps({ params }) {
   const productMeta = await res.json();
 
   // Pass the post data to the page via props
-  return { props: { meta: productMeta } };
+  return { props: { meta: productMeta, id: id } };
 }

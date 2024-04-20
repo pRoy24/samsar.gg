@@ -447,6 +447,8 @@ export default function EditorHome() {
               currentViewDisplay={currentView}
               textConfig={textConfig}
               setTextConfig={setTextConfig}
+              activeItemList={activeItemList}
+              setActiveItemList={setActiveItemList}
             />
           </div>
         </div>

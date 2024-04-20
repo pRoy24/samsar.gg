@@ -198,9 +198,15 @@ export async function publishSessionAndSetURI(payload) {
   const imageData = await uploadImageToIpfs(payload.image);
   const imageURL = `ipfs://${imageData.data.Hash}`;
   payload.nft.image = imageURL;
+
+
   const nftmetadata = getNFTMetaData(payload.nft);
 
+  const selectedChainId = payload.selectedChain;
 
+  console.log("SELECTED CHAIN ID");
+  console.log(selectedChainId);
+  
 
   const nftMetadata = await uploadMetadataToIpfs(nftmetadata);
   const nftMetadataHash = nftMetadata.data.Hash;
@@ -208,21 +214,21 @@ export async function publishSessionAndSetURI(payload) {
 
   const nftmetadataurl = `ipfs://${nftMetadataHash}`;
 
-  const nftTokenData = await setUrlForNextToken(nftmetadataurl);
+  console.log("GOT NFT METADATA URL");
+  console.log(nftmetadataurl);
+
+  const nftTokenData = await setUrlForNextToken(selectedChainId, nftmetadataurl);
 
   const { tokenId, hash } = nftTokenData;
   const userCustodyAddress = userDataValue.custody;
 
   const allocation = payload.creatorAllocation;
 
-  const creatorInitHashData = await mintTokensForCreator(userCustodyAddress, tokenId, allocation);
+  const creatorInitHashData = await mintTokensForCreator(userCustodyAddress, tokenId, selectedChainId, allocation);
   
   const creatorInitHash = creatorInitHashData.transactionHash;
 
   const publicationsDB = await getPublicationsDB();
-
-
-  const selectedChainId = payload.selectedChain;
 
 
   const chain = getChainById(selectedChainId);

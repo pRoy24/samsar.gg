@@ -1,28 +1,35 @@
 import { abi } from './contractABI';
-import { CHAIN } from './constants';
+import {  CHAIN_DEFINITIONS} from './constants';
 import { createThirdwebClient, getContract, prepareContractCall, toWei , sendTransaction} from 'thirdweb';
-
- 
-
 
 const THIRDWEB_CLIENT_ID = process.env.NEXT_PUBLIC_THIRDWEB_ID;
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CHAIDO_DEPLOYMENT_ADDRESS;
 const client = createThirdwebClient({
   clientId: THIRDWEB_CLIENT_ID
 });
 
-export function getContractObject() {
 
-  const chainId = CHAIN.id;
-  console.log("CONTRACT ADDRESS");
-  console.log(CONTRACT_ADDRESS);
-  console.log("CHAIN ID");
-  console.log(chainId);
+export async function getContractAddress(chainId) {
+  chainId = parseInt(chainId, 10);
 
+  const CHAIDO_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CHAIDO_DEPLOYMENT_ADDRESS;
+  const ARBI_SEPOLIA_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_ARBI_SEPOLIA_DEPLOYMENT_ADDRESS;
+  if (chainId === 421614) {
+    return ARBI_SEPOLIA_CONTRACT_ADDRESS; 
+  } else {
+    return CHAIDO_CONTRACT_ADDRESS;
+  }
+}
+
+export function getContractObject(chainId) {
+
+
+  const chainData = CHAIN_DEFINITIONS.find(chain => chain.id.toString() === chainId.toString());
+
+  const CONTRACT_ADDRESS = getContractAddress(chainId);
   const contract = getContract({
     client,
-    chain: CHAIN,
+    chain: chainData,
     chainId,
     // The ABI for the contract is defined here
     abi: abi,

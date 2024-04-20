@@ -9,30 +9,16 @@ import 'dotenv/config';
 
 const THIRDWEB_CLIENT_ID = process.env.THIRDWEB_ID;
 const THIRDWEB_CLIENT_SECRET = process.env.THIRDWEB_SECRET_KEY; 
-const contractAddress = process.env.CHAIDO_DEPLOYMENT_ADDRESS;
 
 const privateKey = process.env.APP_PRIVATE_KEY;
 
-const chaidoChainDefinition = CHAIN_DEFINITIONS.find((chain) => chain.key === 'gnosis_chaido');
-
-const chaidoChain = defineChain(chaidoChainDefinition);
 
 const client = createThirdwebClient({
   clientId: THIRDWEB_CLIENT_ID,
   secretKey: THIRDWEB_CLIENT_SECRET,
 });
 
-const contract = getContract({
-  // the client you have created via `createThirdwebClient()`
-  client,
-  // the chain the contract is deployed on
-  chain: chaidoChain,
-  chainId: chaidoChain.id,
-  // the contract's address
-  address: contractAddress,
-  // OPTIONAL: the contract's abi
-  abi: abi,
-});
+
 
 const wallet = privateKeyAccount({
   client,
@@ -40,8 +26,46 @@ const wallet = privateKeyAccount({
 });
 
 
+export function getContractAddress(chainId) {
+  chainId = parseInt(chainId, 10);
 
-export async function setUrlForNextToken(metadataUrl) {
+  const CHAIDO_CONTRACT_ADDRESS = process.env.CHAIDO_DEPLOYMENT_ADDRESS;
+  const ARBI_SEPOLIA_CONTRACT_ADDRESS = process.env.ARBI_SEPOLIA_DEPLOYMENT_ADDRESS;
+  if (chainId === 421614) {
+    return ARBI_SEPOLIA_CONTRACT_ADDRESS; 
+  } else {
+    return CHAIDO_CONTRACT_ADDRESS;
+  }
+}
+
+async function getContractForChainId(chainId) {
+  const chainData = CHAIN_DEFINITIONS.find(chain => chain.id.toString() === chainId.toString());
+  const CONTRACT_ADDRESS = getContractAddress(chainId);
+
+  console.log(chainData);
+  console.log(CONTRACT_ADDRESS);
+
+  console.log("NEEYY");
+
+  const contract = getContract({
+    client,
+    chain: chainData,
+    chainId,
+    // The ABI for the contract is defined here
+    abi: abi,
+    address:CONTRACT_ADDRESS
+  });
+  return contract;
+}
+
+
+
+export async function setUrlForNextToken(chainId, metadataUrl) {
+
+  const contract = await getContractForChainId(chainId);
+
+  console.log("Getting next token id");
+
 
   const nextToken = await readContract({
     contract,
@@ -49,6 +73,8 @@ export async function setUrlForNextToken(metadataUrl) {
   });
 
   const nextTokenId = nextToken.toString();
+
+  console.log(nextTokenId);
 
   const transaction = prepareContractCall({
     contract,
@@ -68,13 +94,17 @@ export async function setUrlForNextToken(metadataUrl) {
     hash: receipt.transactionHash,
     tokenId: nextTokenId,
   }
+
+  console.log(returnPayload);
+
   return returnPayload;
 
 
 }
 
 
-export async function mintTokensForCreator(custodyAddress, tokenId, allocation) {
+export async function mintTokensForCreator(custodyAddress, tokenId, chainId, allocation) {
+  const contract = await getContractForChainId(chainId);
   tokenId = parseInt(tokenId);
   allocation = parseInt(allocation);
   

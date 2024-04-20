@@ -52,6 +52,30 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
   }, [currentView]);
 
 
+
+  useEffect(() => {
+    const checkIfClickedOutside = (e) => {
+      // This function will be triggered by any click on the webpage.
+      if (!document.getElementById('samsar-konva-stage').contains(e.target)) {
+        // If the clicked element is not part of the Konva stage
+        selectImage(null);
+      }
+    };
+
+    // Add event listener when the component mounts
+    document.addEventListener('click', checkIfClickedOutside);
+
+    // Remove event listener on cleanup
+    return () => {
+      document.removeEventListener('click', checkIfClickedOutside);
+    };
+  }, []);
+
+
+
+
+
+
   if (currentView === CURRENT_TOOLBAR_VIEW.SHOW_EDIT_MASK_DISPLAY) {
 
     const stage = ref.current.getStage();
@@ -135,7 +159,8 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
         width={STAGE_DIMENSIONS.width}
         height={STAGE_DIMENSIONS.height}
         ref={ref}
-        onMouseDown={handleStageClick}  // Listen for mouse down events on the stage
+        onMouseDown={handleStageClick}
+        id="samsar-konva-stage"  
 
       >
         <Layer

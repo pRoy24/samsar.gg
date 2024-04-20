@@ -35,6 +35,14 @@ export default function AddText(props) {
             <option value="24">24</option>
             <option value="28">28</option>
             <option value="32">32</option>
+            <option value="36">36</option>
+            <option value="40">40</option>
+            <option value="44">44</option>
+            <option value="48">48</option>
+            <option value="52">52</option>
+            <option value="56">56</option>
+            <option value="60">60</option>
+            
           </select>
         </div>
         <div>

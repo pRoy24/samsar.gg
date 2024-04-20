@@ -7,27 +7,26 @@ import { HeartBit, useHeartBit , HeartBitProvider} from "@fileverse/heartbit-rea
 import './publication.css';
 
 import { sendTransaction, readContract, prepareContractCall, toWei } from 'thirdweb';
-import { useActiveAccount, useSendTransaction, useReadContract, TransactionButton } from "thirdweb/react";
+import { useActiveAccount, useSendTransaction, useReadContract, useSwitchActiveWalletChain,  useActiveWalletChain} from "thirdweb/react";
+import { CHAIN_DEFINITIONS } from '@/utils/constants.js';
 
 const IPFS_BASE = 'https://cloudflare-ipfs.com/ipfs/';
 
 const HOST_URL = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:3005';
 
 export default function PublicationHome(props) {
-  const { meta } = props;
+  const { meta , tokenId, chainId } = props;
   const [onChainMeta, setOnChainMeta] = useState(null);
   const [currentChain, setCurrentChain] = useState(null);
-  const [tokenId, setTokenId] = useState(null);
+
   const router = useRouter();
   const activeAccount = useActiveAccount();
-  const contract = getContractObject();
+  const contract = getContractObject(chainId);
   const { mutate: sendTransaction, isPending } = useSendTransaction();
   const page = router.query.id;
   const pageTokens = page.split('_');
   const tokenIdN = pageTokens[1];
 
-  console.log("TOKEN ID");
-  console.log(tokenIdN);
 
   const { data, isLoading } = useReadContract({
     contract,
@@ -72,13 +71,6 @@ export default function PublicationHome(props) {
         });
     }
 
-    const page = router.query.id;
-    const pageTokens = page.split('_');
-    if (pageTokens.length > 1) {
-      setCurrentChain(pageTokens[0])
-      setTokenId(pageTokens[1]);
-    }
-    console.log(page);
 
   }, []);
 
@@ -100,7 +92,7 @@ export default function PublicationHome(props) {
     const address = activeAccount.address;
 
 
-    const message = "Hello World!"
+    const message = `Samsar ${tokenId} ${chainId}`
 
     const signature = await activeAccount.signMessage({ 'message': message });
 
@@ -113,29 +105,22 @@ export default function PublicationHome(props) {
         console.log("Minted!")
       }
     };
-
-    // const signer = await provider.getSigner()
-    // const address = await signer.getAddress();
-
-    // const siweMessage = new SiweMessage({
-    //   domain: window.location.host,
-    //   address,
-    //   statement: "Hello World!",
-    //   uri: window.location.origin,
-    //   version: "1",
-    // });
-
-    // const message = siweMessage.prepareMessage();
-    // const signature = await signer.signMessage(message);
-
-    // return {
-    //   message,
-    //   signature,
-    //   onMintCallback: () => {
-    //     console.log("Minted!")
-    //   }
-    // };
   };
+
+  const switchChain = useSwitchActiveWalletChain();
+  const activeWalletChain = useActiveWalletChain();
+
+  console.log(activeWalletChain);
+  console.log(chainId);
+
+  if (activeWalletChain && chainId && activeWalletChain.id !== chainId) {
+   const newChain = CHAIN_DEFINITIONS.find(chain => chain.id.toString() === chainId.toString());
+   console.log("NEW CHAIN");
+   console.log(CHAIN_DEFINITIONS);
+    console.log(newChain);
+   switchChain(newChain);
+    //switchChain(chainId);
+  }
 
   
   return (

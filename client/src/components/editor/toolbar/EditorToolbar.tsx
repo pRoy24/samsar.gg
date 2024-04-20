@@ -5,6 +5,7 @@ import OutpaintGenerator from './OutpaintGenerator.tsx';
 import RangeSlider from '../utils/RangeSlider.js';
 import AddText from './AddText.tsx';
 import { FaChevronDown, FaChevronUp, FaRobot } from 'react-icons/fa';
+import LayersDisplay from './LayersDisplay.tsx';
 import { CURRENT_TOOLBAR_VIEW } from '../../../constants/Types.ts';
 
 export default function EditorToolbar(props: any) {
@@ -16,7 +17,8 @@ export default function EditorToolbar(props: any) {
     showMask, setShowMask,
     editBrushWidth, setEditBrushWidth,
     setCurrentViewDisplay, currentViewDisplay,
-    textConfig, setTextConfig
+    textConfig, setTextConfig,
+    activeItemList, setActiveItemList
   } = props;
 
 
@@ -82,6 +84,16 @@ export default function EditorToolbar(props: any) {
       <div>
         <RangeSlider editBrushWidth={editBrushWidth} setEditBrushWidth={setEditBrushWidth}/>
         <OutpaintGenerator {...props} />
+      </div>
+    )
+  }
+
+  let layersDisplay = <span />;
+  if (currentViewDisplay === CURRENT_TOOLBAR_VIEW.SHOW_LAYERS_DISPLAY) {
+    layersDisplay = (
+      <div>
+        <LayersDisplay activeItemList={activeItemList}
+        setActiveItemList={setActiveItemList}/>
       </div>
     )
   }
@@ -196,12 +208,13 @@ export default function EditorToolbar(props: any) {
         </div>
 
         <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm text-left pl-2 pr-2'>
-          <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => setComingSoon()}>
+          <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_LAYERS_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
               Layers
             </div>
             <FaChevronDown className='inline-flex float-right mr-4 mt-2 text-sm' />
           </div>
+          {layersDisplay}
         </div>
         <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm text-left pl-2 pr-2'>
 
