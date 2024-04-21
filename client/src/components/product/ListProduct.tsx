@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import FrameActionButton from "../common/FrameActionButton.js";
 
-const PROCESSOR_SERVER = process.env.NEXT_PUBLIC_API_SERVER;
+const PROCESSOR_SERVER = process.env.REACT_APP_PROCESSOR_API;
 
 export default function ListProduct() {
   const [productList, setProductList] = useState([]);
@@ -19,6 +19,8 @@ export default function ListProduct() {
 
   let productListDisplay = <span />;
   if (productList.length > 0) {
+    console.log(productList);
+
     productListDisplay = productList.map((product, index) => {
       return (
         <div key={index} className="p-4 bg-slate-50 border-2 border-slate-300">
