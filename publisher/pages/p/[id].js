@@ -29,18 +29,14 @@ export default function Page(props) {
         <FrameMetadata
           buttons={[
             {
-              label: 'Mint',
+              label: 'Info',
               action: 'tx',
               target: `${HOST_URL}/api/frame/get-mint-tx`
             },
             {
-              label: 'Burn',
+              label: 'Like',
               action: 'tx',
               target: `${HOST_URL}/api/frame/get-burn-tx`
-            },
-            {
-              label: 'Info',
-              action: 'post_redirect',
             },
           ]}
           image={{
