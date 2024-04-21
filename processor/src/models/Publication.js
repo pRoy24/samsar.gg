@@ -1,9 +1,14 @@
 import { getPublicationsDB } from "../storage/Documents.js";
 
 export async function getPublicationsList() {
+  try {
   const db = await getPublicationsDB();
   const productsList = await db.all();
-  return productsList.map((product) => product.value);
+  if (productsList && productsList.length > 0) {
+    return productsList.map((product) => product.value);
+  }
+  } catch (error) {
+  }
 }
 
 export async function getPublicationMeta(publicationId) {
