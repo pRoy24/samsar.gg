@@ -7,7 +7,7 @@ export async function deleteAllRows() {
   const usersDB = await getUsersDB();
   const generationsDB = await getGenerationsDB();
   const sessionsDB = await getSessionsDB();
-  const productsDB = await getPublicationsDB();
+  const publicationsDB = await getPublicationsDB();
 
   const userList = await usersDB.all();
   for (const user of userList) {

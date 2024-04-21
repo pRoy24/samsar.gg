@@ -231,6 +231,11 @@ async function handleTerminationSignal() {
   } catch (e) {
 
   }
+  try {
+    await publicationsDB.close()
+  } catch (e) {
+
+  }
 
   try {
     await ipfs.stop()
