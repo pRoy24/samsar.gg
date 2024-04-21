@@ -9,7 +9,7 @@ export default function ListProduct() {
 
   useEffect(() => {
     axios.get(`${PROCESSOR_SERVER}/publications/list`).then(function (response) {
-      console.log(response.data);
+
       setProductList(response.data);
       
     }).catch(function (error) {

@@ -33,7 +33,7 @@ export async function deleteAllRows() {
   }
   console.log("All sessions deleted");
 
-  const productList = await getPublicationsDB.all();
+  const productList = await publicationsDB.all();
   for (const product of productList) {
     const productId = product.value._id;
     console.log(`Deleting product ${productId}`);

@@ -217,7 +217,7 @@ async function handleTerminationSignal() {
   console.info('received termination signal, cleaning up and exiting...');
 
   try {
-    await generationdDB.close()
+    await generationsdDB.close()
   } catch (e) {
 
   }
