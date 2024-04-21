@@ -37,7 +37,7 @@ export async function deleteAllRows() {
   for (const product of productList) {
     const productId = product.value._id;
     console.log(`Deleting product ${productId}`);
-    await getPublicationsDB.del(productId);
+    await publicationsDB.del(productId);
   }
   console.log("All rows deleted");
 
