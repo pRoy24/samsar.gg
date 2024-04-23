@@ -1,6 +1,6 @@
 export const CHAIN_DEFINITIONS = [
   {
-    name: 'Gnosis Chaido (Testnet)',
+    name: 'Gnosis Chiado (Testnet)',
     key: 'gnosis_chaido',
     id: 10200,
     rpc: "https://rpc.chiadochain.net",

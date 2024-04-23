@@ -1,0 +1,4 @@
+export const IMAGE_GENERAITON_MODEL_TYPES = {
+  'SDXL': 'SDXL',
+  'DALLE3': 'DALLE3',
+}

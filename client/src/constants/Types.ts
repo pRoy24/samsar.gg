@@ -8,3 +8,29 @@ export const CURRENT_TOOLBAR_VIEW = {
 
 
 }
+
+
+export const IMAGE_GENERAITON_MODEL_TYPES = [
+
+  {
+    name: 'Stable Diffusion XL',
+    key: 'SDXL',
+  },
+  {
+    name: 'Dall-E 3',
+    key: 'DALLE3'
+  },
+
+]
+
+
+export const IMAGE_EDIT_MODEL_TYPES = [
+  {
+    name: 'Stable Diffusion XL',
+    key: 'SDXL',
+  },
+  {
+    name: 'Dall-E 2',
+    key: 'DALLE2'
+  },
+]

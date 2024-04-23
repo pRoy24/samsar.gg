@@ -24,9 +24,7 @@ export async function addImageGeneratorRequest(payload) {
 
 
 export async function addImageOutpaintRequest(payload) {
-  console.log("ADDING TO QUEUE");
   const localImageLinks = await uploadTempEditImageToFileSystem(payload);
-  console.log(localImageLinks);
   const uuid = uuidv4();
   const queuePayload = {
     _id: uuid,

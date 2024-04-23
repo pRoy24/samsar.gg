@@ -36,6 +36,8 @@ export default function EditorHome() {
 
   const [currentView, setCurrentView] = useState(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
 
+  const [selectedGenerationModel, setSelecteGenerationdModel] = useState('SDXL');
+
 
   const [textConfig, setTextConfig] = useState({
     fontSize: 16,
@@ -80,7 +82,6 @@ export default function EditorHome() {
 
         setActiveItemList(nImageList);
       } else {
-        console.log("NO LAYERS YET");
         const nImageList: any = Object.assign([], activeItemList);
         if (nImageList.length === 0) {
           nImageList.push({id: 0, type: 'shape', shape: 'rect', config: { x: 0, y: 0, width: 1024, height: 1024, fill: 'white' }});
@@ -119,7 +120,8 @@ export default function EditorHome() {
   const submitGenerateRequest = async () => {
     const payload = {
       prompt: promptText,
-      sessionId: id
+      sessionId: id,
+      model: selectedGenerationModel,
     }
     const generateStatus = await axios.post(`${PROCESSOR_API_URL}/sessions/request_generate`, payload);
     startGenerationPoll();
@@ -410,20 +412,15 @@ export default function EditorHome() {
   }
   return (
     <CommonContainer>
-
-
       <div className='m-auto'>
-
-
         <div className='block'>
-          <div className='w-[5%] '>
+          <div className='w-[6%] '>
             <ActionToolbar />
           </div>
-          <div className='text-center w-[80%] inline-block h-[100vh] overflow-scroll m-auto p-4 mb-8 '>
+          <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto p-4 mb-8 '>
             {viewDisplay}
           </div>
-
-          <div className='w-[15%] inline-block bg-green-500 '>
+          <div className='w-[16%] inline-block bg-green-500 '>
             <EditorToolbar promptText={promptText} setPromptText={setPromptText}
               submitGenerateRequest={submitGenerateRequest}
               submitOutpaintRequest={submitOutpaintRequest}
@@ -449,14 +446,11 @@ export default function EditorHome() {
               setTextConfig={setTextConfig}
               activeItemList={activeItemList}
               setActiveItemList={setActiveItemList}
+              selectedGenerationModel={selectedGenerationModel}
+              setSelecteGenerationdModel={setSelecteGenerationdModel}
             />
           </div>
         </div>
-
-
-
-
-
       </div>
     </CommonContainer>
   )

@@ -7,7 +7,6 @@ import { useUser } from '../../contexts/UserContext.js';
 const PROCESSOR_SERVER = process.env.REACT_APP_PROCESSOR_API;
 
 export default function CreatorLanding(props) {
-  console.log("INSIDE CREATOR LANDING");
 
   const navigate = useNavigate();
   const { user } = useUser();

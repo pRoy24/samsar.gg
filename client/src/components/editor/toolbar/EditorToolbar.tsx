@@ -18,7 +18,8 @@ export default function EditorToolbar(props: any) {
     editBrushWidth, setEditBrushWidth,
     setCurrentViewDisplay, currentViewDisplay,
     textConfig, setTextConfig,
-    activeItemList, setActiveItemList
+    activeItemList, setActiveItemList,
+    selectedGenerationModel, setSelectedGenerationModel,
   } = props;
 
 
@@ -171,7 +172,7 @@ export default function EditorToolbar(props: any) {
             <div className='inline-flex ml-4 pl-4'>
               Generate
             </div>
-            <FaRobot className='inline-flex text-sm ml-1' />
+            <FaRobot className='inline-flex text-lg ml-1 mb-1 text-neutral-500' />
 
             <FaChevronDown className='inline-flex float-right mr-4 mt-2 text-sm' />
           </div>

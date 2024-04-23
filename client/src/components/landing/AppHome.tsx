@@ -7,8 +7,7 @@ import OverflowContainer from '../common/OverflowContainer.tsx';
 export default function AppHome() {
   const { user, userFetching } = useUser();
   let currentView = <span />;
-  console.log("APP HOMEE");
-  console.log(user);
+
   if (!userFetching && !user) {
     currentView =  (
       <PublicLanding />

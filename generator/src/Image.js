@@ -1,5 +1,5 @@
 import { getGenerationsDB, getSessionsDB } from './Database.js';
-import { getImageFromText, getOutpaintImageFromText } from './OpenAI.js';
+import { getImageFromText, getOutpaintImageFromText } from './Dispatcher.js';
 import('dotenv/config');
 import * as path from 'path';
 
@@ -7,33 +7,22 @@ const API_SERVER = process.env.API_SERVER;
 
 
 export async function processPendingImageRequests() {
-
   const generationsDB = await getGenerationsDB();
   const sessionsDB = await getSessionsDB();
-
   const pendingRequests = await generationsDB.all();
-
-
   for (let request of pendingRequests) {
     let requestId;
     try {
-
       let pendingRequestData = request.value;
       requestId = pendingRequestData._id;
       const prompt = pendingRequestData.prompt;
       const operationType = pendingRequestData.operationType;
-      console.log(requestId);
-
       if (operationType === "GENERATE") {
+
         await processGenerationRequest(pendingRequestData);
       } else if (operationType === "OUTPAINT") {
         await processOutpaintRequest(pendingRequestData);
       }
-
-
-
-
-
     } catch (e) {
       console.log("CAUGHT ERROR");
       if (requestId) {
@@ -44,8 +33,6 @@ export async function processPendingImageRequests() {
         }
       }
     }
-
-
   }
 }
 
@@ -57,8 +44,18 @@ async function processGenerationRequest(pendingRequestData) {
 
   const requestId = pendingRequestData._id;
   const prompt = pendingRequestData.prompt;
+
+  console.log(pendingRequestData);
+  console.log(requestId);
+
   let genDBData = await generationsDB.get(requestId);
-  const imageURL = await getImageFromText(prompt);
+  console.log("GOT DB DATA");
+  console.log(genDBData);
+
+  const imageURL = await getImageFromText(pendingRequestData);
+
+
+  console.log("*******");
 
   const genRowValue = genDBData.value;
   const sessionData = await sessionsDB.get(genRowValue.sessionId);
@@ -80,11 +77,7 @@ async function processGenerationRequest(pendingRequestData) {
     sessionGenerations.push(imageURL);
   }
   sessionDataValue.generations = sessionGenerations;
-
   sessionDataValue._id = genRowValue.sessionId;
-  console.log(genRowValue.sessionId);
-
-
   try {
     await sessionsDB.put(sessionDataValue);
   } catch (e) {
@@ -93,11 +86,6 @@ async function processGenerationRequest(pendingRequestData) {
   }
 
   await generationsDB.del(requestId);
-
-
-  console.log(`Processed request ${requestId}`);
-
-
 }
 
 async function processOutpaintRequest(pendingRequestData) {
@@ -115,7 +103,7 @@ async function processOutpaintRequest(pendingRequestData) {
   const targetDirPath = path.resolve(pwd, '../processor/assets/temp/');
   const imageURL = path.resolve(targetDirPath, image);
   const maskImageURL = path.resolve(targetDirPath, maskImage);
-  
+
 
 
   let genDBData = await generationsDB.get(requestId);
