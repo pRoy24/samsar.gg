@@ -14,7 +14,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 generator = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0", torch_dtype=torch.float16, use_safetensors=True, variant="fp16").to("cuda")
 
-# inpainter = AutoPipelineForInpainting.from_pretrained("diffusers/stable-diffusion-xl-1.0-inpainting-0.1", torch_dtype=torch.float16, variant="fp16").to("cuda")
+inpainter = AutoPipelineForInpainting.from_pretrained("diffusers/stable-diffusion-xl-1.0-inpainting-0.1", torch_dtype=torch.float16, variant="fp16").to("cuda")
 
 
 @app.route("/generate", methods=["POST"])
@@ -23,8 +23,8 @@ def generate_image():
     content = request.json
     prompt = content.get('prompt')
     print(prompt)
-    images = generator(prompt=prompt).images[0]
-    return jsonify({'image': images[0]})
+    image = generator(prompt=prompt).images[0]
+    return jsonify({'image': image})
 
 
 
