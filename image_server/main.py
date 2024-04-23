@@ -35,6 +35,7 @@ def generate_image():
     # Return the base64 string within a JSON response
     response = jsonify({'image': img_base64})
     response.headers.add('Content-Type', 'application/json')
+    return response
 
 
 @app.route("/edit", methods=["POST"])
