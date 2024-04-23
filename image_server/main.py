@@ -41,9 +41,17 @@ def generate_image():
 @app.route("/edit", methods=["POST"])
 def edit_image():
   content = request.json
+  print(content)
+  print("IIII")
+  
   image_url = content.get('imageURL')
   mask_url = content.get('maskImageURL')
   prompt = content.get('prompt')
+
+  print("EDITING IMAGE")
+  print(image_url)
+  print(mask_url)
+  print(prompt)
 
   image = load_image(image_url).resize((1024, 1024))
   mask_image = load_image(mask_url).resize((1024, 1024))

@@ -45,17 +45,9 @@ async function processGenerationRequest(pendingRequestData) {
   const requestId = pendingRequestData._id;
   const prompt = pendingRequestData.prompt;
 
-  console.log(pendingRequestData);
-  console.log(requestId);
-
   let genDBData = await generationsDB.get(requestId);
-  console.log("GOT DB DATA");
-  console.log(genDBData);
 
   const imageURL = await getImageFromText(pendingRequestData);
-
-
-  console.log("*******");
 
   const genRowValue = genDBData.value;
   const sessionData = await sessionsDB.get(genRowValue.sessionId);
@@ -89,14 +81,14 @@ async function processGenerationRequest(pendingRequestData) {
 }
 
 async function processOutpaintRequest(pendingRequestData) {
+  console.log("PROCESSING OUTPAINT REQUEST")
+
   const generationsDB = await getGenerationsDB();
   const sessionsDB = await getSessionsDB();
   const requestId = pendingRequestData._id;
   const prompt = pendingRequestData.prompt;
   const image = pendingRequestData.image;
   const maskImage = pendingRequestData.maskImage;
-  //const imageURL = `${API_SERVER}/temp/${image}`;
-  //const maskImageURL = `${API_SERVER}/temp/${maskImage}`;
 
   const pwd = process.cwd();
 
@@ -107,7 +99,9 @@ async function processOutpaintRequest(pendingRequestData) {
 
 
   let genDBData = await generationsDB.get(requestId);
-  const editedImageURL = await getOutpaintImageFromText(prompt, imageURL, maskImageURL);
+  
+  const editedImageURL = await getOutpaintImageFromText(pendingRequestData);
+
 
 
   const genRowValue = genDBData.value;

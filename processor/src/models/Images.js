@@ -35,9 +35,9 @@ export async function addImageOutpaintRequest(payload) {
     rowLocked: false,
     operationType: "OUTPAINT",
     prompt: payload.prompt,
+    model: payload.model,
   }
-  console.log(queuePayload);
-  console.log("EE TEEE");
+
 
   const db = await getGenerationsDB();
   await db.put(queuePayload);

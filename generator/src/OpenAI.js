@@ -1,12 +1,9 @@
 import 'dotenv/config';
 import * as fs from 'fs';
-import OpenAI from "openai";
-
-
-
 import path from "path";
 import { mkdir, writeFile } from "fs/promises";
 
+import OpenAI from "openai";
 
 const API_KEY = process.env.OPENAI_API_KEY;
 

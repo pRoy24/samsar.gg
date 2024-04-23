@@ -137,7 +137,8 @@ export default function EditorHome() {
       image: baseImageData,
       maskImage: maskImageData,
       sessionId: id,
-      prompt: promptText
+      prompt: promptText,
+      model: 'SDXL',
     }
     const outpaintStatus = await axios.post(`${PROCESSOR_API_URL}/sessions/request_outpaint`, payload);
     startOutpaintPoll();
