@@ -4,6 +4,8 @@ from diffusers import AutoPipelineForInpainting, DiffusionPipeline
 from diffusers.utils import load_image
 import torch
 
+torch.cuda.empty_cache() 
+
 
 app = Flask(__name__)
 
