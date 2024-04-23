@@ -54,6 +54,10 @@ def edit_image():
   image.save(img_io, 'PNG', quality=100)
   img_io.seek(0)
 
+  print(img_io)
+
+  print("I BNE HERE")
+  
   # Send the buffer as a response
   return send_file(img_io, mimetype='image/jpeg')
 
