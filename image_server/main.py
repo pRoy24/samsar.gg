@@ -19,8 +19,10 @@ generator = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-xl-b
 
 @app.route("/generate", methods=["POST"])
 def generate_image():
+    print("GENERATING")
     content = request.json
     prompt = content.get('prompt')
+    print(prompt)
     images = generator(prompt=prompt).images[0]
     return jsonify({'image': images[0]})
 
