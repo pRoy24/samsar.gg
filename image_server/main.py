@@ -41,8 +41,8 @@ def generate_image():
 @app.route("/edit", methods=["POST"])
 def edit_image():
   content = request.json
-  image_url = content.get('image_url')
-  mask_url = content.get('mask_url')
+  image_url = content.get('imageURL')
+  mask_url = content.get('maskImageURL')
   prompt = content.get('prompt')
 
   image = load_image(image_url).resize((1024, 1024))
@@ -64,7 +64,15 @@ def edit_image():
   img_io = io.BytesIO()
   image.save(img_io, 'PNG')
   img_io.seek(0)
-  return Response(img_io.getvalue(), mimetype='image/png')
+
+
+  # Encode the image as base64
+  img_base64 = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+  # Return the base64 string within a JSON response
+  response = jsonify({'image': img_base64})
+  response.headers.add('Content-Type', 'application/json')
+  return response
 
 
 
