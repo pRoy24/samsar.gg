@@ -131,7 +131,7 @@ export default function EditorHome() {
   const submitOutpaintRequest = async () => {
 
     const baseImageData = await exportBaseGroup();
-    const maskImageData = await exportMaskGroupAsTransparent();
+    const maskImageData = await exportMaskGroupAsColored();
 
     const payload = {
       image: baseImageData,
@@ -166,6 +166,47 @@ export default function EditorHome() {
   };
 
 
+  const exportMaskGroupAsColored = async () => {
+    const baseStage: any = canvasRef.current;
+    const baseLayer = baseStage.getLayers()[0];
+    const maskGroup = baseLayer.children.find((child) => child.attrs && child.attrs.id === 'maskGroup');
+  
+    if (maskGroup) {
+      // Create an offscreen canvas
+      const offscreenCanvas = document.createElement('canvas');
+      offscreenCanvas.width = baseStage.width();
+      offscreenCanvas.height = baseStage.height();
+      const ctx: any = offscreenCanvas.getContext('2d');
+  
+      // Initially set the entire canvas to be transparent
+      ctx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+  
+      // Use source-over to draw white shapes
+      ctx.globalCompositeOperation = 'source-over';
+  
+      // Fill where mask shapes are with white
+      ctx.fillStyle = 'white';
+      maskGroup.children.forEach(line => {
+        ctx.beginPath();
+        ctx.moveTo(line.points()[0], line.points()[1]);
+        for (let i = 2; i < line.points().length; i += 2) {
+          ctx.lineTo(line.points()[i], line.points()[i + 1]);
+        }
+        ctx.closePath();  // Ensure the shape is closed for filling
+        ctx.fill();
+      });
+  
+      // Convert offscreen canvas to data URL
+      const dataUrl = offscreenCanvas.toDataURL('image/png', 1); // Ensure full quality
+      console.log(dataUrl);  // Use as needed
+      return dataUrl;
+    } else {
+      console.error('Mask group not found');
+      return null;
+    }
+  };
+
+  
   const exportMaskGroupAsTransparent = async () => {
     const baseStage: any = canvasRef.current;
     const baseLayer = baseStage.getLayers()[0];
