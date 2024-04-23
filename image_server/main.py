@@ -4,7 +4,7 @@ from diffusers import AutoPipelineForInpainting, DiffusionPipeline
 from diffusers.utils import load_image
 import torch
 import io
-from flask import send_file
+from flask import send_file, Response
 
 torch.cuda.empty_cache() 
 
@@ -24,8 +24,10 @@ def generate_image():
     content = request.json
     prompt = content.get('prompt')
     image = generator(prompt=prompt).images[0]
-    print(image)
-    return {'image': image}
+    img_io = io.BytesIO()
+    image.save(img_io, 'PNG')
+    img_io.seek(0)
+    return Response(img_io.getvalue(), mimetype='image/png')
 
 @app.route("/edit", methods=["POST"])
 def edit_image():
@@ -49,17 +51,13 @@ def edit_image():
     generator=generator,
   ).images[0]
 
-  # Save the image to a BytesIO object
+
   img_io = io.BytesIO()
-  image.save(img_io, 'PNG', quality=100)
+  image.save(img_io, 'PNG')
   img_io.seek(0)
+  return Response(img_io.getvalue(), mimetype='image/png')
 
-  print(img_io)
 
-  print("I BNE HERE")
-  
-  # Send the buffer as a response
-  return send_file(img_io, mimetype='image/jpeg')
 
 
 
