@@ -3,6 +3,8 @@ from PIL import Image
 from diffusers import AutoPipelineForInpainting, DiffusionPipeline
 from diffusers.utils import load_image
 import torch
+import io
+from flask import send_file
 
 torch.cuda.empty_cache() 
 
@@ -46,7 +48,15 @@ def edit_image():
     strength=0.99,  # make sure to use `strength` below 1.0
     generator=generator,
   ).images[0]
-  return ({'image': image})
+
+  # Save the image to a BytesIO object
+  img_io = io.BytesIO()
+  image.save(img_io, 'PNG', quality=100)
+  img_io.seek(0)
+
+  # Send the buffer as a response
+  return send_file(img_io, mimetype='image/jpeg')
+
 
 
 if __name__ == "__main__":
