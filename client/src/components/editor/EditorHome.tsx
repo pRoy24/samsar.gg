@@ -13,7 +13,7 @@ import AttestationDialog from './utils/AttestationDialog.tsx';
 import PublishDialog from './utils/PublishDialog.tsx';
 import CommonContainer from '../common/CommonContainer.tsx';
 import ActionToolbar from './toolbar/ActionToolbar.tsx';
-import { CURRENT_TOOLBAR_VIEW } from '../../constants/Types.ts';
+import { CURRENT_TOOLBAR_VIEW , CANVAS_ACTION } from '../../constants/Types.ts';
 import { STAGE_DIMENSIONS } from '../../constants/Image.js';
 
 import './editor.css';
@@ -33,10 +33,13 @@ export default function EditorHome() {
   const [templateOptionList, setTemplateOptionList] = useState([]);
   const [activeItemList, setActiveItemList] = useState([]);
   const [editBrushWidth, setEditBrushWidth] = useState(5);
+  const [editMasklines, setEditMaskLines] = useState([]);
 
   const [currentView, setCurrentView] = useState(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
 
   const [selectedGenerationModel, setSelecteGenerationdModel] = useState('SDXL');
+
+  const [ currentCanvasAction, setCurrentCanvasAction ] = useState(CANVAS_ACTION.DEFAULT);
 
 
   const [textConfig, setTextConfig] = useState({
@@ -84,9 +87,9 @@ export default function EditorHome() {
       } else {
         const nImageList: any = Object.assign([], activeItemList);
         if (nImageList.length === 0) {
-          nImageList.push({id: 0, type: 'shape', shape: 'rect', config: { x: 0, y: 0, width: 1024, height: 1024, fill: 'white' }});
+          nImageList.push({ id: 0, type: 'shape', shape: 'rect', config: { x: 0, y: 0, width: STAGE_DIMENSIONS.width, height: STAGE_DIMENSIONS.height, fill: 'white' } });
           setActiveItemList(nImageList);
-        } 
+        }
       }
 
       setSessionDetails(response.data);
@@ -167,35 +170,35 @@ export default function EditorHome() {
 
 
   const exportMaskGroupAsColored = async () => {
-    const baseStage: any = canvasRef.current;
+    const baseStage = canvasRef.current;
     const baseLayer = baseStage.getLayers()[0];
     const maskGroup = baseLayer.children.find((child) => child.attrs && child.attrs.id === 'maskGroup');
-  
+
     if (maskGroup) {
       // Create an offscreen canvas
       const offscreenCanvas = document.createElement('canvas');
       offscreenCanvas.width = baseStage.width();
       offscreenCanvas.height = baseStage.height();
-      const ctx: any = offscreenCanvas.getContext('2d');
-  
-      // Initially set the entire canvas to be transparent
-      ctx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
-  
-      // Use source-over to draw white shapes
-      ctx.globalCompositeOperation = 'source-over';
-  
-      // Fill where mask shapes are with white
+      const ctx = offscreenCanvas.getContext('2d');
+
+      // Initially fill the canvas with black
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+
+      // Set the fill style for the mask to white
       ctx.fillStyle = 'white';
+
+      // Draw each mask shape in white
       maskGroup.children.forEach(line => {
         ctx.beginPath();
         ctx.moveTo(line.points()[0], line.points()[1]);
         for (let i = 2; i < line.points().length; i += 2) {
           ctx.lineTo(line.points()[i], line.points()[i + 1]);
         }
-        ctx.closePath();  // Ensure the shape is closed for filling
+        ctx.closePath();  // Ensures the shape is closed for filling
         ctx.fill();
       });
-  
+
       // Convert offscreen canvas to data URL
       const dataUrl = offscreenCanvas.toDataURL('image/png', 1); // Ensure full quality
       console.log(dataUrl);  // Use as needed
@@ -206,14 +209,13 @@ export default function EditorHome() {
     }
   };
 
-  
   const exportMaskGroupAsTransparent = async () => {
     const baseStage: any = canvasRef.current;
     const baseLayer = baseStage.getLayers()[0];
     const maskGroup = baseLayer.children.find((child) => child.attrs && child.attrs.id === 'maskGroup');
 
     if (maskGroup) {
-  
+
       // Create an offscreen canvas
       const offscreenCanvas = document.createElement('canvas');
       offscreenCanvas.width = baseStage.width();
@@ -433,6 +435,12 @@ export default function EditorHome() {
     setActiveItemList(nImageList);
   }
 
+  const setCurrentAction = (currentAction) => {
+    console.log("Setting Current Action:", currentAction);
+    setCurrentCanvasAction(currentAction);
+    
+  }
+
 
   let viewDisplay = <span />;
 
@@ -448,8 +456,13 @@ export default function EditorHome() {
         sessionDetails={sessionDetails}
         activeItemList={activeItemList}
         editBrushWidth={editBrushWidth}
-        currentView={currentView} 
-        />
+        currentView={currentView}
+        editMasklines={editMasklines}
+        setEditMaskLines={setEditMaskLines}
+        currentCanvasAction={currentCanvasAction}
+        
+
+      />
     )
   }
   return (
@@ -457,7 +470,9 @@ export default function EditorHome() {
       <div className='m-auto'>
         <div className='block'>
           <div className='w-[6%] '>
-            <ActionToolbar />
+            <ActionToolbar
+              setCurrentAction={setCurrentAction}
+            />
           </div>
           <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto p-4 mb-8 '>
             {viewDisplay}
@@ -490,6 +505,7 @@ export default function EditorHome() {
               setActiveItemList={setActiveItemList}
               selectedGenerationModel={selectedGenerationModel}
               setSelecteGenerationdModel={setSelecteGenerationdModel}
+
             />
           </div>
         </div>

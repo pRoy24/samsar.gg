@@ -33,7 +33,7 @@ export async function getOutpaintImageFromText(payload) {
     const requestPayload = {
       prompt,
       imageURL: imageURL,
-      maskImageURL: 'https://raw.githubusercontent.com/CompVis/latent-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo_mask.png'
+      maskImageURL: maskImageURL
     }
     console.log(requestPayload);
 

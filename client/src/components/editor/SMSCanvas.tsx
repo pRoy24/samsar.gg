@@ -5,31 +5,81 @@ import { useImage } from 'react-konva-utils';
 import ResizableImage from "./ResizableImage.tsx";
 import ResizableText from "./ResizableText.tsx";
 import ResizableShape from "./ResizableShape.js";
+import { STAGE_DIMENSIONS } from '../../constants/Image.js';
 
 const IMAGE_BASE = `${process.env.REACT_APP_PROCESSOR_API}`;
 
-const STAGE_DIMENSIONS = {
-  width: 1024,
-  height: 1024,
-}
-
 const SMSCanvas = forwardRef((props: any, ref: any) => {
 
-  const { sessionDetails, activeItemList, currentView, editBrushWidth, maskGroupRef } = props;
+  const { sessionDetails, activeItemList, currentView, editBrushWidth, maskGroupRef ,
+    editMasklines, setEditMaskLines, currentCanvasAction
+  } = props;
   const [showMask, setShowMask] = useState(false);
   const [mask, setMask] = useState(null);
-  const [lines, setLines] = useState([]);
+
   const [isPainting, setIsPainting] = useState(false);
   const imageSrc = `${IMAGE_BASE}/generations/${sessionDetails?.activeSelectedImage}`;
   const [image, status] = useImage(imageSrc, 'anonymous');
   const [selectedId, selectImage] = useState(null);
 
-  const handleStageClick = (e) => {
-    // Check if the click is on empty stage area
-    if (e.target === e.target.getStage()) {
-      selectImage(null); // Deselect any selected image
+
+  console.log("CURRENT CANVAS ACTION", currentCanvasAction);
+
+  useEffect(() => {
+    if (currentCanvasAction === 'MOVE') {
+      const stage = ref.current.getStage();
+      const container = stage.container();
+      container.style.cursor = 'grab';
+    } else if (currentCanvasAction === 'RESIZE') {
+      const stage = ref.current.getStage();
+      const container = stage.container();
+      container.style.cursor = 'nwse-resize';
+    } else {
+      const stage = ref.current.getStage();
+      const container = stage.container();
+      container.style.cursor = 'default';
     }
+  }, [currentCanvasAction]);
+
+  const handleStageClick = (e) => {
+    // if (selectedId === null) return;
+
+    // const clickedOnEmpty = e.target === e.target.getStage();
+    // const isSelectedItem = e.target.attrs.id === selectedId || (e.target.getParent() && e.target.getParent().attrs.id === selectedId);
+  
+    // // If the click is on an empty stage area or not on the selected item or its transformer
+    // if (clickedOnEmpty || !isSelectedItem) {
+    //   selectImage(null); // Deselect any selected image
+    // }
   };
+
+
+  useEffect(() => {
+    const stage = ref.current.getStage(); // Assuming `ref` is the ref to your Stage component
+  
+    const checkIfClickedOutside = (e) => {
+      // Get the clicked shape or the stage
+      const clickedShape = e.target;
+      // Check if the clicked shape is part of the stage but not part of the selected group/item
+      const isOutside = clickedShape === stage || // Click on empty stage
+                        (selectedId && !clickedShape.findAncestor(`#${selectedId}`)); // No ancestor with selectedId
+  
+      if (isOutside) {
+        selectImage(null); // Deselect any selected image
+      }
+    };
+  
+    // Add event listener to the Konva stage
+    stage.on('click tap', checkIfClickedOutside);
+  
+    // Remove event listener on cleanup
+    return () => {
+      stage.off('click tap', checkIfClickedOutside);
+    };
+  }, [selectedId, ref]);
+
+
+
 
   const setItemAsSelected = (itemId) => {
     selectImage(itemId);
@@ -44,6 +94,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
     setShowMask(false);
 
     if (currentView === CURRENT_TOOLBAR_VIEW.SHOW_EDIT_MASK_DISPLAY) {
+      console.log("GETTING CURSOR");
       setShowMask(true);
       const stage = ref.current.getStage();
       const container = stage.container();
@@ -90,7 +141,8 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
       if (item.type === 'image') {
         return (
           <ResizableImage
-            key={index}
+            key={`group_image_${index}`}
+            id={`group_image_${index}`}
             image={item}
             isSelected={selectedId === item.id}
             onSelect={() => setItemAsSelected(item.id)}
@@ -101,7 +153,8 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
       } else if (item.type === 'text') {
         return (
           <ResizableText
-            key={index}
+            key={`group_text_${index}`}
+            id={`group_text_${index}`}
             text={item.text}
             config={item.config} 
             isSelected={selectedId === item.id}
@@ -134,7 +187,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
 
   // This function updates the lines array with the new points
   const addLine = (points) => {
-    setLines([...lines, { points, stroke: 'white', strokeWidth: editBrushWidth }]);
+    setEditMaskLines([...editMasklines, { points, stroke: 'white', strokeWidth: editBrushWidth }]);
   };
 
 
@@ -142,16 +195,14 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
     if (!isPainting) return;
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
-    let lastLine = lines[lines.length - 1];
+    let lastLine = editMasklines[editMasklines.length - 1];
     lastLine.points = lastLine.points.concat([point.x, point.y]);
-    setLines(lines.slice(0, -1).concat(lastLine));
+    setEditMaskLines(editMasklines.slice(0, -1).concat(lastLine));
   };
 
   const handleLayerMouseUp = () => {
     setIsPainting(false);
   };
-
-  let currentCursor = 'default';
 
   return (
     <div className={`m-auto bg-stone-400 pt-8 pb-8  shadow-lg  `}>
@@ -159,7 +210,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
         width={STAGE_DIMENSIONS.width}
         height={STAGE_DIMENSIONS.height}
         ref={ref}
-        onMouseDown={handleStageClick}
+        onClick={handleStageClick}
         id="samsar-konva-stage"  
 
       >
@@ -167,8 +218,6 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
           onMouseDown={handleLayerMouseDown}
           onMousemove={handleLayerMouseMove}
           onMouseup={handleLayerMouseUp}
-
-          style={{ cursor: currentCursor }}
         >
           <Group id="baseGroup">
             {imageStackList}
@@ -176,7 +225,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
 
           {showMask && (
             <Group id="maskGroup">
-              {lines.map((line, i) => (
+              {editMasklines.map((line, i) => (
                 <Line key={i} points={line.points} stroke={line.stroke} strokeWidth={line.strokeWidth} />
               ))}
             </Group>

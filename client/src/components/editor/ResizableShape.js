@@ -3,8 +3,7 @@ import {  Rect, Text, Circle, Line } from 'react-konva';
 
 export default function ResizableShape(props) { 
   const { shape, config } = props;
-  console.log("adding shape");
-  console.log(props);
+
 
   const { x, y, width, height, fill } = config;
   return (

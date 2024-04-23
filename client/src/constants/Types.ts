@@ -34,3 +34,11 @@ export const IMAGE_EDIT_MODEL_TYPES = [
     key: 'DALLE2'
   },
 ]
+
+
+export const CANVAS_ACTION = {
+  MOVE: 'MOVE',
+  EDIT: 'EDIT',
+  RESIZE: 'RESIZE',
+  DEFAULT: 'DEFAULT',
+}

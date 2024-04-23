@@ -41,17 +41,10 @@ def generate_image():
 @app.route("/edit", methods=["POST"])
 def edit_image():
   content = request.json
-  print(content)
-  print("IIII")
-  
+
   image_url = content.get('imageURL')
   mask_url = content.get('maskImageURL')
   prompt = content.get('prompt')
-
-  print("EDITING IMAGE")
-  print(image_url)
-  print(mask_url)
-  print(prompt)
 
   image = load_image(image_url).resize((1024, 1024))
   mask_image = load_image(mask_url).resize((1024, 1024))
@@ -63,7 +56,7 @@ def edit_image():
     image=image,
     mask_image=mask_image,
     guidance_scale=8.0,
-    num_inference_steps=20,  # steps between 15 and 30 work well for us
+    num_inference_steps=30,  # steps between 15 and 30 work well for us
     strength=0.75,  # make sure to use `strength` below 1.0
     generator=generator,
   ).images[0]

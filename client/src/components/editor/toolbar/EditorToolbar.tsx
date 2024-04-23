@@ -20,6 +20,7 @@ export default function EditorToolbar(props: any) {
     textConfig, setTextConfig,
     activeItemList, setActiveItemList,
     selectedGenerationModel, setSelectedGenerationModel,
+    editMasklines, setEditMaskLines
   } = props;
 
 

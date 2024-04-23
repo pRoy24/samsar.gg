@@ -1,21 +1,30 @@
 import React, { useRef, useEffect } from 'react';
-import { Text, Transformer } from 'react-konva';
+import { Text, Transformer, Group } from 'react-konva';
 
 
 const ResizableText = ({ text, isSelected, onSelect, ...props }) => {
   const textRef = useRef();
   const trRef = useRef();
-  const { config } = props;
+  const { config, id } = props;
 
-  useEffect(() => {
-    if (isSelected && textRef.current) {
-      trRef.current.nodes([textRef.current]);
-      trRef.current.getLayer().batchDraw();
-    }
-  }, [isSelected]);
+
+    useEffect(() => {
+      if (trRef.current) {
+        if (isSelected && textRef.current) {
+          trRef.current.nodes([textRef.current]);
+          trRef.current.getLayer().batchDraw();
+        } else {
+          // Ensure transformer is detached when not selected
+          trRef.current.nodes([]);
+          trRef.current.getLayer().batchDraw();
+        }
+      }
+    }, [isSelected]);
+
+
 
   return (
-    <>
+    <Group id={id}>
       <Text
         {...props}
 
@@ -40,7 +49,7 @@ const ResizableText = ({ text, isSelected, onSelect, ...props }) => {
           }}
         />
       )}
-    </>
+    </Group>
   );
 };
 

@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react';
-
+import { FaTimes } from 'react-icons/fa';
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-
-// fake data generator
-const getItems = count =>
-  Array.from({ length: count }, (v, k) => k).map(k => ({
-    id: `item-${k}`,
-    content: `item ${k}`
-  }));
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -40,23 +33,12 @@ const getListStyle = isDraggingOver => ({
   width: 250
 });
 
-
-
-
 export default function LayersDisplay(props: any) {
 
-  console.log(props);
   const { activeItemList, setActiveItemList } = props;
-
-  console.log("EEETTE");
-
 
   const onDragEnd = result => {
     // dropped outside the list
-
-    console.log("REORDER");
-
-    console.log(result);
     if (!result.destination) {
       return;
     }
@@ -66,14 +48,17 @@ export default function LayersDisplay(props: any) {
       result.source.index,
       result.destination.index
     );
-
-    console.log("SINIGH REORDER");
-    console.log(newItems);
-
     setActiveItemList(newItems);
 
   };
   
+  const deleteItem = (id) => {
+    // Filter out the item with the matching id
+    const filteredItems = activeItemList.filter(item => item.id !== id);
+    // Update the activeItemList with the filtered items
+    setActiveItemList(filteredItems);
+  };
+
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -85,12 +70,10 @@ export default function LayersDisplay(props: any) {
           style={getListStyle(snapshot.isDraggingOver)}
         >
           {activeItemList.map(function(item, index) {
-
             const itemId = `list_item_${item.id}`;
-            console.log(itemId);
-            const itemContent = `item ${item.id} - ${item.type}`
+            const itemContent = `item ${item.id} - ${item.type}`;
             return (
-              <Draggable key={item.id} draggableId={itemId} index={index} id={itemId}>
+              <Draggable key={item.id} draggableId={itemId} index={index}>
               {(provided, snapshot) => (
                 <div
                   ref={provided.innerRef}
@@ -102,16 +85,22 @@ export default function LayersDisplay(props: any) {
                   )}
                 >
                   {itemContent}
+                  <button
+                    onClick={() => deleteItem(item.id)}
+                    style={{ marginLeft: 'auto', background: 'red', color: 'white' }}
+                  >
+                    <FaTimes />
+                  </button>
                 </div>
               )}
             </Draggable>           
             )
           })}
-
           {provided.placeholder}
         </div>
       )}
     </Droppable>
   </DragDropContext>
   );
+  
 }

@@ -10,3 +10,4 @@ export function getScalingFactor(imageDimensions) {
   }
   return scalingFactor;
 }
+
