@@ -4,6 +4,7 @@ from diffusers import AutoPipelineForInpainting, DiffusionPipeline
 from diffusers.utils import load_image
 import torch
 import io
+import base64
 from flask import send_file, Response
 
 torch.cuda.empty_cache() 
@@ -26,8 +27,15 @@ def generate_image():
     image = generator(prompt=prompt).images[0]
     img_io = io.BytesIO()
     image.save(img_io, 'PNG')
-    img_io.seek(0)
-    return Response(img_io.getvalue(), mimetype='image/png')
+    img_io.seek(0)    
+
+    # Encode the image as base64
+    img_base64 = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+    # Return the base64 string within a JSON response
+    response = jsonify({'image': img_base64})
+    response.headers.add('Content-Type', 'application/json')
+
 
 @app.route("/edit", methods=["POST"])
 def edit_image():
