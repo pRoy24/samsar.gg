@@ -19,13 +19,34 @@ inpainter = AutoPipelineForInpainting.from_pretrained("diffusers/stable-diffusio
 
 @app.route("/generate", methods=["POST"])
 def generate_image():
-    print("GENERATING")
     content = request.json
     prompt = content.get('prompt')
-    print(prompt)
     image = generator(prompt=prompt).images[0]
-    return jsonify({'image': image})
+    print(image)
+    return {'image': image}
 
+@app.route("/edit", methods=["POST"])
+def edit_image():
+  content = request.json
+  image_url = content.get('image_url')
+  mask_url = content.get('mask_url')
+  prompt = content.get('prompt')
+
+  image = load_image(image_url).resize((1024, 1024))
+  mask_image = load_image(mask_url).resize((1024, 1024))
+
+  generator = torch.Generator(device="cuda").manual_seed(0)
+  
+  image = inpainter(
+    prompt=prompt,
+    image=image,
+    mask_image=mask_image,
+    guidance_scale=8.0,
+    num_inference_steps=20,  # steps between 15 and 30 work well for us
+    strength=0.99,  # make sure to use `strength` below 1.0
+    generator=generator,
+  ).images[0]
+  return ({'image': image})
 
 
 if __name__ == "__main__":
