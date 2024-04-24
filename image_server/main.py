@@ -46,19 +46,19 @@ def edit_image():
   mask_url = content.get('maskImageURL')
   prompt = content.get('prompt')
 
-  image = load_image(image_url)
-  mask_image = load_image(mask_url)
+  image = load_image(image_url).resize((1024, 1024))
+  mask_image = load_image(mask_url).resize((1024, 1024))
 
-  im_generator = torch.Generator(device="cuda").manual_seed(0)
+  generator = torch.Generator(device="cuda").manual_seed(0)
   
   image = inpainter(
     prompt=prompt,
     image=image,
     mask_image=mask_image,
-    guidance_scale=6.0,
-    num_inference_steps=25,  # steps between 15 and 30 work well for us
-    strength=0.9,  # make sure to use `strength` below 1.0
-    generator=im_generator,
+    guidance_scale=8.0,
+    num_inference_steps=20,  # steps between 15 and 30 work well for us
+    strength=0.99,  # make sure to use `strength` below 1.0
+    generator=generator,
   ).images[0]
 
 
