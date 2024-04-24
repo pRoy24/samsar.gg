@@ -108,8 +108,11 @@ async function processOutpaintRequest(pendingRequestData) {
   sessionDataValue.activeSelectedImage = editedImageURL;
 
 
+  console.log(sessionDataValue);
+
+
   try {
-    await sessionDataValue.save();
+    await sessionDataValue.save({});
   } catch (e) {
     console.log(e);
 

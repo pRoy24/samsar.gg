@@ -7,7 +7,7 @@ const sessionSchema = new Schema({
     generations: Array,
     activeSelectedImage: String,
     activeGeneratedImage: String,
-    activeOutpaintImage: String,
+    activeOutpaintedImage: String,
     
 
     generationStatus: String,

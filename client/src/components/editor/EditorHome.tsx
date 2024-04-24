@@ -306,6 +306,11 @@ export default function EditorHome(props) {
 
     const pollStatus = await axios.get(`${PROCESSOR_API_URL}/sessions/generate_status?id=${id}`);
 
+    const pollStatusData = pollStatus.data;
+    console.log(pollStatusData);
+
+
+    
     if (pollStatus.data.outpaintStatus === 'COMPLETED') {
       const generatedImageUrlName = pollStatus.data.activeOutpaintedImage;
       const generatedURL = `${PROCESSOR_API_URL}/generations/${generatedImageUrlName}`;

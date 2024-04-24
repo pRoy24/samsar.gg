@@ -34,9 +34,6 @@ export async function requestGenerateImage(payload) {
   const sessionId = payload.sessionId;
   const sessionDataValue = await Session.findOne({ _id: sessionId });
 
-
-  console.log("GOT SESSION");
-  console.log(sessionDataValue);
   
   if (!sessionDataValue) {
     return;
