@@ -22,7 +22,7 @@ export default function AddText(props) {
       <div className='grid grid-cols-3'>
 
         <div>
-          <div>Font Size</div>
+          <div className='text-xs'>Font Size</div>
           <select
             value={fontSize}
             onChange={(e) => setFontSize(e.target.value)}
@@ -46,7 +46,7 @@ export default function AddText(props) {
           </select>
         </div>
         <div>
-          <div>Font Family</div>
+          <div className='text-xs'>Font Family</div>
           <select
             value={fontFamily}
             onChange={(e) => setFontFamily(e.target.value)}
@@ -62,7 +62,7 @@ export default function AddText(props) {
           </select>
         </div>
         <div>
-          <div>Fill Color</div>
+          <div className='text-xs'>Fill Color</div>
           <input
             type="color"
             value={fillColor}

@@ -94,11 +94,17 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
     setShowMask(false);
 
     if (currentView === CURRENT_TOOLBAR_VIEW.SHOW_EDIT_MASK_DISPLAY) {
-      console.log("GETTING CURSOR");
       setShowMask(true);
       const stage = ref.current.getStage();
       const container = stage.container();
       container.style.cursor = generateCursor(editBrushWidth);
+    } else {
+      setEditMaskLines([]);
+      
+      const stage = ref.current.getStage();
+      const container = stage.container();
+      container.style.cursor = 'default';
+
     }
   }, [currentView]);
 

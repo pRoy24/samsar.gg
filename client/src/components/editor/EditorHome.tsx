@@ -23,7 +23,6 @@ const PUBLISHER_URL = process.env.REACT_APP_PUBLISHER_URL;
 const PROCESSOR_API_URL = process.env.REACT_APP_PROCESSOR_API;
 const IPFS_URL_BASE = process.env.REACT_APP_IPFS_URL_BASE;
 
-
 export default function EditorHome() {
   const { id } = useParams();
   const [promptText, setPromptText] = useState("");
@@ -106,11 +105,6 @@ export default function EditorHome() {
     }).catch((error) => {
 
     });
-
-
-    // Set the background item layer
-
-
   }, []);
 
   const updateNFTData = (value) => {
@@ -460,8 +454,6 @@ export default function EditorHome() {
         editMasklines={editMasklines}
         setEditMaskLines={setEditMaskLines}
         currentCanvasAction={currentCanvasAction}
-        
-
       />
     )
   }
