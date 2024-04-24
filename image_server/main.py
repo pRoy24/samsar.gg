@@ -56,8 +56,8 @@ def edit_image():
     image=image,
     mask_image=mask_image,
     guidance_scale=6.0,
-    num_inference_steps=20,  # steps between 15 and 30 work well for us
-    strength=0.6,  # make sure to use `strength` below 1.0
+    num_inference_steps=25,  # steps between 15 and 30 work well for us
+    strength=0.9,  # make sure to use `strength` below 1.0
     generator=im_generator,
   ).images[0]
 
