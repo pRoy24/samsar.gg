@@ -34,9 +34,6 @@ export default function EditorHome(props) {
   }
 
   if (!id) {
-   // id = props.id;
-
-   console.log("ID NOT FOUND");
    id = props.id;
   }
   const [promptText, setPromptText] = useState("");

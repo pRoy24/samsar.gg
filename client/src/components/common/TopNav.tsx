@@ -19,8 +19,13 @@ export default function TopNav(props) {
 
 
 
+
   const { openAlertDialog, closeAlertDialog} = useAlertDialog();
 
+  const resetSession = () => {
+    resetCurrentSession();
+    closeAlertDialog();
+  }
 
   const { setUserApi, user, setUser } = useUser();
   const navigate = useNavigate();
@@ -69,7 +74,7 @@ export default function TopNav(props) {
         <div>
           <CommonButton
             onClick={() => {
-              resetCurrentSession();
+              resetSession();
             }}
           >
             Yes
