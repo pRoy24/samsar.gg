@@ -4,7 +4,8 @@ import PromptGenerator from './PromptGenerator.tsx';
 import OutpaintGenerator from './OutpaintGenerator.tsx';
 import RangeSlider from '../utils/RangeSlider.js';
 import AddText from './AddText.tsx';
-import { FaChevronDown, FaChevronUp, FaRobot } from 'react-icons/fa';
+import { FaChevronDown, FaChevronUp, FaRobot, FaExpandArrowsAlt } from 'react-icons/fa';
+import { FaHand } from "react-icons/fa6";
 import LayersDisplay from './LayersDisplay.tsx';
 import { CURRENT_TOOLBAR_VIEW } from '../../../constants/Types.ts';
 
@@ -74,8 +75,8 @@ export default function EditorToolbar(props: any) {
     addTextDisplay = (
       <AddText setAddText={setAddText}
         submitAddText={submitAddText}
-       textConfig={textConfig} setTextConfig={setTextConfig}
-        
+        textConfig={textConfig} setTextConfig={setTextConfig}
+
       />
     )
   }
@@ -84,7 +85,7 @@ export default function EditorToolbar(props: any) {
   if (currentViewDisplay === CURRENT_TOOLBAR_VIEW.SHOW_EDIT_MASK_DISPLAY) {
     editDisplay = (
       <div>
-        <RangeSlider editBrushWidth={editBrushWidth} setEditBrushWidth={setEditBrushWidth}/>
+        <RangeSlider editBrushWidth={editBrushWidth} setEditBrushWidth={setEditBrushWidth} />
         <OutpaintGenerator {...props} />
       </div>
     )
@@ -95,7 +96,7 @@ export default function EditorToolbar(props: any) {
     layersDisplay = (
       <div>
         <LayersDisplay activeItemList={activeItemList}
-        setActiveItemList={setActiveItemList}/>
+          setActiveItemList={setActiveItemList} />
       </div>
     )
   }
@@ -143,31 +144,14 @@ export default function EditorToolbar(props: any) {
   }
 
   return (
-    <div className='bg-neutral-50 h-full m-auto fixed top-0 overflow-y-auto'>
-      <div className='mt-[50px]'>
+    <div className='bg-neutral-50 h-full m-auto fixed top-0 overflow-y-auto ml-4 mr-4 w-[16%]'>
 
-        <div className=' pt-4 pb-4 bg-neutral-200 mt-4 rounded-sm'>
+      <div>
 
-          <div className='grid grid-cols-2'>
-            <button className='bg-neutral-50 shadow-sm hover:bg-neutral-100 rounded-md m-auto pl-4 pr-4 h-[30px]' onClick={saveIntermediateImage}>
-              Save
-            </button>
-            <div className='flex'>
-              <input type='checkbox' checked className='inline-flex' />
-              <span className='inline-flex text-xs text-left pl-1 pr-2'>
-                Auto Checkpoint
-              </span>
-            </div>
-          </div>
-        </div>
 
-        <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm text-left pl-2 pr-2' >
-          <div className='text-lg font-bold  m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_TEMPLATES_DISPLAY)}>
-            <div className='inline-flex ml-4 pl-4'>
-              Templates
-            </div>
-          </div>
-        </div>
+      </div>
+      <div className='mt-[80px] '>
+
         <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm  text-left pl-2 pr-2'>
           <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_GENERATE_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
@@ -206,7 +190,7 @@ export default function EditorToolbar(props: any) {
             </div>
             <FaChevronDown className='inline-flex float-right mr-4 mt-2 text-sm' />
           </div>
-       
+
         </div>
 
         <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm text-left pl-2 pr-2'>
@@ -221,8 +205,8 @@ export default function EditorToolbar(props: any) {
         <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm text-left pl-2 pr-2'>
 
           <div className='text-lg font-bold m-auto cursor-pointer' onClick={showAttestationDialog}>
-          <div className='inline-flex ml-4 pl-4'>
-            Publish
+            <div className='inline-flex ml-4 pl-4'>
+              Publish
             </div>
           </div>
         </div>

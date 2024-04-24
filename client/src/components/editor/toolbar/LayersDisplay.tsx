@@ -87,7 +87,7 @@ export default function LayersDisplay(props: any) {
                   {itemContent}
                   <button
                     onClick={() => deleteItem(item.id)}
-                    style={{ marginLeft: 'auto', background: 'red', color: 'white' }}
+                    style={{ marginLeft: 'auto', background: '#64748b', color: 'white' , float: 'right'}}
                   >
                     <FaTimes />
                   </button>

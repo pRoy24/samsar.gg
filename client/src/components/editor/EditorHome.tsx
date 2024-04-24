@@ -477,7 +477,7 @@ export default function EditorHome() {
           <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto p-4 mb-8 '>
             {viewDisplay}
           </div>
-          <div className='w-[16%] inline-block bg-green-500 '>
+          <div className='w-[16%] inline-block  '>
             <EditorToolbar promptText={promptText} setPromptText={setPromptText}
               submitGenerateRequest={submitGenerateRequest}
               submitOutpaintRequest={submitOutpaintRequest}
