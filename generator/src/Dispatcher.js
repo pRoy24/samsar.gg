@@ -8,6 +8,8 @@ const IMAGE_PROCESSOR_SERVER = process.env.IMAGE_PROCESSOR_SERVER;
 
 export async function getImageFromText(payload) {
   const { prompt, model } = payload;
+  console.log(payload);
+  
   if (model === IMAGE_GENERAITON_MODEL_TYPES['SDXL']) {
     const imageURL = await getImageFromWebModel(prompt);
     return imageURL;

@@ -1,13 +1,11 @@
-import { EventEmitter } from 'events';
-EventEmitter.defaultMaxListeners = 100;
+// import { EventEmitter } from 'events';
+// EventEmitter.defaultMaxListeners = 100;
 
 import { processPendingImageRequests } from './src/Image.js';
-import { createReplicas } from './src/Database.js';
+
 
 export async function listenToGenerationRequests() {
-  await createReplicas();
 
-    await getTimeout(10000);
 
     while (true) {
       console.log("Waiting for records");

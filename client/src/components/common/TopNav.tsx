@@ -1,27 +1,45 @@
 import React, { useEffect, useState } from 'react';
 
-
+import { SignInButton, useProfile, useSignIn } from '@farcaster/auth-kit';
 import axios from 'axios';
 import { useUser } from '../../contexts/UserContext'
 import CommonButton from './CommonButton.tsx';
 import { useNavigate } from 'react-router-dom';
 import { createSponsoredSigner } from '../../utils/pinata.js';
 import QRCode from "react-qr-code";
+import { useAlertDialog } from '../../contexts/AlertDialogContext';
 
 
 
 const PROCESSOR_SERVER = process.env.REACT_APP_PROCESSOR_API;
 
-export default function TopNav() {
+export default function TopNav(props) {
+
+  const { resetCurrentSession } = props;
 
 
-  const { user } = useUser();
+
+  const { openAlertDialog, closeAlertDialog} = useAlertDialog();
+
+
+  const { setUserApi, user, setUser } = useUser();
   const navigate = useNavigate();
 
-
-
+  const [userProfileData, setUserProfileData] = useState({});
 
   let userProfile = <span />;
+
+  const setUserProfile = (profile) => {
+    setUserProfileData(profile);
+  
+  }
+
+  useEffect(() => {
+    if (userProfileData && userProfileData.fid) {
+      setUserApi(userProfileData);
+    }
+  }, [userProfileData]);
+
 
   if (user && user.fid) {
     userProfile = (
@@ -35,12 +53,38 @@ export default function TopNav() {
     );
   } else {
     const nonce = Math.random().toString(36).substring(7);
-    userProfile = <span />
+    userProfile = <SignInButton
+      onSuccess={(profile) => setUserProfile(profile)}
+    />
+
 
   }
 
   const gotoHome = () => {
-    navigate('/');
+    const alertDialogComponent = (
+      <div>
+        <div>
+          This will reset your current session. Are you sure you want to proceed?
+        </div>
+        <div>
+          <CommonButton
+            onClick={() => {
+              resetCurrentSession();
+            }}
+          >
+            Yes
+          </CommonButton>
+          <CommonButton
+            onClick={() => {
+              closeAlertDialog();
+            }}
+          >
+            No
+          </CommonButton>
+         </div> 
+      </div>
+    )
+    openAlertDialog(alertDialogComponent);
   }
   let addFarcasterWallet = <span />;
 
@@ -49,7 +93,7 @@ export default function TopNav() {
     <div className='bg-gradient-to-r from-green-700 to-green-400  h-[50px] fixed w-[100vw] shadow-lg z-10'>
       <div className='grid grid-cols-4'>
         <div>
-        <img src={'/logo.png'} className='cursor-pointer' onClick={() => gotoHome()} />
+          <img src={'/logo.png'} className='cursor-pointer' onClick={() => gotoHome()} />
         </div>
         <div>
 

@@ -7,12 +7,8 @@ import usersRouter from './src//routes/users.js';
 import adminRouter from './src/routes/admin.js';
 import utilsRouter from './src/routes/utils.js';
 
-
-import {  createReplicas } from './src/storage/Documents.js';
 const app = express();
 const PORT = 3002;
-
-
 
 app.use(express.json({ limit: '50mb', extended: true  })); 
 
@@ -28,12 +24,7 @@ const corsOptions = {
 // Apply CORS middleware to all requests
 app.use(cors(corsOptions));
 
-
-
 app.use(express.static('assets'));
-
-console.log("Creating Replicas");
-createReplicas();
 
 app.use('/users', usersRouter);
 app.use('/sessions', sessionsRouter);

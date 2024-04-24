@@ -19,10 +19,7 @@ export const AlertDialogProvider = ({ children }) => {
   const [alertComponentData, setAlertComponentData] = useState(<span />);
 
   const openAlertDialog = (content, onsubmit) => {
-    console.log("OPENING ALERT DIALOG");
-    console.log(content);
-    console.log(onsubmit);
-    
+
     setDialogContent(content);
     setAlertDialogSubmit(onsubmit);
     setIsAlertDialogOpen(true);

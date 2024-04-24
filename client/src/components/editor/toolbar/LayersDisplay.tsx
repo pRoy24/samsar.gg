@@ -53,6 +53,10 @@ export default function LayersDisplay(props: any) {
   };
   
   const deleteItem = (id) => {
+
+    console.log("IIII");
+    console.log(id);
+    
     // Filter out the item with the matching id
     const filteredItems = activeItemList.filter(item => item.id !== id);
     // Update the activeItemList with the filtered items

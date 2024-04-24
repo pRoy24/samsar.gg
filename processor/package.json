@@ -25,6 +25,7 @@
     "express": "^4.19.2",
     "hat": "^0.0.3",
     "helia": "^4.1.0",
+    "mongoose": "^8.3.2",
     "pinata-fdk": "^3.7.2",
     "thirdweb": "^5.5.0",
     "uuid": "^9.0.1",

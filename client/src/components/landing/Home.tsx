@@ -2,6 +2,8 @@ import React from "react";
 import CommonContainer from "../common/CommonContainer.tsx";
 import { useEffect } from "react";
 import EditorHome from "../editor/EditorHome.tsx";
+import EditorLanding from '../editor/EditorLanding.tsx';
+
 import ListProduct from "../product/ListProduct.tsx";
 import AppHome from "./AppHome.tsx";
 import axios from "axios";
@@ -28,7 +30,7 @@ export default function Home() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<AppHome />} />
+        <Route path="/" element={<EditorLanding />} />
         <Route path="/session/:id" element={<EditorHome />} />
         {/* Add more routes as needed */}
       </Routes>

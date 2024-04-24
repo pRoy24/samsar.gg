@@ -100,7 +100,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
       container.style.cursor = generateCursor(editBrushWidth);
     } else {
       setEditMaskLines([]);
-      
+
       const stage = ref.current.getStage();
       const container = stage.container();
       container.style.cursor = 'default';
@@ -198,7 +198,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
 
 
   const handleLayerMouseMove = (e) => {
-    if (!isPainting) return;
+    if (!isPainting || editMasklines.length === 0) return;
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
     let lastLine = editMasklines[editMasklines.length - 1];

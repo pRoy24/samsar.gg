@@ -1,107 +1,111 @@
-import { getSessionsDB, getPublicationsDB, getUsersDB } from "../storage/Documents.js";
+
+import Session from '../schema/Session.js';
+import Publication from '../schema/Publication.js';
+
+
+import { getDBConnectionString } from "./DBString.js";
 import { v4 as uuidv4 } from 'uuid';
 import { addImageGeneratorRequest , addImageOutpaintRequest } from "./Images.js";
 import hat from 'hat';
 import { uploadImageToIpfs, uploadImageToFileSystem, uploadMetadataToIpfs } from "../storage/Files.js";
-import { generateWitnessForFile, createEthSignAttestation } from './Attestation.js';
 import { setUrlForNextToken, mintTokensForCreator } from './Contract.js';
 import { getChainById } from './Utility.js';
 
-
 import { getNFTMetaData } from './Metadata.js';
+import { User } from "../schema/User.js";
 
-export async function testConnection() {
-  const dbConn = await getSessionsDocument();
-}
 
-export async function createNewSession(payload) {
-  const fid = payload.fid;
+export async function createNewSession(userId, payload) {
+
   const sessionId = uuidv4();
   const sessionPayload = {
-    fid: fid.toString(),
+    userId: userId,
     generations: [],
     _id: sessionId,
   }
-  const db = await getSessionsDB();
-  await db.put(sessionPayload);
-
-  return sessionPayload;
+  await getDBConnectionString();
+  const sessionData = new Session(sessionPayload);
+  const sessionSaveResponse = await sessionData.save();
+  return sessionSaveResponse;
 }
 
 export async function requestGenerateImage(payload) {
-  const db = await getSessionsDB();
+  await getDBConnectionString();
   const sessionId = payload.sessionId;
-  const sessionData = await db.get(sessionId);
+  const sessionDataValue = await Session.findOne({ _id: sessionId });
 
-  if (!sessionData) {
+
+  console.log("GOT SESSION");
+  console.log(sessionDataValue);
+  
+  if (!sessionDataValue) {
     return;
   }
-  const sessionDataValue = sessionData.value;
+
   sessionDataValue.generationStatus = "PENDING";
   sessionDataValue.prompt = payload.prompt;
   await addImageGeneratorRequest(payload);
-  await db.put(sessionDataValue);
+  await sessionDataValue.save();
   return sessionDataValue;
 }
 
 export async function requestOutpaintImage(payload) {
-  const db = await getSessionsDB();
-  const sessionId = payload.sessionId;
-  const sessionData = await db.get(sessionId);
+  await getDBConnectionString();
 
-  if (!sessionData) {
-    return;
-  }
-  const sessionDataValue = sessionData.value;
+  const sessionId = payload.sessionId;
+  const sessionDataValue = await Session.findOne({ _id: sessionId });
+
   sessionDataValue.outpaintStatus = "PENDING";
   sessionDataValue.prompt = payload.prompt;
   await addImageOutpaintRequest(payload);
   
-  await db.put(sessionDataValue);
-  return sessionDataValue;
+  const saveRes = await sessionDataValue.save();
+
+  return saveRes;
 
 }
 
 export async function getSessionGenerationStatus(sessionId) {
-  const db = await getSessionsDB();
-  const sessionData = await db.get(sessionId);
-  if (sessionData) {
-    return sessionData.value;
-  }
+
+  await getDBConnectionString();
+  const sessionDataValue = await Session.findOne({ _id: sessionId });
+  return sessionDataValue;
 }
 
 
 
 export async function publishSession(payload) {
-  const db = await getSessionsDB();
-  const sessionId = payload.sessionId;
-  const sessionData = await db.get(sessionId);
-  const sessionDataValue = sessionData.value;
 
+  await getDBConnectionString();
+  const sessionId = payload.sessionId;
+  const sessionDataValue = await Session.findOne({ _id: sessionId });
+  
+  if (!sessionDataValue) {
+    return;
+  }
   sessionDataValue.publishStatus = "COMPLETED";
   const imageData = await uploadImageToIpfs(payload.image);
   const imageHash = imageData.data.Hash;
-  const publicationsDB = await getPublicationsDB();
-
-  const publicationsPayload = {
+  const publicationsPayload = new Publication({
     _id: productId,
     sessionId: sessionId,
     imageHash: imageHash,
-    createdBy: sessionDataValue.fid,
+    createdBy: sessionDataValue.userId,
     slug: productId,
-  }
-  await publicationsDB.put(publicationsPayload);
+  });
 
-  await db.put(sessionDataValue);
-  return sessionDataValue;
+  const publicationRes = await publicationsPayload.save();
+  return publicationRes;
 }
 
 export async function saveIntermediate(payload) {
-  const db = await getSessionsDB();
+  //const db = await getSessionsDB();
 
-  // Fetch existing session data from the database
-  const sessionData = await db.get(payload.sessionId);
-  const sessionDataValue = sessionData.value;
+  await getDBConnectionString();
+  const sessionId = payload.sessionId;
+  const sessionDataValue = await Session.findOne({ _id: sessionId });
+
+
 
   // Retrieve the intermediates array or initialize as empty if it doesn't exist
   let intermediates = sessionDataValue.intermediates || [];
@@ -115,7 +119,7 @@ export async function saveIntermediate(payload) {
   // Add the new item (imageName in this case) to the beginning of the queue
   intermediates.unshift(imageFile);
 
-  updateWitnessForIntermediate(payload.sessionId, imageName, imageData);
+  // updateWitnessForIntermediate(payload.sessionId, imageName, imageData);
 
   // Ensure the queue doesn't exceed 10 items
   if (intermediates.length > 10) {
@@ -126,73 +130,76 @@ export async function saveIntermediate(payload) {
   // Save the updated intermediates back to the database
   sessionDataValue.intermediates = intermediates;
   sessionDataValue.activeSelectedImage = imageName;
-  await db.put(sessionDataValue);
+  
+  await sessionDataValue.save();
+  return sessionDataValue;
 
 }
 
 async function updateWitnessForIntermediate(sessionId, imageName, imageData) {
-  const leafHash = await generateWitnessForFile(imageData);
+  // const leafHash = await generateWitnessForFile(imageData);
 
-  const db = await getSessionsDB();
-  const sessionData = await db.get(sessionId);
-  const sessionDataValue = sessionData.value;
+  // const db = await getSessionsDB();
+  // const sessionData = await db.get(sessionId);
+  // const sessionDataValue = sessionData.value;
 
 
-  sessionDataValue.witnesses = sessionDataValue.witnesses || [];
-  sessionDataValue.witnesses.push({
-    imageName: imageName,
-    leafHash: leafHash,
-  });
-  await db.put(sessionDataValue);
+  // sessionDataValue.witnesses = sessionDataValue.witnesses || [];
+  // sessionDataValue.witnesses.push({
+  //   imageName: imageName,
+  //   leafHash: leafHash,
+  // });
+  // await db.put(sessionDataValue);
 
 }
 
 export async function getSessionDetails(sessionId) {
-  const db = await getSessionsDB();
-  const sessionData = await db.get(sessionId);
-  return sessionData.value;
+  await getDBConnectionString();
+  const sessionDataValue = await Session.findOne({ _id: sessionId });
+  return sessionDataValue;
+
 }
 
 
 export async function createAttestation(payload) {
-  const db = await getSessionsDB();
-  const userDB = await getUsersDB();
-  const sessionId = payload.sessionId;
-  const fid = payload.fid;
+  // const db = await getSessionsDB();
+  // const userDB = await getUsersDB();
+  
+  // const sessionId = payload.sessionId;
+  // const fid = payload.fid;
 
-  const sessionData = await db.get(sessionId);
-  const sessionDataValue = sessionData.value;
+  // const sessionData = await db.get(sessionId);
+  // const sessionDataValue = sessionData.value;
 
 
-  const userData = await userDB.get(fid);
-  const userDataValue = userData.value;
+  // const userData = await userDB.get(fid);
+  // const userDataValue = userData.value;
 
-  const attesterPrivateKey = userDataValue.attesterPrivateKey;
+  // const attesterPrivateKey = userDataValue.attesterPrivateKey;
 
-  let attestationPayload = {
-    name: sessionData._id
-  }
-  const attestation = await createEthSignAttestation(attestationPayload);
+  // let attestationPayload = {
+  //   name: sessionData._id
+  // }
+  // const attestation = await createEthSignAttestation(attestationPayload);
 
-  const attestationId = attestation.attestationId;
+  // const attestationId = attestation.attestationId;
 
-  sessionDataValue.attestationId = attestationId;
+  // sessionDataValue.attestationId = attestationId;
 
-  await db.put(sessionDataValue);
-  return sessionDataValue;
+  // await db.put(sessionDataValue);
+  // return sessionDataValue;
 }
 
 export async function publishSessionAndSetURI(payload) {
 
-  const db = await getSessionsDB();
-  const userDB = await getUsersDB();
+  await getDBConnectionString();
 
+
+ 
   const sessionId = payload.sessionId;
-  const sessionData = await db.get(sessionId);
-  const sessionDataValue = sessionData.value;
-  const userData = await userDB.get(sessionDataValue.fid);
-  const userDataValue = userData.value;
+  const sessionDataValue = await Session.findOne({ _id: sessionId });
 
+  const userDataValue = await User.findOne({'_id': sessionDataValue.userId});
 
   sessionDataValue.publishStatus = "COMPLETED";
   const imageData = await uploadImageToIpfs(payload.image);
@@ -204,18 +211,11 @@ export async function publishSessionAndSetURI(payload) {
 
   const selectedChainId = payload.selectedChain;
 
-  console.log("SELECTED CHAIN ID");
-  console.log(selectedChainId);
-  
-
   const nftMetadata = await uploadMetadataToIpfs(nftmetadata);
   const nftMetadataHash = nftMetadata.data.Hash;
   const imageHash = imageData.data.Hash;
 
   const nftmetadataurl = `ipfs://${nftMetadataHash}`;
-
-  console.log("GOT NFT METADATA URL");
-  console.log(nftmetadataurl);
 
   const nftTokenData = await setUrlForNextToken(selectedChainId, nftmetadataurl);
 
@@ -228,7 +228,7 @@ export async function publishSessionAndSetURI(payload) {
   
   const creatorInitHash = creatorInitHashData.transactionHash;
 
-  const publicationsDB = await getPublicationsDB();
+
 
 
   const chain = getChainById(selectedChainId);
@@ -236,7 +236,7 @@ export async function publishSessionAndSetURI(payload) {
 
   const publicationId = `${chain.id}_${tokenId}`;
 
-  const publicationsPayload = {
+  const publicationsPayload = new Publication({
     _id: publicationId,
     sessionId: sessionId,
     imageHash: imageHash,
@@ -247,13 +247,37 @@ export async function publishSessionAndSetURI(payload) {
     generationHash: hash,
     creatorInitAllocation: allocation
 
-  }
+  });
 
-  await publicationsDB.put(publicationsPayload);
+
+  await publicationsPayload.save();
 
   const uri = `https://gateway.ipfs.io/ipfs/${imageHash}`;
   sessionDataValue.uri = uri;
-  await db.put(sessionDataValue);
+  await sessionDataValue.save();
+
   return publicationsPayload;
 
+}
+
+
+export async function getOrCreateSession(payload) {
+  await getDBConnectionString();
+
+
+  const userId = payload.userId;
+  const sessionId = payload.sessionId;
+  const sessionDataValue = await Session.findOne({ _id: sessionId });
+
+  if (sessionDataValue) {
+    return sessionDataValue;
+  } else {
+    const sessionPayload = new Session({
+      userId: userId.toString(),
+      generations: [],
+      _id: sessionId,
+    });
+    const sessionSaveResponse = await sessionPayload.save();
+    return sessionSaveResponse;
+  }
 }

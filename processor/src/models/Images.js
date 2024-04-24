@@ -1,21 +1,30 @@
-import { getGenerationsDB } from '../storage/Documents.js';
+import { getDBConnectionString } from './DBString.js';
+import Generation from '../schema/Generation.js';
 import { v4 as uuidv4 } from 'uuid';
 import { uploadTempEditImageToFileSystem } from '../storage/Files.js';
 
 export async function addImageGeneratorRequest(payload) {
 
   try {
-  const uuid = uuidv4();
-  const db = await getGenerationsDB();
 
-  const generationPayload = {
-    _id: uuid,
+    console.log(payload);
+
+
+  await getDBConnectionString();
+
+
+  const generationPayload = new Generation({
+
     ...payload,
     generationStatus: "PENDING",
     rowLocked: false,
     operationType: "GENERATE",
-  }
-  await db.put(generationPayload);
+  });
+
+
+  console.log(generationPayload);
+  
+  await generationPayload.save();
   return generationPayload;
 } catch (error) {
 }
@@ -25,9 +34,10 @@ export async function addImageGeneratorRequest(payload) {
 
 export async function addImageOutpaintRequest(payload) {
   const localImageLinks = await uploadTempEditImageToFileSystem(payload);
-  const uuid = uuidv4();
-  const queuePayload = {
-    _id: uuid,
+
+  await getDBConnectionString();
+  const queuePayload = new Generation({
+
     outpaintStatus: "PENDING",
     sessionId: payload.sessionId,
     image: localImageLinks.image,
@@ -36,12 +46,11 @@ export async function addImageOutpaintRequest(payload) {
     operationType: "OUTPAINT",
     prompt: payload.prompt,
     model: payload.model,
-  }
+  });
 
-
-  const db = await getGenerationsDB();
-  await db.put(queuePayload);
+  await queuePayload.save();
   return queuePayload;
+
 
 
 }

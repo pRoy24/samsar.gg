@@ -8,6 +8,12 @@ export default function CommonContainer(props) {
 
   const { getUserAPI } = useUser();
 
+  const resetCurrentSession = () => {
+    if (props.resetSession) {
+      props.resetSession();
+    
+    }
+  }
   useEffect(() => {
     const userFid = localStorage.getItem("fid");
     if (userFid) {
@@ -18,7 +24,7 @@ export default function CommonContainer(props) {
 
   return (
     <div className='h-[100vh] overflow-hidden'>
-      <TopNav />
+      <TopNav resetCurrentSession={resetCurrentSession}/>
       <div>
         <AlertDialog />
         {children}

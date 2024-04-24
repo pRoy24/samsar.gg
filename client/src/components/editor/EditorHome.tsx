@@ -23,8 +23,22 @@ const PUBLISHER_URL = process.env.REACT_APP_PUBLISHER_URL;
 const PROCESSOR_API_URL = process.env.REACT_APP_PROCESSOR_API;
 const IPFS_URL_BASE = process.env.REACT_APP_IPFS_URL_BASE;
 
-export default function EditorHome() {
-  const { id } = useParams();
+export default function EditorHome(props) {
+  
+  let { id } = useParams();
+
+  const resetSession = () => {
+    if (props.resetCurrentSession) {
+      props.resetCurrentSession();
+    }
+  }
+
+  if (!id) {
+   // id = props.id;
+
+   console.log("ID NOT FOUND");
+   id = props.id;
+  }
   const [promptText, setPromptText] = useState("");
   const [selectedChain, setSelectedChain] = useState('');
   const [selectedAllocation, setSelectedAllocation] = useState(300);
@@ -37,6 +51,7 @@ export default function EditorHome() {
   const [currentView, setCurrentView] = useState(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
 
   const [selectedGenerationModel, setSelecteGenerationdModel] = useState('SDXL');
+  const [ isGenerationPending , setIsGenerationPending ] = useState(false);
 
   const [ currentCanvasAction, setCurrentCanvasAction ] = useState(CANVAS_ACTION.DEFAULT);
 
@@ -74,7 +89,11 @@ export default function EditorHome() {
 
 
   useEffect(() => {
+    if (!id) {
+      return;
+    }
     axios.get(`${PROCESSOR_API_URL}/sessions/details?id=${id}`).then((response) => {
+
 
       const activeSelectedImageName = response.data.activeSelectedImage;
       if (activeSelectedImageName) {
@@ -99,13 +118,26 @@ export default function EditorHome() {
     // get list of available chains
     axios.get(`${PROCESSOR_API_URL}/utils/chain_list`).then((response) => {
       const chainList = response.data;
-      console.log(chainList);
       setChainList(chainList);
       setSelectedChain(chainList[0].key);
     }).catch((error) => {
 
     });
   }, []);
+
+
+  useEffect(() => {
+    if (user && user.fid && id) {
+      axios.post(`${PROCESSOR_API_URL}/sessions/get_or_create_session`, {
+        userId: user._id.toString(),
+        sessionId: id
+      }).then((response) => {
+        console.log(response);
+      }).catch((error) => {
+        console.log(error);
+      });
+    }
+  }, [user, id]);
 
   const updateNFTData = (value) => {
     let newNftData = Object.assign({}, nftData, value);
@@ -251,6 +283,7 @@ export default function EditorHome() {
 
 
   async function startGenerationPoll() {
+    setIsGenerationPending(true);
     const pollStatus = await axios.get(`${PROCESSOR_API_URL}/sessions/generate_status?id=${id}`);
 
     if (pollStatus.data.generationStatus === 'COMPLETED') {
@@ -262,6 +295,7 @@ export default function EditorHome() {
 
       setActiveItemList(nImageList);
       setSessionDetails(pollStatus.data);
+      setIsGenerationPending(false);
       return;
     } else {
       setTimeout(() => {
@@ -458,12 +492,13 @@ export default function EditorHome() {
     )
   }
   return (
-    <CommonContainer>
+    <CommonContainer resetSession={resetSession}>
       <div className='m-auto'>
         <div className='block'>
           <div className='w-[6%] '>
             <ActionToolbar
               setCurrentAction={setCurrentAction}
+              setCurrentViewDisplay={setCurrentViewDisplay}
             />
           </div>
           <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto p-4 mb-8 '>
@@ -497,6 +532,7 @@ export default function EditorHome() {
               setActiveItemList={setActiveItemList}
               selectedGenerationModel={selectedGenerationModel}
               setSelecteGenerationdModel={setSelecteGenerationdModel}
+              isGenerationPending={isGenerationPending}
 
             />
           </div>
