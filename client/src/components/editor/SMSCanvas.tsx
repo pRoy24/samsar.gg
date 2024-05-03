@@ -6,6 +6,9 @@ import ResizableImage from "./ResizableImage.tsx";
 import ResizableText from "./ResizableText.tsx";
 import ResizableShape from "./ResizableShape.js";
 import { STAGE_DIMENSIONS } from '../../constants/Image.js';
+import ResizableRectangle from "./shapes/ResizableRectangle.tsx";
+import ResizablePolygon from "./shapes/ResizablePolygon.tsx";
+import ResizableCircle from "./shapes/ResizableCircle.tsx";
 
 const IMAGE_BASE = `${process.env.REACT_APP_PROCESSOR_API}`;
 
@@ -21,9 +24,6 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
   const imageSrc = `${IMAGE_BASE}/generations/${sessionDetails?.activeSelectedImage}`;
   const [image, status] = useImage(imageSrc, 'anonymous');
   const [selectedId, selectImage] = useState(null);
-
-
-  console.log("CURRENT CANVAS ACTION", currentCanvasAction);
 
   useEffect(() => {
     if (currentCanvasAction === 'MOVE') {
@@ -128,11 +128,6 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
     };
   }, []);
 
-
-
-
-
-
   if (currentView === CURRENT_TOOLBAR_VIEW.SHOW_EDIT_MASK_DISPLAY) {
 
     const stage = ref.current.getStage();
@@ -143,12 +138,14 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
   let imageStackList = <span />;
 
   if (activeItemList && activeItemList.length > 0) {
+    
     imageStackList = activeItemList.map(function (item, index) {
+
       if (item.type === 'image') {
         return (
           <ResizableImage
-            key={`group_image_${index}`}
-            id={`group_image_${index}`}
+            key={`group_image_${item.id}`}
+            id={`group_image_${item.id}`}
             image={item}
             isSelected={selectedId === item.id}
             onSelect={() => setItemAsSelected(item.id)}
@@ -159,31 +156,41 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
       } else if (item.type === 'text') {
         return (
           <ResizableText
-            key={`group_text_${index}`}
-            id={`group_text_${index}`}
+            key={`group_text_${item.id}`}
+            id={`group_text_${item.id}`}
             text={item.text}
             config={item.config} 
             isSelected={selectedId === item.id}
             onSelect={() => selectImage(item.id)}
             onUnselect={() => selectImage(null)}
-
           />
         )
       } else if (item.type === 'shape') {
-        return (
-          <ResizableShape
-            key={index}
-            shape={item.shape}
-            config={item.config} 
-            isSelected={selectedId === item.id}
-            onSelect={() => selectImage(item.id)}
-            onUnselect={() => selectImage(null)}
+        if (item.shape === 'circle') {
+          return <ResizableCircle {...item}
+          key={`group_circle_${item.id}`}
+          isSelected={selectedId === item.id}
+          onSelect={() => setItemAsSelected(item.id)}
+          onUnselect={() => selectImage(null)}
+        />
+        } else if (item.shape === 'rectangle') {
+          return <ResizableRectangle config={item.config} {...item}
+          key={`group_rectangle_${item.id}`}
+          isSelected={selectedId === item.id}
+          onSelect={() => setItemAsSelected(item.id)}
+          onUnselect={() => selectImage(null)}
           />
-        )
+        } else {
+          return <ResizablePolygon {...item}
+          key={`group_polygon_${item.id}`}
+          isSelected={selectedId === item.id}
+          onSelect={() => setItemAsSelected(item.id)}
+          onUnselect={() => selectImage(null)}
+           />
+        }
       }
     }).filter(Boolean);
   }
-
 
   const handleLayerMouseDown = (e) => {
     setIsPainting(true);

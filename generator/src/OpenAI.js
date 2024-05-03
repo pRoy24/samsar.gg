@@ -10,7 +10,7 @@ const API_KEY = process.env.OPENAI_API_KEY;
 
 const openai = new OpenAI({apiKey: API_KEY });
 
-export async function getImageFromText(prompt) {
+export async function getImageFromAPI(prompt) {
 
 
   try {
@@ -47,7 +47,7 @@ export async function getImageFromText(prompt) {
 
 }
 
-export async function getOutpaintImageFromText(prompt, imageURL, maskImageURL) {
+export async function getOutpaintImageFromApi(prompt, imageURL, maskImageURL) {
   console.log("GETTING OUTPAINT");
   console.log(prompt);
   console.log(imageURL);
@@ -63,12 +63,9 @@ export async function getOutpaintImageFromText(prompt, imageURL, maskImageURL) {
         response_format: 'b64_json'
       }
     );
-    console.log(image);
 
     const imageData = image.data[0]['b64_json'];
 
-    console.log("IMAGE DATA");
-    console.log(imageData);
 
     const randStr = Math.random().toString(36).substring(7);
     const imageName = `outpaint_${Date.now()}_${randStr}.png`

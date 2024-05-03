@@ -2,22 +2,23 @@
 
 export const CHAIN_DEFINITIONS = [
   {
-    name: 'Gnosis Chaido (Testnet)',
-    key: 'gnosis_chaido',
-    id: 10200,
-    rpc: "https://rpc.chiadochain.net",
-    blockExplorer: "https://blockscout.com/gnosis/chiado"
+    name: 'Base Sepolia (Testnet)',
+    key: 'base_sepolia',
+    id: 84532,
+    rpc: "https://sepolia.base.org",
+    blockExplorer: "https://sepolia-explorer.base.org",
   },
   {
-    name: 'Arbitrum Sepolia (Testnet)',
-    key: 'arbitrum_sepolia',
-    id: 421614,
-    rpc: "https://sepolia-rollup.arbitrum.io/rpc",
-    blockExplorer: "https://sepolia.arbiscan.io",
+    name: 'Base (Mainnet)',
+    key: 'base',
+    id: 8453,
+    rpc: "https://mainnet.base.org",
+    blockExplorer: "https://basescan.org",
   }
+  
 ]
 
 
-export const erc1155ContractAddress = process.env.CHAIDO_DEPLOYMENT_ADDRESS;
+export const erc1155ContractAddress = process.env.NEXT_PUBLIC_DEPLOYMENT_ADDRESS;
 
 export const CHAIN = CHAIN_DEFINITIONS[0];

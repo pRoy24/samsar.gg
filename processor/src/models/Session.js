@@ -12,7 +12,7 @@ import { setUrlForNextToken, mintTokensForCreator } from './Contract.js';
 import { getChainById } from './Utility.js';
 
 import { getNFTMetaData } from './Metadata.js';
-import { User } from "../schema/User.js";
+import User from "../schema/User.js";
 
 
 export async function createNewSession(userId, payload) {
@@ -189,10 +189,12 @@ export async function createAttestation(payload) {
 
 export async function publishSessionAndSetURI(payload) {
 
+  console.log("PUBLISHING SESSION");
+  console.log(payload);
+
+
   await getDBConnectionString();
 
-
- 
   const sessionId = payload.sessionId;
   const sessionDataValue = await Session.findOne({ _id: sessionId });
 
@@ -234,7 +236,7 @@ export async function publishSessionAndSetURI(payload) {
   const publicationId = `${chain.id}_${tokenId}`;
 
   const publicationsPayload = new Publication({
-    _id: publicationId,
+    slug: tokenId,
     sessionId: sessionId,
     imageHash: imageHash,
     createdBy: sessionDataValue.fid,

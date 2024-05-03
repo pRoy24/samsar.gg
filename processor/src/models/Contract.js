@@ -27,19 +27,23 @@ const wallet = privateKeyAccount({
 
 
 export function getContractAddress(chainId) {
+  console.log("GETTONG CONTRACT ADDRESS");
+  console.log(chainId);
+  console.log("EE TEE");
+
   chainId = parseInt(chainId, 10);
 
-  const CHAIDO_CONTRACT_ADDRESS = process.env.CHAIDO_DEPLOYMENT_ADDRESS;
-  const ARBI_SEPOLIA_CONTRACT_ADDRESS = process.env.ARBI_SEPOLIA_DEPLOYMENT_ADDRESS;
-  if (chainId === 421614) {
-    return ARBI_SEPOLIA_CONTRACT_ADDRESS; 
-  } else {
-    return CHAIDO_CONTRACT_ADDRESS;
-  }
+  const DEPLOYMENT_ADDRESS = process.env.DEPLOYMENT_ADDRESS;
+  return DEPLOYMENT_ADDRESS;
+
+
 }
 
 async function getContractForChainId(chainId) {
   const chainData = CHAIN_DEFINITIONS.find(chain => chain.id.toString() === chainId.toString());
+  console.log("GOT CHAIN DATA");
+  console.log(chainData);
+
   const CONTRACT_ADDRESS = getContractAddress(chainId);
 
   console.log(chainData);
@@ -64,17 +68,12 @@ export async function setUrlForNextToken(chainId, metadataUrl) {
 
   const contract = await getContractForChainId(chainId);
 
-  console.log("Getting next token id");
-
-
   const nextToken = await readContract({
     contract,
     method: 'getNextTokenId',
   });
 
   const nextTokenId = nextToken.toString();
-
-  console.log(nextTokenId);
 
   const transaction = prepareContractCall({
     contract,
@@ -94,8 +93,6 @@ export async function setUrlForNextToken(chainId, metadataUrl) {
     hash: receipt.transactionHash,
     tokenId: nextTokenId,
   }
-
-  console.log(returnPayload);
 
   return returnPayload;
 

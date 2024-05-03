@@ -4,7 +4,7 @@ import { createFarcasterSigner, pollSignerForCompletion, getUserExtradata } from
 import { generateAttesterPrivateKey } from '../utils/ViemUtils.js';
 import { v4 as uuidv4 } from 'uuid';
 import 'dotenv/config';
-import { User } from '../schema/User.js';
+import  User from '../schema/User.js';
 
 
 import { getDBConnectionString } from './DBString.js';

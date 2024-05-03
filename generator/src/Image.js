@@ -27,13 +27,17 @@ export async function processPendingImageRequests() {
       } else if (operationType === "OUTPAINT") {
         await processOutpaintRequest(pendingRequestData);
       }
+
+      
     } catch (e) {
       console.log("CAUGHT ERROR");
     
+      console.log(e);
 
       if (requestId) {
         try {
-          await generationsDB.del(requestId);
+          await Generation.deleteOne({ _id: requestId });
+
         } catch (e) {
 
         }

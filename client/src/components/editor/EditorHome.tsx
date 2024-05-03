@@ -13,6 +13,9 @@ import AttestationDialog from './utils/AttestationDialog.tsx';
 import PublishDialog from './utils/PublishDialog.tsx';
 import CommonContainer from '../common/CommonContainer.tsx';
 import ActionToolbar from './toolbar/ActionToolbar.tsx';
+import ResizableCircle from './shapes/ResizableCircle.tsx';
+import ResizablePolygon from './shapes/ResizablePolygon.tsx';
+import ResizableRectangle from './shapes/ResizableRectangle.tsx';
 import { CURRENT_TOOLBAR_VIEW , CANVAS_ACTION } from '../../constants/Types.ts';
 import { STAGE_DIMENSIONS } from '../../constants/Image.js';
 
@@ -42,12 +45,15 @@ export default function EditorHome(props) {
   const [isTemplateSelectViewSelected, setIsTemplateSelectViewSelected] = useState(false);
   const [templateOptionList, setTemplateOptionList] = useState([]);
   const [activeItemList, setActiveItemList] = useState([]);
+
+
   const [editBrushWidth, setEditBrushWidth] = useState(5);
   const [editMasklines, setEditMaskLines] = useState([]);
 
   const [currentView, setCurrentView] = useState(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
 
-  const [selectedGenerationModel, setSelecteGenerationdModel] = useState('SDXL');
+  const [selectedGenerationModel, setSelectedGenerationModel] = useState('SDXL');
+  const [selectedEditModel, setSelectedEditModel] = useState('SDXL');
   const [ isGenerationPending , setIsGenerationPending ] = useState(false);
 
   const [ currentCanvasAction, setCurrentCanvasAction ] = useState(CANVAS_ACTION.DEFAULT);
@@ -74,7 +80,6 @@ export default function EditorHome(props) {
   });
 
 
-  const [chainList, setChainList] = useState([]);
   const { openAlertDialog, } = useAlertDialog();
   const { user } = useUser();
 
@@ -102,7 +107,7 @@ export default function EditorHome(props) {
       } else {
         const nImageList: any = Object.assign([], activeItemList);
         if (nImageList.length === 0) {
-          nImageList.push({ id: 0, type: 'shape', shape: 'rect', config: { x: 0, y: 0, width: STAGE_DIMENSIONS.width, height: STAGE_DIMENSIONS.height, fill: 'white' } });
+          nImageList.push({ id: 0, type: 'shape', shape: 'rectangle', config: { x: 0, y: 0, width: STAGE_DIMENSIONS.width, height: STAGE_DIMENSIONS.height, fill: 'white' } });
           setActiveItemList(nImageList);
         }
       }
@@ -112,14 +117,6 @@ export default function EditorHome(props) {
 
     });
 
-    // get list of available chains
-    axios.get(`${PROCESSOR_API_URL}/utils/chain_list`).then((response) => {
-      const chainList = response.data;
-      setChainList(chainList);
-      setSelectedChain(chainList[0].key);
-    }).catch((error) => {
-
-    });
   }, []);
 
 
@@ -149,6 +146,7 @@ export default function EditorHome(props) {
       sessionId: id,
       model: selectedGenerationModel,
     }
+
     const generateStatus = await axios.post(`${PROCESSOR_API_URL}/sessions/request_generate`, payload);
     startGenerationPoll();
   }
@@ -157,14 +155,20 @@ export default function EditorHome(props) {
   const submitOutpaintRequest = async () => {
 
     const baseImageData = await exportBaseGroup();
-    const maskImageData = await exportMaskGroupAsColored();
+    let maskImageData;
+    if (selectedEditModel === 'SDXL') {
+      maskImageData = await exportMaskGroupAsColored();
+    } else {
+      maskImageData = await exportMaskGroupAsTransparent();
+    }
+
 
     const payload = {
       image: baseImageData,
       maskImage: maskImageData,
       sessionId: id,
       prompt: promptText,
-      model: 'SDXL',
+      model: selectedEditModel,
     }
     const outpaintStatus = await axios.post(`${PROCESSOR_API_URL}/sessions/request_outpaint`, payload);
     startOutpaintPoll();
@@ -183,7 +187,6 @@ export default function EditorHome(props) {
         height: STAGE_DIMENSIONS.height,
         pixelRatio: 1 // Ensures that the output resolution is not scaled; adjust as needed for high DPI displays
       });
-      console.log(dataUrl);  // You can use this URL as needed, e.g., send it to a server or download it
       return dataUrl;
     } else {
       console.error('Base group not found');
@@ -277,8 +280,6 @@ export default function EditorHome(props) {
     }
   };
 
-
-
   async function startGenerationPoll() {
     setIsGenerationPending(true);
     const pollStatus = await axios.get(`${PROCESSOR_API_URL}/sessions/generate_status?id=${id}`);
@@ -307,27 +308,19 @@ export default function EditorHome(props) {
     const pollStatus = await axios.get(`${PROCESSOR_API_URL}/sessions/generate_status?id=${id}`);
 
     const pollStatusData = pollStatus.data;
-    console.log(pollStatusData);
 
-
-    
     if (pollStatus.data.outpaintStatus === 'COMPLETED') {
       const generatedImageUrlName = pollStatus.data.activeOutpaintedImage;
       const generatedURL = `${PROCESSOR_API_URL}/generations/${generatedImageUrlName}`;
 
-      console.log("GENERATED URL", generatedURL);
-
       const nImageList: any = Object.assign([], activeItemList);
-      nImageList.push({ src: generatedURL, id: nImageList.length, type: 'image' });
+      const currentItemId = nImageList.length;
+      nImageList.push({ src: generatedURL, id: currentItemId, type: 'image' });
 
-      console.log(nImageList);
       setCurrentView(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
-
-
 
       setActiveItemList(nImageList);
       setSessionDetails(pollStatus.data);
-
       return;
     } else {
       setTimeout(() => {
@@ -376,7 +369,10 @@ export default function EditorHome(props) {
     }
 
     const creatorAllocation = formData.get("creatorAllocation");
-    const selectedChain = formData.get("selectedChain");
+    const selectedChain = process.env.REACT_APP_SELECTED_CHAIN;
+
+    console.log("SELECTED CHAIN:", selectedChain);
+    console.log("CREATOR ALLOCATION:", creatorAllocation);
 
     if (canvasRef.current) {
       const canvasInstance = canvasRef.current;
@@ -394,39 +390,32 @@ export default function EditorHome(props) {
       sessionPayload.creatorAllocation = creatorAllocation;
 
       axios.post(`${PROCESSOR_API_URL}/sessions/publish_and_set_uri`, sessionPayload).then(function (dataResponse) {
-        console.log(dataResponse);
         const publicationResponse = dataResponse.data;
-        const publicationId = publicationResponse._id;
+        const publicationId = publicationResponse.slug;
         window.location.href = `${PUBLISHER_URL}/p/${publicationId}`;
       });
     }
   }
 
   const showAttestationDialog = () => {
-    if (sessionDetails.attestationId) {
-      const publishDialog = <PublishDialog onSubmit={onPublishDialog}
-        chainList={chainList} selectedChain={selectedChain}
-        setSelectedChain={setSelectedChain}
-      />
-      openAlertDialog(publishDialog);
-    } else {
-      const attestationDialog = <AttestationDialog onSubmit={submitAttestation} />
-      openAlertDialog(attestationDialog, onAttestationDialogClose);
+    const publishDialog = <PublishDialog onSubmit={onPublishDialog}
+    selectedChain={selectedChain}
+    setSelectedChain={setSelectedChain}
+  />
+  openAlertDialog(publishDialog);
 
-    }
 
   }
 
   const showPublishDialg = () => {
     const publishDialog = <PublishDialog onSubmit={onPublishDialog}
-      chainList={chainList} selectedChain={selectedChain}
+   selectedChain={selectedChain}
       setSelectedChain={setSelectedChain}
     />
     openAlertDialog(publishDialog);
   }
 
   const getRemoteTemplateData = () => {
-    console.log("getting remote data");
     axios.get(`${PROCESSOR_API_URL}/utils/template_list`).then((response) => {
 
       const generatedImageUrlName = response.data.activeGeneratedImage;
@@ -454,13 +443,16 @@ export default function EditorHome(props) {
     const templateURL = `${IPFS_URL_BASE}/ipfs/${templateOption.ipfs_pin_hash}`;
 
     const nImageList: any = Object.assign([], activeItemList);
-    nImageList.push({ src: templateURL, id: nImageList.length, type: 'image' });
+    const currentItemId = nImageList.length;
+    nImageList.push({ src: templateURL, id: nImageList.length, type: 'image',  });
     setActiveItemList(nImageList);
     setCurrentView(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
   }
 
   const addTextBoxToCanvas = (payload) => {
     const nImageList: any = Object.assign([], activeItemList);
+    const currentItemId = nImageList.length;
+    payload.id = currentItemId;
     nImageList.push(payload);
     setActiveItemList(nImageList);
   }
@@ -471,6 +463,46 @@ export default function EditorHome(props) {
     
   }
 
+  const showMoveAction = () => {
+
+    console.log("Showing Move Action");
+    
+
+
+  }
+
+  const showResizeAction = () => {
+
+    console.log("Showing Resize Action");
+
+
+  }
+
+  const showSaveAction = () => {
+    saveIntermediateImage();
+  }
+
+  const showUploadAction = () => {
+
+   //  showPublishDialg();
+  }
+
+  const setSelectedShape = (shapeKey) => {
+
+    let currentLayerList: any = Object.assign([], activeItemList);
+
+    const shapeConfig = { x: 0, y: 0, width: 1024, height: 1024, fill: 'white', radius: 70 }
+
+    currentLayerList.push({
+      'type': 'shape',
+      'shape': shapeKey,
+      'config': shapeConfig,
+      'id': currentLayerList.length
+    });
+
+    setActiveItemList(currentLayerList);
+
+  }
 
   let viewDisplay = <span />;
 
@@ -501,6 +533,10 @@ export default function EditorHome(props) {
             <ActionToolbar
               setCurrentAction={setCurrentAction}
               setCurrentViewDisplay={setCurrentViewDisplay}
+              showMoveAction={showMoveAction}
+              showResizeAction={showResizeAction}
+              showSaveAction={showSaveAction}
+              showUploadAction={showUploadAction}
             />
           </div>
           <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto p-4 mb-8 '>
@@ -515,7 +551,6 @@ export default function EditorHome(props) {
               updateNFTData={updateNFTData}
               setNftData={setNftData}
               nftData={nftData}
-              chainList={chainList}
               selectedChain={selectedChain}
               setSelectedChain={setSelectedChain}
               selectedAllocation={selectedAllocation}
@@ -533,8 +568,12 @@ export default function EditorHome(props) {
               activeItemList={activeItemList}
               setActiveItemList={setActiveItemList}
               selectedGenerationModel={selectedGenerationModel}
-              setSelecteGenerationdModel={setSelecteGenerationdModel}
+              setSelectedGenerationModel={setSelectedGenerationModel}
+              selectedEditModel={selectedEditModel}
+              setSelectedEditModel={setSelectedEditModel}
               isGenerationPending={isGenerationPending}
+              setSelectedShape={setSelectedShape}
+
 
             />
           </div>

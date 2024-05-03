@@ -5,7 +5,14 @@ import OutpaintGenerator from './OutpaintGenerator.tsx';
 import RangeSlider from '../utils/RangeSlider.js';
 import AddText from './AddText.tsx';
 import { FaChevronDown, FaChevronUp, FaRobot, FaExpandArrowsAlt } from 'react-icons/fa';
-import { FaHand } from "react-icons/fa6";
+import { FaCircle, FaHand } from "react-icons/fa6";
+import { FaRegCircle } from "react-icons/fa";
+import { MdOutlineRectangle } from "react-icons/md";
+import { IoTriangleOutline } from "react-icons/io5";
+
+
+
+
 import LayersDisplay from './LayersDisplay.tsx';
 import { CURRENT_TOOLBAR_VIEW } from '../../../constants/Types.ts';
 
@@ -21,7 +28,9 @@ export default function EditorToolbar(props: any) {
     textConfig, setTextConfig,
     activeItemList, setActiveItemList,
     selectedGenerationModel, setSelectedGenerationModel,
-    editMasklines, setEditMaskLines
+    editMasklines, setEditMaskLines,
+    setSelectedShape,
+    
   } = props;
 
 
@@ -143,6 +152,38 @@ export default function EditorToolbar(props: any) {
 
   }
 
+  let addShapeDisplay = (
+    
+      <div className='grid grid-cols-3'>
+        <div className='text-center pl-2 pr-2'>
+          <div className='text-sm font-bold m-auto cursor-pointer' onClick={() => setSelectedShape("circle")}>
+            <FaRegCircle className='m-auto'/>
+            <div className='text-[10px] font-bold'>
+              Circle
+            </div>
+          </div>
+        </div>
+        <div className='text-center pl-2 pr-2'>
+          <div className='text-sm font-bold m-auto cursor-pointer' onClick={() => setSelectedShape("rectangle")}>
+            <MdOutlineRectangle className='m-auto'/>
+            <div className='text-[10px] font-bold'>
+              Rectangle
+            </div>  
+          </div>
+        </div>
+        <div className='text-center pl-2 pr-2'>
+          <div className='text-sm font-bold m-auto cursor-pointer' onClick={() => setSelectedShape("triangle")}>
+            <IoTriangleOutline className='m-auto'/>
+            <div className='text-[10px] font-bold'>
+              Polygon
+            </div>
+
+          </div>
+        </div>
+      </div>
+    )
+  
+
   return (
     <div className='bg-neutral-50 h-full m-auto fixed top-0 overflow-y-auto ml-4 mr-4 w-[16%]'>
 
@@ -190,6 +231,8 @@ export default function EditorToolbar(props: any) {
             </div>
             <FaChevronDown className='inline-flex float-right mr-4 mt-2 text-sm' />
           </div>
+          
+          {addShapeDisplay}
 
         </div>
 

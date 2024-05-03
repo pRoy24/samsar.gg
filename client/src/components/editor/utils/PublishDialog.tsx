@@ -40,24 +40,7 @@ export default function PublishDialog(props) {
               </div>
             </div>
 
-            <div>
-              <div>
-                Select the chain
-              </div>
-              <div className="form-group">
-                <select onChange={(evt) => (setSelectedChain(evt.target.value))} name="selectedChain">
-                  {chainList.map((chain) => {
-                    let isSelected = '';
-                    if (chain.id == selectedChain) {
-                      isSelected = 'selected';
-                    }
-                    return (
-                      <option key={chain.id} value={chain.id} selected={isSelected}>{chain.name}</option>
-                    )
-                  })}
-                </select>
-              </div>
-            </div>
+       
           </div>
 
         </div>

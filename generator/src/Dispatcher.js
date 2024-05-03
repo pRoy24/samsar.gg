@@ -2,6 +2,7 @@ import { IMAGE_GENERAITON_MODEL_TYPES, IMAGE_EDIT_MODEL_TYPES } from './constant
 import axios from 'axios';
 import path from 'path';
 import { saveGeneratedFile } from './Files.js';
+import { getImageFromAPI, getOutpaintImageFromApi } from './OpenAI.js';
 
 const IMAGE_PROCESSOR_SERVER = process.env.IMAGE_PROCESSOR_SERVER;
 
@@ -15,36 +16,45 @@ export async function getImageFromText(payload) {
     return imageURL;
   } else if (model === IMAGE_GENERAITON_MODEL_TYPES['DALLE3']) {
     console.log("DALLE3");
+    const response = await getImageFromAPI(prompt);
+    return response;
+    
   }
 }
 
 export async function getOutpaintImageFromText(payload) {
-  console.log("OUTPAINTING IMAGE");
-  console.log(payload);
 
   const { prompt, model, image, maskImage } = payload;
 
   const pwd = process.cwd();
 
-  const IMAGE_BASE_URL = `${process.env.API_SERVER}/temp/`;
-  const imageURL = `${IMAGE_BASE_URL}${image}`;
-  const maskImageURL = `${IMAGE_BASE_URL}${maskImage}`;
+
 
 
   if (model === IMAGE_EDIT_MODEL_TYPES.SDXL) {
+
+    const IMAGE_BASE_URL = `${process.env.API_SERVER}/temp/`;
+    const imageURL = `${IMAGE_BASE_URL}${image}`;
+    const maskImageURL = `${IMAGE_BASE_URL}${maskImage}`;
+
     const requestPayload = {
       prompt,
       imageURL: imageURL,
       maskImageURL: maskImageURL
     }
-    console.log(requestPayload);
-
-
+ 
     const response = await getEditedImageFromWebModel(requestPayload);
     return response;
 
   } else if (model === IMAGE_EDIT_MODEL_TYPES.DALLE2) {
+    const pwd = process.cwd();
 
+    const targetDirPath = path.resolve(pwd, '../processor/assets/temp/');
+    const imageURL = path.resolve(targetDirPath, image);
+    const maskImageURL = path.resolve(targetDirPath, maskImage);
+    const response = await getOutpaintImageFromApi(prompt, imageURL, maskImageURL);
+    return response;
+  
   }
 
 }

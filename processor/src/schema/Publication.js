@@ -14,6 +14,7 @@ const publicationSchema = new Schema({
   generationHash: String,
   creatorInitAllocation: Number,
   creatorInitHash: String,
+  
 
 
 }, { timestamps: true });

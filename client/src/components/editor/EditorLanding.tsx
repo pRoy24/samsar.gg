@@ -39,7 +39,7 @@ export default function EditorLanding() {
   }
   return (
     <div>
-      <EditorHome id={sessionID}
+      <EditorHome id={sessionID} key={sessionID}
         resetCurrentSession={resetCurrentSession} />
     </div>
   )

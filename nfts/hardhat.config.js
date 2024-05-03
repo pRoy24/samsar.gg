@@ -3,7 +3,7 @@ require("@nomicfoundation/hardhat-toolbox");
 require('dotenv').config();
 
 
-let accounts = { mnemonic: process.env.SIGNER_MNEMONIC}
+let accounts = { mnemonic: process.env.SIGNER_MNEMONIC }
 
 const ARBI_KEY = process.env.ARBISCAN_API_KEY;
 const BLOCKSCOUT_API_KEY = process.env.BLOCKSCOUT_API_KEY;
@@ -31,6 +31,14 @@ module.exports = {
     },
     arbitrum_sepolia: {
       url: "https://sepolia-rollup.arbitrum.io/rpc",
+      accounts: accounts,
+    },
+    base_sepolia: {
+      url: "https://sepolia.base.org",
+      accounts: accounts,
+    },
+    base: {
+      url: "https://mainnet.base.org",
       accounts: accounts,
     }
   },
@@ -68,6 +76,22 @@ module.exports = {
           browserURL: "https://arbiscan.io",
         },
       },
+      {
+        network: "base",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org",
+        },
+      },
+      {
+        network: "base_sepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: "https://api.arbiscan.io/api",
+          browserURL: "https://sepolia-explorer.base.org",
+        },
+      }
     ],
     apiKey: {
       //4) Insert your Gnosisscan API key

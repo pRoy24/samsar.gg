@@ -13,34 +13,31 @@ import { useActiveAccount, useSendTransaction, useReadContract, useSwitchActiveW
 import { CHAIN_DEFINITIONS } from '@/utils/constants.js';
 
 const IPFS_BASE = 'https://cloudflare-ipfs.com/ipfs/';
+const chainId = 84532;
+
 
 const HOST_URL = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:3005';
 
 export default function PublicationHome(props) {
-  const { meta , tokenId, chainId } = props;
+  
+  const { meta , tokenId } = props;
   const [onChainMeta, setOnChainMeta] = useState(null);
   const [currentChain, setCurrentChain] = useState(null);
 
   const router = useRouter();
   const activeAccount = useActiveAccount();
-  const contract = getContractObject(chainId);
+  const contract = getContractObject();
   const { mutate: sendTransaction, isPending } = useSendTransaction();
   const page = router.query.id;
   const pageTokens = page.split('_');
   const tokenIdN = pageTokens[1];
-
-
-  const { data, isLoading } = useReadContract({
-    contract,
-    method: "currentMintPrice",
-    params: [tokenIdN],
-  });
 
   const coreOptions = {
     chain: "0xaa36a7"
   }
 
   const mintNFTTransaction = async () => {
+
 
     const transaction = prepareContractCall({
       contract,
@@ -90,10 +87,7 @@ export default function PublicationHome(props) {
 
   const getSignatureArgsHook = async () => {
 
-
     const address = activeAccount.address;
-
-
     const message = `Samsar ${tokenId} ${chainId}`
 
     const signature = await activeAccount.signMessage({ 'message': message });
@@ -110,10 +104,8 @@ export default function PublicationHome(props) {
   const switchChain = useSwitchActiveWalletChain();
   const activeWalletChain = useActiveWalletChain();
 
-  console.log(activeWalletChain);
-  console.log(chainId);
-
   if (activeWalletChain && chainId && activeWalletChain.id !== chainId) {
+
    const newChain = CHAIN_DEFINITIONS.find(chain => chain.id.toString() === chainId.toString());
    switchChain(newChain);
     //switchChain(chainId);

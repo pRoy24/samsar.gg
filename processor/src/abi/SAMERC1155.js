@@ -1,4 +1,4 @@
-export const abi =  [
+export const abi = [
   {
     "inputs": [
       {
@@ -377,16 +377,11 @@ export const abi =  [
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_totalSupply",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "calculatePrice",
+    "name": "creatorMintAmount",
     "outputs": [
       {
         "internalType": "uint256",
@@ -394,7 +389,7 @@ export const abi =  [
         "type": "uint256"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -702,6 +697,25 @@ export const abi =  [
         "internalType": "bool",
         "name": "",
         "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "tokenEthBalances",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

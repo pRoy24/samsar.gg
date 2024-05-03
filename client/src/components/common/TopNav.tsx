@@ -20,7 +20,7 @@ export default function TopNav(props) {
 
 
 
-  const { openAlertDialog, closeAlertDialog} = useAlertDialog();
+  const { openAlertDialog, closeAlertDialog } = useAlertDialog();
 
   const resetSession = () => {
     resetCurrentSession();
@@ -36,7 +36,7 @@ export default function TopNav(props) {
 
   const setUserProfile = (profile) => {
     setUserProfileData(profile);
-  
+
   }
 
   useEffect(() => {
@@ -71,22 +71,28 @@ export default function TopNav(props) {
         <div>
           This will reset your current session. Are you sure you want to proceed?
         </div>
-        <div>
-          <CommonButton
-            onClick={() => {
-              resetSession();
-            }}
-          >
-            Yes
-          </CommonButton>
-          <CommonButton
-            onClick={() => {
-              closeAlertDialog();
-            }}
-          >
-            No
-          </CommonButton>
-         </div> 
+        <div className=' mt-4 mb-4 m-auto'>
+          <div className='inline-flex ml-2 mr-2'>
+            <CommonButton
+              onClick={() => {
+                resetSession();
+              }}
+            >
+              Yes
+            </CommonButton>
+          </div>
+          <div className='inline-flex ml-2 mr-2'>
+            <CommonButton
+              onClick={() => {
+                closeAlertDialog();
+              }}
+            >
+              No
+            </CommonButton>
+          </div>
+
+
+        </div>
       </div>
     )
     openAlertDialog(alertDialogComponent);

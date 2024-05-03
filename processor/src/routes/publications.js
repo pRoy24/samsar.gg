@@ -14,6 +14,7 @@ router.get('/list', async function(req, res) {
 router.get('/get_meta', async function(req, res) {
   const publicationId = req.query.id;
   const publicationsMeta = await getPublicationMeta(publicationId);
+
   res.json(publicationsMeta);
 });
 

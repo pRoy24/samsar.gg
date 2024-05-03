@@ -6,9 +6,6 @@ export default function CommonButton(props) {
   const { children , onClick, isPending} = props;
   const { user } = useUser();
 
-  console.log("USER");
-  console.log(user);
-
   let isBtnDisabled = false;
 
   if (!user || !user.fid) {

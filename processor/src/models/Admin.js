@@ -1,45 +1,22 @@
-import { getUsersDB, getGenerationsDB, getSessionsDB, getPublicationsDB } from '../storage/Documents.js';
+
 import { getSignersForUser } from '../utils/PinataUtils.js';
 import { createEthSignSchema } from './Attestation.js';
+import { getDBConnectionString } from './DBString.js';
+
+import Session from '../schema/Session.js';
+import Publication from '../schema/Publication.js';
+import User from '../schema/User.js';
+import Generation from '../schema/Generation.js';
 
 export async function deleteAllRows() {
   // Implement the deleteAllRows function here
-  const usersDB = await getUsersDB();
-  const generationsDB = await getGenerationsDB();
-  const sessionsDB = await getSessionsDB();
-  const publicationsDB = await getPublicationsDB();
+ await getDBConnectionString();
 
-  const userList = await usersDB.all();
-  for (const user of userList) {
-    const userId = user.value._id;
-    console.log(`Deleting user ${userId}`);
-    await usersDB.del(userId);
-  }
-  console.log("All users deleted");
-
-  const generationList = await generationsDB.all();
-  for (const generation of generationList) {
-    const generationId = generation.value._id;
-    console.log(`Deleting generation ${generationId}`);
-    await generationsDB.del(generationId);
-  }
-  console.log("All generations deleted");
-
-  const sessionList = await sessionsDB.all();
-  for (const session of sessionList) {
-    const sessionId = session.value._id;
-    console.log(`Deleting session ${sessionId}`);
-    await sessionsDB.del(sessionId);
-  }
-  console.log("All sessions deleted");
-
-  const productList = await publicationsDB.all();
-  for (const product of productList) {
-    const productId = product.value._id;
-    console.log(`Deleting product ${productId}`);
-    await publicationsDB.del(productId);
-  }
-  console.log("All rows deleted");
+  const sessionData = await Session.deleteMany({});
+  const publicationData = await Publication.deleteMany({});
+  const userData = await User.deleteMany({});
+  const generationData = await Generation.deleteMany({});
+  return {sessionData, publicationData, userData, generationData};
 
 }
 

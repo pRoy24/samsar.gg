@@ -15,7 +15,9 @@ export async function getPublicationsList() {
 export async function getPublicationMeta(publicationId) {
   try {
     await getDBConnectionString();
-    const publication = await Publication.findOne({ _id: publicationId });
+    const publication = await Publication.findOne({ slug: publicationId });
+    console.log(publication);
+    
     return publication;
   } catch (error) {
   }

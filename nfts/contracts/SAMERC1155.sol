@@ -11,21 +11,19 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
     string private _baseURI = "";
 
     uint256 public constant MAX_SUPPLY = 10000;
+    uint256 private constant FINAL_PRICE = 1e18; // Final price at max supply
     mapping(uint256 => uint256) public totalSupply;
     mapping(uint256 => uint256) public effectiveSupply;
-    
 
     mapping(uint256 => uint256) public currentMintPrice;
-
+    mapping(uint256 => uint256) public creatorMintAmount; // Tracks reserved creator mint amounts for each tokenId
+    mapping(uint256 => uint256) public tokenEthBalances;
 
     address public adminWallet;
-    uint256 private constant FEE_RATE = 50; 
-
+    uint256 private constant FEE_RATE = 50; // 0.05% admin fee rate
 
     mapping(uint256 => bool) public creatorMinted;
-
     uint256 public nextTokenId = 0;
-
 
     constructor(
         address initialOwner,
@@ -35,7 +33,6 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
         adminWallet = _adminWallet;
     }
 
-    // Override the _safeTransferFrom function to disable transfers
     function safeTransferFrom(
         address,
         address,
@@ -46,7 +43,6 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
         require(false, "Transfers are disabled");
     }
 
-    // Override the _safeBatchTransferFrom function to disable batch transfers
     function safeBatchTransferFrom(
         address,
         address,
@@ -58,26 +54,24 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
     }
 
     function mint(uint256 tokenId) public payable nonReentrant {
-        uint256 amount = 1;
-        require(creatorMinted[tokenId], "Creator mint must occur first.");
-        uint256 price = calculatePrice(effectiveSupply[tokenId], amount);
-        require(msg.value >= price, "Insufficient funds for minting");
+        require(creatorMinted[tokenId], "Creator mint required first");
+        require(balanceOf(msg.sender, tokenId) == 0, "Token already minted");
+        uint256 price = calculatePrice(effectiveSupply[tokenId], tokenId);
+        require(msg.value >= price, "Insufficient funds");
+        require(totalSupply[tokenId] + 1 <= MAX_SUPPLY, "Max supply exceeded");
 
-        if (totalSupply[tokenId] + amount > MAX_SUPPLY) {
-            revert("Total supply exceeds the maximum supply");
-        }
+        totalSupply[tokenId]++;
+        effectiveSupply[tokenId]++;
+        currentMintPrice[tokenId] = calculatePrice(
+            totalSupply[tokenId],
+            tokenId
+        );
 
-        totalSupply[tokenId] += amount;
-        effectiveSupply[tokenId] += amount;
-
-        currentMintPrice[tokenId] = calculatePrice(effectiveSupply[tokenId], 1);
-
-        _mint(msg.sender, tokenId, amount, "");
-  
-
+        _mint(msg.sender, tokenId, 1, "");
         if (msg.value > price) {
             payable(msg.sender).transfer(msg.value - price);
         }
+        tokenEthBalances[tokenId] += msg.value;
     }
 
     function mintCreator(
@@ -90,50 +84,53 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
             "Only admin can initiate creator mint."
         );
         require(!creatorMinted[tokenId], "Creator mint can only be done once.");
-        require(
-            amount <= (MAX_SUPPLY * 5) / 100,
-            "Amount exceeds 5% of the total supply."
-        );
 
         totalSupply[tokenId] += amount;
-        // currentMintPrice[tokenId] = calculatePrice(totalSupply[tokenId], 1);
-
+        creatorMintAmount[tokenId] = amount;
         _mint(minter, tokenId, amount, "");
-        
         creatorMinted[tokenId] = true;
     }
 
     function calculatePrice(
         uint256 _totalSupply,
-        uint256 amount
-    ) public pure returns (uint256) {
-        uint256 price = 0;
-        uint256 BASE_PRICE = 1; // Assuming BASE_PRICE is in the smallest unit of currency (e.g., wei in Ethereum)
-        uint256 PRICE_FACTOR = 10001; // Slightly above 1 to ensure a slow growth
-        uint256 DIVISOR = 1000000; // Increase the divisor to reduce price increment
-
-        for (uint256 i = 0; i < amount; i++) {
-            price += BASE_PRICE * (PRICE_FACTOR ** (_totalSupply + i) / DIVISOR);
+        uint256 tokenId
+    ) internal view returns (uint256) {
+        if (_totalSupply <= creatorMintAmount[tokenId]) {
+            return 0;
         }
-        return price;
+        uint256 adjustedSupply = _totalSupply - creatorMintAmount[tokenId];
+        return
+            (FINAL_PRICE * adjustedSupply * adjustedSupply) /
+            ((MAX_SUPPLY - creatorMintAmount[tokenId]) *
+                (MAX_SUPPLY - creatorMintAmount[tokenId]));
     }
 
-
-    // Burn function with full mint price and admin fee
     function burn(uint256 tokenId, uint256 amount) public nonReentrant {
         require(
             balanceOf(msg.sender, tokenId) >= amount,
             "Insufficient balance for burning"
         );
+        uint256 refundableSupply = effectiveSupply[tokenId] >
+            creatorMintAmount[tokenId]
+            ? effectiveSupply[tokenId] - creatorMintAmount[tokenId]
+            : 0;
+        uint256 burnPrice = calculatePrice(refundableSupply, tokenId);
 
-        uint256 burnPrice = calculatePrice(effectiveSupply[tokenId], amount);
-        // uint256 adminFee = (burnPrice * FEE_RATE) / 10000;
+        uint256 adminFee = (burnPrice * amount * FEE_RATE) / 1000000; // 0.05% of the refund price
+        uint256 refundAmount = (burnPrice * amount) - adminFee;
 
         totalSupply[tokenId] -= amount;
         effectiveSupply[tokenId] -= amount;
         _burn(msg.sender, tokenId, amount);
-        payable(msg.sender).transfer(burnPrice);
-        // payable(adminWallet).transfer(adminFee);
+
+        if (refundableSupply > 0) {
+            require(
+                tokenEthBalances[tokenId] >= refundAmount + adminFee,
+                "Insufficient ETH balance for refund"
+            );
+            payable(adminWallet).transfer(adminFee);
+            payable(msg.sender).transfer(refundAmount);
+        }
     }
 
     function setBaseURI(string memory baseURI) public onlyOwner {
@@ -156,9 +153,4 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
         _setURI(nextTokenId, _tokenURI);
         nextTokenId++;
     }
-
-
-
-
-
 }

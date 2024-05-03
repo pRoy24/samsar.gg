@@ -15,9 +15,9 @@ export default function Page(props) {
 
   const { meta, id } = props;
 
-  const idTokens = id.split('_');
-  const tokenId = idTokens[1];
-  const chainId = idTokens[0];
+  const tokenId = id;
+
+
 
   let imgSrc = ``;
   if (meta.imageHash) {
@@ -50,7 +50,7 @@ export default function Page(props) {
         />
       </Head>
       <PLanding meta={meta}
-        chainId={chainId} tokenId={tokenId}
+         tokenId={tokenId}
       />
     </div>
   )
