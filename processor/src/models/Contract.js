@@ -20,11 +20,7 @@ import path from 'path';
 const THIRDWEB_CLIENT_ID = process.env.THIRDWEB_ID;
 const THIRDWEB_CLIENT_SECRET = process.env.THIRDWEB_SECRET_KEY;
 
-const privateKey = process.env.APP_PRIVATE_KEY;
-
-const CHAIN_ID = 1;
-
-
+const privateKey = process.env.ADMIN_WALLET_PRIVATE_KEY;
 
 const client = createThirdwebClient({
   clientId: THIRDWEB_CLIENT_ID,
