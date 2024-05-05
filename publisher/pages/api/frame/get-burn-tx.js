@@ -12,8 +12,6 @@ export default async function handler(req, res) {
   }
 
   const tokenId = req.query.id;
-  console.log(tokenId);
-
 
   const { isValid, message} = await validateMessage(req.body); 
 

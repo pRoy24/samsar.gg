@@ -1,5 +1,5 @@
 import { validateMessage, getFarcasterAccountAddress } from "../../../utils/pinata";
-import { getERC1155PreparedEncodedMintData } from "../../../utils/tx-frame";
+import { getERC1155PreparedEncodedMintData , getMintPrice } from "../../../utils/tx-frame";
 import { abi } from "../../../utils/contractABI";
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID;
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_DEPLOYMENT_ADDRESS;
@@ -12,8 +12,6 @@ export default async function handler(req, res) {
   }
 
   const tokenId = req.query.id;
-  console.log(tokenId);
-
 
   const { isValid, message} = await validateMessage(req.body); 
 
@@ -24,8 +22,8 @@ export default async function handler(req, res) {
 
   const address = await getFarcasterAccountAddress(message.data.fid);
   const encodedData = await getERC1155PreparedEncodedMintData(address, tokenId);
-
-
+  
+  const value = await getMintPrice(tokenId);
 
   res.status(200).json({
     chainId: `eip155:${CHAIN_ID}`,
@@ -34,10 +32,9 @@ export default async function handler(req, res) {
       abi: abi,
       to: CONTRACT_ADDRESS,
       data: encodedData,
-      value: "0"
+      value: value
     }
 
-  
   });
 
 }
