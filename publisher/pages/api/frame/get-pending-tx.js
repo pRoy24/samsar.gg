@@ -23,6 +23,7 @@ export default async function handler(req, res) {
   <meta name="fc:frame:button:3" content="Info">
   <meta name="fc:frame:button:3:action" content="post">
   <meta name="fc:frame:button:3:target" content="${HOST_URL}/api/frame/get-info?id=${tokenId}">
+  <meta name="fc:frame:post_url" content="${HOST_URL}/api/frame/get-pending-tx?id=${tokenId}&imageHash=${imageHash}">
 
   `;
 
