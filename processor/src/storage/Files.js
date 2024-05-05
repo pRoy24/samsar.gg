@@ -1,10 +1,16 @@
-import lighthouse from '@lighthouse-web3/sdk'
+
+
 import 'dotenv/config';
 import fs from 'fs';
+import { Readable } from 'stream';
 
-const LT_API_KEY = process.env.LIGHTHOUSE_KEY;
+import pinataSDK from '@pinata/sdk';
 
+const PINATA_API_KEY = process.env.PINATA_API_Key;
+const PINATA_SECRET_API_KEY = process.env.PINATA_API_Secret;
 
+const pinata = new pinataSDK(PINATA_API_KEY, PINATA_SECRET_API_KEY);
+  
 const decodeBase64Image = (dataString) => {
   const matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
   if (!matches || matches.length !== 3) {
@@ -17,11 +23,19 @@ const decodeBase64Image = (dataString) => {
 export async function uploadImageToIpfs(fileData) {
   try {
     const imageData = decodeBase64Image(fileData);
-    const uploadResponse = await lighthouse.uploadBuffer(
-      imageData,
-      LT_API_KEY,
-      'image/png'
-    )
+
+    const imageStream = Readable.from(imageData);
+
+    const options = {
+      pinataMetadata: {
+        name: 'samsar_image',
+      },
+    };
+
+    const uploadResponse = await pinata.pinFileToIPFS(imageStream, options);
+    console.log("Pinned image to ipfs");
+    console.log(uploadResponse);
+
     return uploadResponse;
   } catch (error) {
     console.log(error);
@@ -43,8 +57,9 @@ export async function uploadImageToFileSystem(imageFile, imageName) {
 
 export async function uploadMetadataToIpfs(payload) {
   try {
-    const metadata = JSON.stringify(payload);
-    const uploadResponse = await lighthouse.uploadText(metadata, LT_API_KEY)
+  //  const metadata = JSON.stringify(payload);
+    const uploadResponse = await pinata.pinJSONToIPFS(payload);
+
     return uploadResponse;
   } catch (error) {
     console.log(error);

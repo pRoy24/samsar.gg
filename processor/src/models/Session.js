@@ -189,10 +189,6 @@ export async function createAttestation(payload) {
 
 export async function publishSessionAndSetURI(payload) {
 
-  console.log("PUBLISHING SESSION");
-  console.log(payload);
-
-
   await getDBConnectionString();
 
   const sessionId = payload.sessionId;
@@ -201,8 +197,10 @@ export async function publishSessionAndSetURI(payload) {
   const userDataValue = await User.findOne({'_id': sessionDataValue.userId});
 
   sessionDataValue.publishStatus = "COMPLETED";
+  console.log("uploading image");
+
   const imageData = await uploadImageToIpfs(payload.image);
-  const imageURL = `ipfs://${imageData.data.Hash}`;
+  const imageURL = `ipfs://${imageData.IpfsHash}`;
   payload.nft.image = imageURL;
 
 
@@ -211,8 +209,8 @@ export async function publishSessionAndSetURI(payload) {
   const selectedChainId = payload.selectedChain;
 
   const nftMetadata = await uploadMetadataToIpfs(nftmetadata);
-  const nftMetadataHash = nftMetadata.data.Hash;
-  const imageHash = imageData.data.Hash;
+  const nftMetadataHash = nftMetadata.IpfsHash;
+  const imageHash = imageData.IpfsHash;
 
   const nftmetadataurl = `ipfs://${nftMetadataHash}`;
 

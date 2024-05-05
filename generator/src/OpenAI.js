@@ -48,11 +48,6 @@ export async function getImageFromAPI(prompt) {
 }
 
 export async function getOutpaintImageFromApi(prompt, imageURL, maskImageURL) {
-  console.log("GETTING OUTPAINT");
-  console.log(prompt);
-  console.log(imageURL);
-  console.log(maskImageURL);
-  console.log("******");
 
   try {
     const image = await openai.images.edit(

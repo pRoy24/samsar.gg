@@ -9,10 +9,19 @@ const fdk = new PinataFDK({
 });
 
 export async function validateMessage(reqBody) {
-    if (!reqBody || !reqBody.interactor) {
+    if (!reqBody) {
         return { isValid: false, message: 'Invalid message' };
     }
-
     const validateResponse = await fdk.validateFrameMessage(reqBody);
     return validateResponse;
+}
+
+export async function getFarcasterAccountAddress(fid) {
+    const addressResponse = await fdk.getEthAddressForFid(fid);
+    return addressResponse;
+}
+
+
+export function getPinataClient() {
+    return fdk;
 }

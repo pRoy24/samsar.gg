@@ -12,14 +12,15 @@ import { sendTransaction, readContract, prepareContractCall, toWei } from 'third
 import { useActiveAccount, useSendTransaction, useReadContract, useSwitchActiveWalletChain,  useActiveWalletChain} from "thirdweb/react";
 import { CHAIN_DEFINITIONS } from '@/utils/constants.js';
 
-const IPFS_BASE = 'https://cloudflare-ipfs.com/ipfs/';
+const IPFS_BASE = process.env.NEXT_PUBLIC_IPFS_BASE;
 const chainId = 84532;
-
 
 const HOST_URL = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:3005';
 
+const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER || 'http://localhost:3002';
+
 export default function PublicationHome(props) {
-  
+  const [ currentView, setCurrentView ] = useState('details');
   const { meta , tokenId } = props;
   const [onChainMeta, setOnChainMeta] = useState(null);
   const [currentChain, setCurrentChain] = useState(null);
@@ -38,6 +39,7 @@ export default function PublicationHome(props) {
 
   const mintNFTTransaction = async () => {
 
+    setCurrentView('details');
 
     const transaction = prepareContractCall({
       contract,
@@ -48,6 +50,7 @@ export default function PublicationHome(props) {
   }
 
   const burnNFTTransaction = async () => {
+    setCurrentView('details');
     const transaction = prepareContractCall({
       contract,
       method: "burn",
@@ -58,8 +61,6 @@ export default function PublicationHome(props) {
 
   useEffect(() => {
     if (meta.generationHash) {
-      console.log("Generation hash found");
-      console.log(meta.generationHash);
       const metaFileURL = `${IPFS_BASE}${meta.metadataHash}`;
       console.log(metaFileURL);
       fetch(metaFileURL)
@@ -70,6 +71,13 @@ export default function PublicationHome(props) {
         });
     }
 
+    fetch(`${API_SERVER}/publications/token_info?id=${tokenId}`)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+ 
+      });
+
 
   }, []);
 
@@ -78,8 +86,8 @@ export default function PublicationHome(props) {
   if (onChainMeta) {
     descriptionBlock = (
       <div className="">
-        <div className='font-bold'>Name: {onChainMeta.name}</div>
-        <p>Description: {onChainMeta.description}</p>
+        <div className='font-bold'>{onChainMeta.name}</div>
+        <p> {onChainMeta.description}</p>
       </div>
     )
   }
@@ -125,9 +133,18 @@ export default function PublicationHome(props) {
     window.open(twitterURL, '_blank');
   }
 
+  const showNFTINfo = () => {
+    setCurrentView('info');
+  }
+
+  let currentDetailImage = <img src={`${IPFS_BASE}${meta.imageHash}`} className="m-auto w-[640px]" />;
+  if (currentView === 'info') {
+    currentDetailImage = (
+      <img src={`${API_SERVER}/price/${tokenId}.png`} className="m-auto w-[640px]" />
+    )
+  }
   
   return (
-
     <CommonContainer>
       <div className="w-[640px] m-auto p-4 bg-slate-50 mt-2 rounded-lg border-2 border-color-neutral-400 shadow-lg">
         <div>
@@ -136,41 +153,31 @@ export default function PublicationHome(props) {
             {descriptionBlock}
             </div>
             <div className='basis-1/4 '>
-                <div className='inline-flex ml-2 mr-2 text-lg' onClick={gotoFarcasterLink}>
+                <div className='inline-flex ml-2 mr-2 text-[30px]' onClick={gotoFarcasterLink}>
                   <SiFarcaster />
                 </div>
-                <div className='inline-flex ml-2 mr-2 text-lg' onClick={gotoTwitterLink}>
+                <div className='inline-flex ml-2 mr-2 text-[30px]' onClick={gotoTwitterLink}>
                 <FaTwitter />
                 </div>
-                
-
               </div>
           </div>
-          
         </div>
-        <img src={`${IPFS_BASE}${meta.imageHash}`} className="m-auto w-[640px]" />
+        <div>
+          {currentDetailImage}
+        </div>
         <p>{meta.description}</p>
-        <div className="grid grid-cols-4 gap-1">
+        <div className="grid grid-cols-3 gap-1">
         <FrameActionButton onClick={mintNFTTransaction}>
             Mint
           </FrameActionButton>
           <FrameActionButton onClick={burnNFTTransaction}>
             Burn
           </FrameActionButton>
-          <FrameActionButton>
+          <FrameActionButton onClick={showNFTINfo}>
             Info
           </FrameActionButton>
-          <div className='bg-slate-300 boder-2 border-slate-900 text-slate-800 rounded-md p-2'>
-            <HeartBit coreOptions={coreOptions}
-              getSignatureArgsHook={getSignatureArgsHook}
-              hash={heartbeatHash}
-              showTotalMintsByHash={true}
-              className="m-auto"
-            />
-          </div>
         </div>
       </div>
-      
     </CommonContainer>
   )
 }

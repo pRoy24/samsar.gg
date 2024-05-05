@@ -13,19 +13,19 @@ export default function PublishDialog(props) {
     <div>
       <form onSubmit={onFormSubmit}>
         <div >
-          <div>
-            Set details about your NFT
+          <div className="font-bold">
+            Publication NFT details
           </div>
 
           <div className="text-left">
             <div className="form-group ">
               <div className="mt-1 mb-1">Name</div>
-              <input type="text" placeholder="Name" name="nftName"/>
+              <input type="text" placeholder="Name" name="nftName" className="w-full h-[40px] pl-2 pr-2 pt-1 pb-1" />
 
             </div>
             <div className="form-group">
               <div className="mt-1 mb-1">Description</div>
-              <textarea placeholder="Description" name="nftDescription"/>
+              <textarea placeholder="Description" name="nftDescription" className="w-full h-[40px] pl-2 pr-2 pt-1 pb-1" />
             </div>
 
             <div>
@@ -35,19 +35,21 @@ export default function PublishDialog(props) {
 
               <div className="form-group">
                 <div className="mt-1 mb-1">Creator Allocation (Max 500 tokens)</div>
-                <input type="number" placeholder="Creator Allocation" name="creatorAllocation"/>
-                
+                <input type="number" placeholder="Creator Allocation"
+                  name="creatorAllocation" className="w-full h-[40px] pl-2 pr-2 pt-1 pb-1" />
+
               </div>
             </div>
 
-       
-          </div>
 
+          </div>
         </div>
 
-        <CommonButton>
-          Publish
-        </CommonButton>
+        <div className="mt-4">
+          <CommonButton>
+            Publish
+          </CommonButton>
+        </div>
       </form>
     </div>
   )

@@ -3,6 +3,17 @@ import Landing from "@/app/components/home/Landing";
 import Head from 'next/head';
 import '@/app/globals.css';
 
+import { GetServerSideProps } from 'next';
+
+export const getServerSideProps = async (context) => {
+  return {
+    redirect: {
+      destination: 'https://app.samsar.gg',  // Replace with your target URL
+      permanent: true,  // Set to true if this is a permanent redirection
+    }
+  };
+};
+
 export default function Index() {
   return (
     <div>
@@ -18,7 +29,8 @@ export default function Index() {
 
       </Head>
       
-      <Landing />
+  
     </div>
   )
 }
+

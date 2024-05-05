@@ -21,4 +21,6 @@ export const CHAIN_DEFINITIONS = [
 
 export const erc1155ContractAddress = process.env.NEXT_PUBLIC_DEPLOYMENT_ADDRESS;
 
-export const CHAIN = CHAIN_DEFINITIONS[0];
+const CURRENT_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID;
+
+export const CHAIN = CHAIN_DEFINITIONS.find(chain => chain.id === CURRENT_CHAIN_ID);

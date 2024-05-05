@@ -9,44 +9,45 @@ const HOST_URL = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:3005';
 
 const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER || 'http://localhost:3002';
 const IMAGE_BASE = `${API_SERVER}/generations/`;
-const IPFS_BASE = 'https://cloudflare-ipfs.com/ipfs/';
+const IPFS_BASE = process.env.NEXT_PUBLIC_IPFS_BASE;
 
 export default function Page(props) {
-
   const { meta, id } = props;
-
   const tokenId = id;
-
-
-
   let imgSrc = ``;
   if (meta.imageHash) {
     imgSrc = `${IPFS_BASE}${meta.imageHash}`;
   }
+  
   return (
     <div>
       <Head>
+        <title>{meta.title}</title>
+        
         <FrameMetadata
           buttons={[
             {
-              label: 'Info',
+              label: 'Mint',
               action: 'tx',
-              target: `${HOST_URL}/api/frame/get-mint-tx`
+              target: `${HOST_URL}/api/frame/get-mint-tx?id=${tokenId}`,
+              postUrl: `${HOST_URL}/api/frame/get-pending-tx?id=${tokenId}`
             },
             {
-              label: 'Like',
+              label: 'Burn',
               action: 'tx',
-              target: `${HOST_URL}/api/frame/get-burn-tx`
+              target: `${HOST_URL}/api/frame/get-burn-tx?id=${tokenId}`,
+              postUrl: `${HOST_URL}/api/frame/get-pending-tx?id=${tokenId}`
+            },
+            {
+              label: 'Info',
+              action: 'post',
+              target: `${HOST_URL}/api/frame/get-info?id=${tokenId}`
             },
           ]}
           image={{
             src: imgSrc,
             aspectRatio: '1:1'
           }}
-          state={{
-            counter: 1,
-          }}
-
         />
       </Head>
       <PLanding meta={meta}
@@ -68,12 +69,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const { id } = params;
-
-
-  // Fetch data using the 'id'
   const res = await fetch(`${API_SERVER}/publications/get_meta?id=${id}`);
   const productMeta = await res.json();
-
-  // Pass the post data to the page via props
   return { props: { meta: productMeta, id: id } };
 }
