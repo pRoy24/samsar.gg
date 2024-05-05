@@ -4,9 +4,7 @@ import { getPublicationsList, getPublicationMeta,
   getTokenChainData
  } from '../models/Publication.js';
 
-
 const router = express.Router();
-
 
 router.get('/list', async function(req, res) {
   const publicationsList = await getPublicationsList();
@@ -28,8 +26,5 @@ router.get('/token_info', async function(req, res) {
 
   res.json(publicationsMeta);
 });
-
-
-// You can add more session-related routes here
 
 export default router;

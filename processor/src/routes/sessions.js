@@ -5,9 +5,7 @@ import { requestGenerateImage, createNewSession, getSessionGenerationStatus, pub
   requestOutpaintImage, getOrCreateSession,
   createAttestation} from '../models/Session.js';
 
-
 const router = express.Router();
-
 
 router.post('/create', async function(req, res) {
   const payload = req.body;
