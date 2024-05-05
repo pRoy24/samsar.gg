@@ -55,15 +55,12 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
     function mint(uint256 tokenId) public payable nonReentrant {
         require(creatorMinted[tokenId], "Creator mint required first");
         require(balanceOf(msg.sender, tokenId) == 0, "Token already minted");
-        uint256 price = calculatePrice(totalSupply[tokenId], tokenId);
+        uint256 price = calculatePrice(tokenId);
         require(msg.value >= price, "Insufficient funds");
         require(totalSupply[tokenId] + 1 <= MAX_SUPPLY, "Max supply exceeded");
 
         totalSupply[tokenId]++;
-        currentMintPrice[tokenId] = calculatePrice(
-            totalSupply[tokenId],
-            tokenId
-        );
+        currentMintPrice[tokenId] = calculatePrice(tokenId);
 
         _mint(msg.sender, tokenId, 1, "");
         if (msg.value > price) {
@@ -82,7 +79,8 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
             "Only admin can initiate creator mint."
         );
         require(!creatorMinted[tokenId], "Creator mint can only be done once.");
-
+        require(totalSupply[tokenId] + amount <= MAX_SUPPLY, "Max supply exceeded");
+        require(amount < 500, "Creator mint amount too high");
         totalSupply[tokenId] += amount;
         creatorMintAmount[tokenId] = amount;
         _mint(minter, tokenId, amount, "");
@@ -90,17 +88,16 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
     }
 
     function calculatePrice(
-        uint256 _totalSupply,
         uint256 tokenId
     ) internal view returns (uint256) {
-        if (_totalSupply <= creatorMintAmount[tokenId]) {
+        uint256 _totalSupply = totalSupply[tokenId];
+        uint256 creatorMint = creatorMintAmount[tokenId];
+        if (_totalSupply <= creatorMint) {
             return 0;
         }
-        uint256 adjustedSupply = _totalSupply - creatorMintAmount[tokenId];
-        return
-            (FINAL_PRICE * adjustedSupply * adjustedSupply) /
-            ((MAX_SUPPLY - creatorMintAmount[tokenId]) *
-                (MAX_SUPPLY - creatorMintAmount[tokenId]));
+        uint256 adjustedSupply = _totalSupply - creatorMint;
+        uint256 maxAdjustedSupply = MAX_SUPPLY - creatorMint;
+        return (FINAL_PRICE * adjustedSupply * adjustedSupply) / (maxAdjustedSupply * maxAdjustedSupply);
     }
 
     function burn(uint256 tokenId, uint256 amount) public nonReentrant {
@@ -108,17 +105,19 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
             balanceOf(msg.sender, tokenId) >= amount,
             "Insufficient balance for burning"
         );
-        uint256 refundableSupply = totalSupply[tokenId] >
-            creatorMintAmount[tokenId]
-            ? totalSupply[tokenId] - creatorMintAmount[tokenId]
-            : 0;
-        uint256 burnPrice = calculatePrice(totalSupply[tokenId], tokenId);
+        uint256 _creatorMint = creatorMintAmount[tokenId];
+        uint256 _totalSupply = totalSupply[tokenId];
 
+        uint256 refundableSupply = _totalSupply > _creatorMint
+            ? _totalSupply - _creatorMint
+            : 0;
+        uint256 burnPrice = calculatePrice(tokenId);
         uint256 adminFee = (burnPrice * amount * FEE_RATE) / 1000000; // 0.05% of the refund price
         uint256 refundAmount = (burnPrice * amount) - adminFee;
-
         totalSupply[tokenId] -= amount;
         _burn(msg.sender, tokenId, amount);
+
+        currentMintPrice[tokenId] = calculatePrice(tokenId);
 
         if (refundableSupply > 0) {
             require(
