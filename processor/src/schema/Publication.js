@@ -15,6 +15,10 @@ const publicationSchema = new Schema({
   creatorInitAllocation: Number,
   creatorInitHash: String,
   
+  maxSupply: Number,
+  currentSupply: Number,
+  creatorMintAmount: Number,
+  mintPrice: Number,
 
 
 }, { timestamps: true });

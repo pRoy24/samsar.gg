@@ -17,6 +17,7 @@ export async function getPublicationMeta(publicationId) {
   try {
     await getDBConnectionString();
     const publication = await Publication.findOne({ slug: publicationId });
+    getContractMetaAndSave(publicationId);
 
     return publication;
   } catch (error) {
@@ -32,4 +33,20 @@ export async function getTokenChainData(tokenId) {
 
   }
 
+}
+
+async function getContractMetaAndSave(tokenId) {
+  try {
+    await getDBConnectionString();
+    const tokenMeta = await getContractMeta(tokenId);
+
+    const publication = await Publication.findOne({ tokenId: tokenId });
+    publication.maxSupply = tokenMeta.maxSupply;
+    publication.currentSupply = tokenMeta.currentSupply;
+    publication.creatorMintAmount = tokenMeta.creatorMintAmount;
+    publication.mintPrice = tokenMeta.mintPrice;
+    publication.save();
+    
+  } catch (error) {
+  }
 }
