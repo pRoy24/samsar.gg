@@ -361,14 +361,37 @@ export const abi = [
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
+      }
+    ],
+    "name": "burn",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "returnAmount",
+        "type": "uint256"
       }
     ],
-    "name": "burn",
+    "name": "burnCreator",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

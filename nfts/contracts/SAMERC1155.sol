@@ -55,12 +55,13 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
     function mint(uint256 tokenId) public payable nonReentrant {
         require(creatorMinted[tokenId], "Creator mint required first");
         require(balanceOf(msg.sender, tokenId) == 0, "Token already minted");
-        uint256 price = calculatePrice(tokenId);
+        uint256 _newSupply = totalSupply[tokenId] + 1;
+        uint256 price = calculatePrice(tokenId, _newSupply);
         require(msg.value >= price, "Insufficient funds");
-        require(totalSupply[tokenId] + 1 <= MAX_SUPPLY, "Max supply exceeded");
+        require(_newSupply <= MAX_SUPPLY, "Max supply exceeded");
 
         totalSupply[tokenId]++;
-        currentMintPrice[tokenId] = calculatePrice(tokenId);
+        currentMintPrice[tokenId] = calculatePrice(tokenId, totalSupply[tokenId] + 1);
 
         _mint(msg.sender, tokenId, 1, "");
         if (msg.value > price) {
@@ -85,12 +86,47 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
         creatorMintAmount[tokenId] = amount;
         _mint(minter, tokenId, amount, "");
         creatorMinted[tokenId] = true;
+        currentMintPrice[tokenId] = calculatePrice(tokenId, totalSupply[tokenId] + 1);
+    }
+
+    function burnCreator(
+        uint256 tokenId,
+        uint256 amount,
+        address minter,
+        uint256 returnAmount
+    ) public nonReentrant {
+        require(
+            msg.sender == adminWallet,
+            "Only admin can initiate creator burn."
+        );
+        require(creatorMinted[tokenId], "Creator mint required first");
+        require(
+            balanceOf(minter, tokenId) >= amount,
+            "Insufficient balance for burning"
+        );
+        require(
+            creatorMintAmount[tokenId] >= amount,
+            "Insufficient creator mint balance"
+        );
+        require(
+            tokenEthBalances[tokenId] >= returnAmount,
+            "Insufficient ETH balance for refund"
+        );
+        
+        totalSupply[tokenId] -= amount;
+        creatorMintAmount[tokenId] -= amount;
+        _burn(minter, tokenId, amount);
+        currentMintPrice[tokenId] = calculatePrice(tokenId, totalSupply[tokenId] + 1);
+
+        if (returnAmount > 0) {
+            payable(minter).transfer(returnAmount);
+        }
     }
 
     function calculatePrice(
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 _totalSupply
     ) internal view returns (uint256) {
-        uint256 _totalSupply = totalSupply[tokenId];
         uint256 creatorMint = creatorMintAmount[tokenId];
         if (_totalSupply <= creatorMint) {
             return 0;
@@ -100,24 +136,27 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
         return (FINAL_PRICE * adjustedSupply * adjustedSupply) / (maxAdjustedSupply * maxAdjustedSupply);
     }
 
-    function burn(uint256 tokenId, uint256 amount) public nonReentrant {
+    function burn(uint256 tokenId) public nonReentrant {
+        uint256 amount = 1;
         require(
             balanceOf(msg.sender, tokenId) >= amount,
             "Insufficient balance for burning"
         );
         uint256 _creatorMint = creatorMintAmount[tokenId];
-        uint256 _totalSupply = totalSupply[tokenId];
-
+        uint256 _totalSupply = totalSupply[tokenId] - amount;
+        
         uint256 refundableSupply = _totalSupply > _creatorMint
             ? _totalSupply - _creatorMint
             : 0;
-        uint256 burnPrice = calculatePrice(tokenId);
+
+        uint256 burnPrice = calculatePrice(tokenId, _totalSupply);
         uint256 adminFee = (burnPrice * amount * FEE_RATE) / 1000000; // 0.05% of the refund price
         uint256 refundAmount = (burnPrice * amount) - adminFee;
         totalSupply[tokenId] -= amount;
+        
         _burn(msg.sender, tokenId, amount);
 
-        currentMintPrice[tokenId] = calculatePrice(tokenId);
+        currentMintPrice[tokenId] = calculatePrice(tokenId, totalSupply[tokenId] + 1);
 
         if (refundableSupply > 0) {
             require(

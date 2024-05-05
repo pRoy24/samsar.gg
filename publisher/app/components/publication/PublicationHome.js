@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import CommonContainer from '../common/CommonContainer.js';
-import { useRouter } from 'next/router';
+
 import FrameActionButton from '../common/FrameActionButton.js';
 import { prepareMintTransaction, burnTransaction, getContractObject } from '../../../utils/ContractOperations.js';
-import { HeartBit, useHeartBit , HeartBitProvider} from "@fileverse/heartbit-react";
+
 import './publication.css';
 import { FaTwitter } from 'react-icons/fa';
 import { SiFarcaster } from "react-icons/si";
@@ -11,6 +11,7 @@ import { SiFarcaster } from "react-icons/si";
 import { sendTransaction, readContract, prepareContractCall, toWei } from 'thirdweb';
 import { useActiveAccount, useSendTransaction, useReadContract, useSwitchActiveWalletChain,  useActiveWalletChain} from "thirdweb/react";
 import { CHAIN_DEFINITIONS } from '@/utils/constants.js';
+
 
 const IPFS_BASE = process.env.NEXT_PUBLIC_IPFS_BASE;
 const chainId = 84532;
@@ -23,30 +24,44 @@ export default function PublicationHome(props) {
   const [ currentView, setCurrentView ] = useState('details');
   const { meta , tokenId } = props;
   const [onChainMeta, setOnChainMeta] = useState(null);
-  const [currentChain, setCurrentChain] = useState(null);
 
-  const router = useRouter();
   const activeAccount = useActiveAccount();
   const contract = getContractObject();
   const { mutate: sendTransaction, isPending } = useSendTransaction();
-  const page = router.query.id;
-  const pageTokens = page.split('_');
-  const tokenIdN = pageTokens[1];
 
-  const coreOptions = {
-    chain: "0xaa36a7"
-  }
+
+  const { data, isLoading} = useReadContract({
+    contract,
+    method: 'currentMintPrice',
+    params: [tokenId],
+  });
+
+
+  console.log(data);
+  console.log(isLoading);
+
 
   const mintNFTTransaction = async () => {
 
     setCurrentView('details');
 
-    const transaction = prepareContractCall({
+    const mintPrice = await readContract({
       contract,
-      method: "function mint(uint256 tokenId)",
+      method: 'currentMintPrice',
       params: [tokenId],
     });
+    console.log(mintPrice.toString());
+
+
+
+    const transaction = prepareContractCall({
+      contract,
+      method: "mint",
+      params: [tokenId],
+      value: mintPrice.toString(),
+    });
     sendTransaction(transaction);
+
   }
 
   const burnNFTTransaction = async () => {
@@ -54,7 +69,7 @@ export default function PublicationHome(props) {
     const transaction = prepareContractCall({
       contract,
       method: "burn",
-      params: [tokenId, 1],
+      params: [tokenId],
     });
     sendTransaction(transaction);
   }
@@ -71,12 +86,7 @@ export default function PublicationHome(props) {
         });
     }
 
-    fetch(`${API_SERVER}/publications/token_info?id=${tokenId}`)
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
- 
-      });
+
 
 
   }, []);

@@ -8,8 +8,6 @@ const ONE_GWEI = 1_000_000_000n;
 const DEPLOYER_WALLET_ADDRESS = process.env.DEPLOYER_WALLET_ADDRESS;
 const ADMIN_WALLET_ADDRESS = process.env.ADMIN_WALLET_ADDRESS;
 
-console.log("DEPLOYER " + DEPLOYER_WALLET_ADDRESS);
-console.log("ADMIN " + ADMIN_WALLET_ADDRESS);
 
 module.exports = buildModule("SAMERC1155Module", (m) => {
 
