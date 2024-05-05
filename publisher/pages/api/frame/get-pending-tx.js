@@ -5,7 +5,6 @@ const IPFS_BASE = process.env.NEXT_PUBLIC_IPFS_BASE;
 
 export default async function handler(req, res) {
 
-  console.log(req.body);
 
   const tokenId = req.query.id;
   const imageHash = req.query.imageHash;

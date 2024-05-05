@@ -30,13 +30,11 @@ export default function Page(props) {
               label: 'Mint',
               action: 'tx',
               target: `${HOST_URL}/api/frame/get-mint-tx?id=${tokenId}`,
-              postUrl: `${HOST_URL}/api/frame/get-pending-tx?id=${tokenId}&imageHash=${meta.imageHash}`
             },
             {
               label: 'Burn',
               action: 'tx',
               target: `${HOST_URL}/api/frame/get-burn-tx?id=${tokenId}`,
-              postUrl: `${HOST_URL}/api/frame/get-pending-tx?id=${tokenId}&imageHash=${meta.imageHash}`
             },
             {
               label: 'Info',
