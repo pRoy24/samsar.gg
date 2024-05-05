@@ -7,7 +7,7 @@ import { Readable } from 'stream';
 import pinataSDK from '@pinata/sdk';
 
 const PINATA_API_KEY = process.env.PINATA_API_Key;
-const PINATA_SECRET_API_KEY = process.env.PINATA_API_Secret;
+const PINATA_SECRET_API_KEY = process.env.PINATA_API_SECRET;
 
 const pinata = new pinataSDK(PINATA_API_KEY, PINATA_SECRET_API_KEY);
   
