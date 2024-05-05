@@ -66,7 +66,7 @@ export default function Page(props) {
 export async function getStaticPaths() {
   const { data } = await axios.get(`${API_SERVER}/publications/list`);
   const paths = data.map((product) => ({
-    params: { id: product._id },
+    params: { id: product.slug },
   }));
 
   return { paths: paths, fallback: 'blocking' }
