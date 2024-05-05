@@ -2,7 +2,7 @@
 import express from 'express';
 import { deleteAllRows, updateSigners, createAttestationSignerSchema } from '../models/Admin.js';
 import { createSchema } from '../models/Signature.js';
-import ('dotenv').config();
+import 'dotenv/config';
 
 const router = express.Router();
 
