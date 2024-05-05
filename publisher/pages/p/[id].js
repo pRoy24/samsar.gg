@@ -51,6 +51,8 @@ export default function Page(props) {
           state={{
             imageHash: meta.imageHash,
           }}
+          postUrl={`${HOST_URL}/api/frame/get-pending-tx?id=${tokenId}&imageHash=${meta.imageHash}`}
+
         />
       </Head>
       <PLanding meta={meta}
