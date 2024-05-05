@@ -221,12 +221,17 @@ export async function publishSessionAndSetURI(payload) {
 
   const allocation = payload.creatorAllocation;
 
+  console.log("FINISH SET URL");
+
+
   const creatorInitHashData = await mintTokensForCreator(userCustodyAddress, tokenId, selectedChainId, allocation);
   
   const creatorInitHash = creatorInitHashData.transactionHash;
 
 
 
+  console.log("FINISH MINT CREATOR");
+  
 
   const chain = getChainById(selectedChainId);
 

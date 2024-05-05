@@ -15,21 +15,22 @@ import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
 
-
-
 const THIRDWEB_CLIENT_ID = process.env.THIRDWEB_ID;
 const THIRDWEB_CLIENT_SECRET = process.env.THIRDWEB_SECRET_KEY;
-
-const privateKey = process.env.ADMIN_WALLET_PRIVATE_KEY;
 
 const client = createThirdwebClient({
   clientId: THIRDWEB_CLIENT_ID,
   secretKey: THIRDWEB_CLIENT_SECRET,
 });
 
-const wallet = privateKeyAccount({
+const adminWallet = privateKeyAccount({
   client,
-  privateKey: privateKey,
+  privateKey: process.env.ADMIN_WALLET_PRIVATE_KEY,
+});
+
+const deployerWallet = privateKeyAccount({
+  client,
+  privateKey: process.env.DEPLOYER_WALLET_PRIVATE_KEY,
 });
 
 export function getContractAddress(chainId) {
@@ -75,7 +76,7 @@ export async function setUrlForNextToken(chainId, metadataUrl) {
 
   const transactionResult = await sendTransaction({
     transaction,
-    account: wallet,
+    account: deployerWallet,
   });
 
   const receipt = await waitForReceipt(transactionResult);
@@ -101,7 +102,7 @@ export async function mintTokensForCreator(custodyAddress, tokenId, chainId, all
 
   const transactionResult = await sendTransaction({
     transaction,
-    account: wallet,
+    account: adminWallet,
   });
 
   const receipt = await waitForReceipt(transactionResult);
