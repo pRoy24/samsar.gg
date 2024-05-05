@@ -12,8 +12,7 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
 
     uint256 public constant MAX_SUPPLY = 10000;
     uint256 private constant FINAL_PRICE = 1e18; // Final price at max supply
-    mapping(uint256 => uint256) public totalSupply;
-    mapping(uint256 => uint256) public effectiveSupply;
+    mapping(uint256 => uint256) public totalSupply; // Effective supply + creator mint amount
 
     mapping(uint256 => uint256) public currentMintPrice;
     mapping(uint256 => uint256) public creatorMintAmount; // Tracks reserved creator mint amounts for each tokenId
@@ -56,12 +55,11 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
     function mint(uint256 tokenId) public payable nonReentrant {
         require(creatorMinted[tokenId], "Creator mint required first");
         require(balanceOf(msg.sender, tokenId) == 0, "Token already minted");
-        uint256 price = calculatePrice(effectiveSupply[tokenId], tokenId);
+        uint256 price = calculatePrice(totalSupply[tokenId], tokenId);
         require(msg.value >= price, "Insufficient funds");
         require(totalSupply[tokenId] + 1 <= MAX_SUPPLY, "Max supply exceeded");
 
         totalSupply[tokenId]++;
-        effectiveSupply[tokenId]++;
         currentMintPrice[tokenId] = calculatePrice(
             totalSupply[tokenId],
             tokenId
@@ -110,17 +108,16 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
             balanceOf(msg.sender, tokenId) >= amount,
             "Insufficient balance for burning"
         );
-        uint256 refundableSupply = effectiveSupply[tokenId] >
+        uint256 refundableSupply = totalSupply[tokenId] >
             creatorMintAmount[tokenId]
-            ? effectiveSupply[tokenId] - creatorMintAmount[tokenId]
+            ? totalSupply[tokenId] - creatorMintAmount[tokenId]
             : 0;
-        uint256 burnPrice = calculatePrice(refundableSupply, tokenId);
+        uint256 burnPrice = calculatePrice(totalSupply[tokenId], tokenId);
 
         uint256 adminFee = (burnPrice * amount * FEE_RATE) / 1000000; // 0.05% of the refund price
         uint256 refundAmount = (burnPrice * amount) - adminFee;
 
         totalSupply[tokenId] -= amount;
-        effectiveSupply[tokenId] -= amount;
         _burn(msg.sender, tokenId, amount);
 
         if (refundableSupply > 0) {
