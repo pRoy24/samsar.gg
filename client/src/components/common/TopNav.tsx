@@ -9,6 +9,7 @@ import { createSponsoredSigner } from '../../utils/pinata.js';
 import QRCode from "react-qr-code";
 import { useAlertDialog } from '../../contexts/AlertDialogContext';
 
+import './common.css';
 
 
 const PROCESSOR_SERVER = process.env.REACT_APP_PROCESSOR_API;
@@ -17,9 +18,6 @@ export default function TopNav(props) {
 
   const { resetCurrentSession } = props;
 
-
-
-
   const { openAlertDialog, closeAlertDialog } = useAlertDialog();
 
   const resetSession = () => {
@@ -27,28 +25,37 @@ export default function TopNav(props) {
     closeAlertDialog();
   }
 
-  const { setUserApi, user, setUser } = useUser();
+  const {  user, setUser } = useUser();
   const navigate = useNavigate();
 
   const [userProfileData, setUserProfileData] = useState({});
 
   let userProfile = <span />;
 
-  const setUserProfile = (profile) => {
-    setUserProfileData(profile);
+  const verifyAndSetUserProfile = (profile) => {
+    axios.post(`${PROCESSOR_SERVER}/users/verify`, profile).then(function(dataRes) {
+      console.log(dataRes);
+      const userData = dataRes.data;
+      const authToken = userData.authToken;
+      localStorage.setItem('authToken', authToken);
+      setUser(userData);
+    
+    })
+
+    //setUserProfileData(profile);
+  }
+
+
+
+
+  const gotoUserAccount = () => {
+    navigate('/account');
 
   }
 
-  useEffect(() => {
-    if (userProfileData && userProfileData.fid) {
-      setUserApi(userProfileData);
-    }
-  }, [userProfileData]);
-
-
   if (user && user.fid) {
     userProfile = (
-      <div className='flex'>
+      <div className='flex cursor' onClick={gotoUserAccount} >
         <div className='inline-flex text-lg mr-2'>
           <h1>{user.displayName}</h1>
         </div>
@@ -59,10 +66,8 @@ export default function TopNav(props) {
   } else {
     const nonce = Math.random().toString(36).substring(7);
     userProfile = <SignInButton
-      onSuccess={(profile) => setUserProfile(profile)}
+      onSuccess={(profile) => verifyAndSetUserProfile(profile)}
     />
-
-
   }
 
   const gotoHome = () => {
@@ -90,8 +95,6 @@ export default function TopNav(props) {
               No
             </CommonButton>
           </div>
-
-
         </div>
       </div>
     )

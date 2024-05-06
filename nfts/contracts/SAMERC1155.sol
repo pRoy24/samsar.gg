@@ -61,9 +61,9 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
         require(_newSupply <= MAX_SUPPLY, "Max supply exceeded");
 
         totalSupply[tokenId]++;
+        _mint(msg.sender, tokenId, 1, "");
         currentMintPrice[tokenId] = calculatePrice(tokenId, totalSupply[tokenId] + 1);
 
-        _mint(msg.sender, tokenId, 1, "");
         if (msg.value > price) {
             payable(msg.sender).transfer(msg.value - price);
         }
@@ -81,7 +81,7 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
         );
         require(!creatorMinted[tokenId], "Creator mint can only be done once.");
         require(totalSupply[tokenId] + amount <= MAX_SUPPLY, "Max supply exceeded");
-        require(amount < 500, "Creator mint amount too high");
+        require(amount <= 500, "Creator mint amount too high");
         totalSupply[tokenId] += amount;
         creatorMintAmount[tokenId] = amount;
         _mint(minter, tokenId, amount, "");
@@ -93,7 +93,8 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
         uint256 tokenId,
         uint256 amount,
         address minter,
-        uint256 returnAmount
+        uint256 returnAmount,
+        uint256 adminFee
     ) public nonReentrant {
         require(
             msg.sender == adminWallet,
@@ -109,17 +110,20 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
             "Insufficient creator mint balance"
         );
         require(
-            tokenEthBalances[tokenId] >= returnAmount,
+            tokenEthBalances[tokenId] >= returnAmount + adminFee,
             "Insufficient ETH balance for refund"
         );
         
         totalSupply[tokenId] -= amount;
-        creatorMintAmount[tokenId] -= amount;
         _burn(minter, tokenId, amount);
         currentMintPrice[tokenId] = calculatePrice(tokenId, totalSupply[tokenId] + 1);
 
-        if (returnAmount > 0) {
+        uint256 totalReturnAmount = returnAmount + adminFee;
+
+        if (totalReturnAmount > 0) {
+            tokenEthBalances[tokenId] -= totalReturnAmount;
             payable(minter).transfer(returnAmount);
+            payable(adminWallet).transfer(adminFee);
         }
     }
 
@@ -143,7 +147,7 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
             "Insufficient balance for burning"
         );
         uint256 _creatorMint = creatorMintAmount[tokenId];
-        uint256 _totalSupply = totalSupply[tokenId] - amount;
+        uint256 _totalSupply = totalSupply[tokenId];
         
         uint256 refundableSupply = _totalSupply > _creatorMint
             ? _totalSupply - _creatorMint
@@ -154,15 +158,20 @@ contract SAMERC1155 is Ownable, ERC1155URIStorage, ReentrancyGuard {
         uint256 refundAmount = (burnPrice * amount) - adminFee;
         totalSupply[tokenId] -= amount;
         
+        uint256 totalAmountToSend = refundAmount + adminFee;
+
+
         _burn(msg.sender, tokenId, amount);
 
         currentMintPrice[tokenId] = calculatePrice(tokenId, totalSupply[tokenId] + 1);
 
-        if (refundableSupply > 0) {
+        if (refundableSupply > 0 && totalAmountToSend > 0) {
             require(
-                tokenEthBalances[tokenId] >= refundAmount + adminFee,
+                tokenEthBalances[tokenId] >= totalAmountToSend,
                 "Insufficient ETH balance for refund"
             );
+            
+            tokenEthBalances[tokenId] -= totalAmountToSend;
             payable(adminWallet).transfer(adminFee);
             payable(msg.sender).transfer(refundAmount);
         }

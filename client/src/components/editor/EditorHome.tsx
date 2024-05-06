@@ -18,6 +18,7 @@ import ResizablePolygon from './shapes/ResizablePolygon.tsx';
 import ResizableRectangle from './shapes/ResizableRectangle.tsx';
 import { CURRENT_TOOLBAR_VIEW , CANVAS_ACTION } from '../../constants/Types.ts';
 import { STAGE_DIMENSIONS } from '../../constants/Image.js';
+import { getHeaders } from '../../utils/web.js';
 
 import './editor.css';
 
@@ -354,8 +355,6 @@ export default function EditorHome(props) {
   }
 
   const showTemplatesSelect = () => {
-    console.log("SHOWING TEMPLATE SELECT");
-
     setIsTemplateSelectViewSelected(!isTemplateSelectViewSelected);
 
   }
@@ -371,9 +370,6 @@ export default function EditorHome(props) {
     const creatorAllocation = formData.get("creatorAllocation");
     const selectedChain = process.env.REACT_APP_SELECTED_CHAIN;
 
-    console.log("SELECTED CHAIN:", selectedChain);
-    console.log("CREATOR ALLOCATION:", creatorAllocation);
-
     if (canvasRef.current) {
       const canvasInstance = canvasRef.current;
       const dataURL = canvasInstance.toDataURL();
@@ -385,11 +381,11 @@ export default function EditorHome(props) {
       if (nftData) {
         sessionPayload = Object.assign(sessionPayload, { nft: nftData });
       }
-
+      const headers = getHeaders();
       sessionPayload.selectedChain = parseInt(selectedChain);
       sessionPayload.creatorAllocation = creatorAllocation;
 
-      axios.post(`${PROCESSOR_API_URL}/sessions/publish_and_set_uri`, sessionPayload).then(function (dataResponse) {
+      axios.post(`${PROCESSOR_API_URL}/sessions/publish_and_set_uri`, sessionPayload, headers).then(function (dataResponse) {
         const publicationResponse = dataResponse.data;
         const publicationId = publicationResponse.slug;
         window.location.href = `${PUBLISHER_URL}/p/${publicationId}`;
@@ -428,11 +424,12 @@ export default function EditorHome(props) {
     if (canvasRef.current) {
       const canvasInstance = canvasRef.current;
       const dataURL = canvasInstance.toDataURL();
+      const headers = getHeaders();
       const sessionPayload = {
         image: dataURL,
         sessionId: id
       }
-      axios.post(`${PROCESSOR_API_URL}/sessions/save_intermediate`, sessionPayload).then(function (dataResponse) {
+      axios.post(`${PROCESSOR_API_URL}/sessions/save_intermediate`, sessionPayload, headers).then(function (dataResponse) {
         console.log(dataResponse);
       });
     }

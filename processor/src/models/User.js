@@ -1,16 +1,45 @@
 import { getUsersDB } from '../storage/Documents.js';
 
 import { createFarcasterSigner, pollSignerForCompletion, getUserExtradata } from '../utils/PinataUtils.js';
-import { generateAttesterPrivateKey } from '../utils/ViemUtils.js';
-import { v4 as uuidv4 } from 'uuid';
+
+import { generateAuthToken, verifyAuthToken } from './Auth.js';
 import 'dotenv/config';
 import  User from '../schema/User.js';
+import { verifyFarcasterSignin } from '../utils/FarcasterUtils.js';
 
 
 import { getDBConnectionString } from './DBString.js';
 
 const FARCASTER_DEVELOPER_FID = process.env.FARCASTER_DEVELOPER_FID;
 const PINATA_JWT = process.env.PINATA_JWT;
+
+
+export async function verifyUserSession(payload) {
+  await verifyFarcasterSignin(payload);
+  await getDBConnectionString();
+  let userData;
+  let userExists = await User.findOne({ fid: payload.fid });
+  if (!userExists) {
+    const userModel = new User(payload);
+    userData = await userModel.save();
+  } else {
+    userData = userExists;
+  }
+  const userId = userData._id.toString();
+  const authToken = generateAuthToken(userId);
+  let returnUserPayload = Object.assign({}, userData._doc, { authToken });
+  return returnUserPayload;
+}
+
+export async function verifyUserToken(payload) {
+  const authToken = payload.authToken;
+  const decodedData = verifyAuthToken(authToken);
+  const userId = decodedData._id;
+  await getDBConnectionString();
+  const userData = await User.findOne({_id: userId});
+  return userData;
+
+}
 
 export async function setUserData(payload) {
 

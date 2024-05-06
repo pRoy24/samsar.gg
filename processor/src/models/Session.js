@@ -187,7 +187,7 @@ export async function createAttestation(payload) {
   // return sessionDataValue;
 }
 
-export async function publishSessionAndSetURI(payload) {
+export async function publishSessionAndSetURI(userId, payload) {
 
   await getDBConnectionString();
 
@@ -197,7 +197,7 @@ export async function publishSessionAndSetURI(payload) {
   const userDataValue = await User.findOne({'_id': sessionDataValue.userId});
 
   sessionDataValue.publishStatus = "COMPLETED";
-  console.log("uploading image");
+
 
   const imageData = await uploadImageToIpfs(payload.image);
   const imageURL = `ipfs://${imageData.IpfsHash}`;
@@ -221,17 +221,11 @@ export async function publishSessionAndSetURI(payload) {
 
   const allocation = payload.creatorAllocation;
 
-  console.log("FINISH SET URL");
-
-
   const creatorInitHashData = await mintTokensForCreator(userCustodyAddress, tokenId, selectedChainId, allocation);
   
   const creatorInitHash = creatorInitHashData.transactionHash;
 
 
-
-  console.log("FINISH MINT CREATOR");
-  
 
   const chain = getChainById(selectedChainId);
 
@@ -242,7 +236,7 @@ export async function publishSessionAndSetURI(payload) {
     slug: tokenId,
     sessionId: sessionId,
     imageHash: imageHash,
-    createdBy: sessionDataValue.fid,
+    createdBy: userId,
     creatorInitHash: creatorInitHash,
     metadataHash: nftMetadataHash,
     tokenId: tokenId,

@@ -14,6 +14,7 @@ import {
 import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
+import exp from "constants";
 
 const THIRDWEB_CLIENT_ID = process.env.THIRDWEB_ID;
 const THIRDWEB_CLIENT_SECRET = process.env.THIRDWEB_SECRET_KEY;
@@ -204,4 +205,26 @@ export async function getBurnPrice(tokenId) {
 }
 
 
+export async function refundTokensToUser(payload) {
+  
+  try {
+    const CHAIN_ID = process.env.CHAIN_ID;
+    const contract = await getContractForChainId(CHAIN_ID);
+    const transaction = prepareContractCall({
+      contract,
+      method: 'burnCreator',
+      params: [payload.tokenId, payload.amount, payload.minter, payload.returnAmount, payload.adminFee],
+    });
+  
+    const transactionResult = await sendTransaction({
+      transaction,
+      account: adminWallet,
+    });
+    const receipt = await waitForReceipt(transactionResult);
+    return receipt;
+  } catch (error) {
+    console.log(error);
+  }
+  
+}
 

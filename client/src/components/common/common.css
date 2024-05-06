@@ -1,0 +1,9 @@
+.fc-authkit-signin-button {
+  button {
+    margin-top: 1px;
+    height: 46px !important;
+
+    background-color: #14532d;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  }
+}

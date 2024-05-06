@@ -1,8 +1,29 @@
 import express from 'express';
-import { setUserData, getUserData, createSponsoredSigner, pollSignerForUser } from '../models/User.js';
+import { setUserData, getUserData, createSponsoredSigner, pollSignerForUser, verifyUserSession ,
+  verifyUserToken
+} from '../models/User.js';
 
 const router = express.Router();
 
+router.post('/verify', async (req, res) => {
+  try {
+    const payload = req.body;
+    const userData = await verifyUserSession(payload);
+    res.send(userData);
+  } catch (e) {
+    res.status(400).send({ e });
+  }
+});
+
+router.get('/verify_token', async (req, res) => {
+  try {
+  const authToken = req.query.authToken;
+  const userData = await verifyUserToken({ authToken });
+  res.send(userData);
+  } catch (e) {
+    res.status(400).send({ e });
+  }
+});
 
 router.post('/set_user', async (req, res) => {
   try {

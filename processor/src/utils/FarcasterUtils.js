@@ -1,5 +1,13 @@
 import { mnemonicToAccount } from "viem/accounts";
 
+import { createAppClient, viemConnector } from '@farcaster/auth-client';
+
+const appClient = createAppClient({
+  relay: 'https://relay.farcaster.xyz',
+  ethereum: viemConnector(),
+});
+
+
 const PINATA_JWT = process.env.PINATA_JWT;
 
 const SIGNED_KEY_REQUEST_VALIDATOR_EIP_712_DOMAIN = {
@@ -88,4 +96,20 @@ export async function getFarcasterSigners() {
   const signerInfo = await res.json();
   const { data } = signerInfo;
   return data;
+}
+
+
+
+export async function verifyFarcasterSignin(profile) {
+  profile.domain = 'samsar.gg'
+  const {
+    fid,
+    data,
+    success,
+    isError
+  } = await appClient.verifySignInMessage(profile);
+
+  if (!success || isError) {
+    throw new Error("Invalid signature");
+  }
 }

@@ -389,6 +389,11 @@ export const abi = [
         "internalType": "uint256",
         "name": "returnAmount",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "adminFee",
+        "type": "uint256"
       }
     ],
     "name": "burnCreator",

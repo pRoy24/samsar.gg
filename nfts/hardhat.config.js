@@ -3,18 +3,21 @@ require("@nomicfoundation/hardhat-toolbox");
 require('dotenv').config();
 
 
+
 let accounts = { mnemonic: process.env.SIGNER_MNEMONIC }
 
 const ARBI_KEY = process.env.ARBISCAN_API_KEY;
 const BLOCKSCOUT_API_KEY = process.env.BLOCKSCOUT_API_KEY;
+const BASE_KEY = process.env.BASE_API_KEY;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.20",
-  //2) select the default network "gnosis" or "chiado"
-  defaultNetwork: "gnosis",
+
   networks: {
     hardhat: {
+   
+  
     },
     gnosis: {
       url: "https://rpc.gnosischain.com",
@@ -100,6 +103,7 @@ module.exports = {
       gnosis: BLOCKSCOUT_API_KEY,
       arbitrum: ARBI_KEY,
       arbitrum_sepolia: ARBI_KEY,
+      base: BASE_KEY,
     },
   }
 };

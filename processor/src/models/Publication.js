@@ -1,7 +1,9 @@
 import { getPublicationsDB } from "../storage/Documents.js";
 import { getDBConnectionString } from "./DBString.js";
+import User from "../schema/User.js";
 import Publication from "../schema/Publication.js";
-import { getTokenSupply , getContractMeta} from "./Contract.js";
+import { getTokenSupply , getContractMeta, getCreatorAllocation, refundTokensToUser} from "./Contract.js";
+import { getOffchainBurnPrice } from "../utils/TokenUtils.js";
 
 export async function getPublicationsList() {
   try {
@@ -47,6 +49,80 @@ async function getContractMetaAndSave(tokenId) {
     publication.mintPrice = tokenMeta.mintPrice;
     publication.save();
     
+  } catch (error) {
+  }
+}
+
+export async function getPublicationsListByUser(userId) {
+  try {
+    await getDBConnectionString();
+    console.log("UUSER ID " + userId);
+
+    const publications = await Publication.find({ createdBy: userId }).limit(10);
+    console.log(publications);
+
+    return publications;
+  } catch (error) {
+  }
+}
+
+export async function getPublicationDataForUser(userId, tokenId) {
+  try {
+    await getDBConnectionString();
+    const publication = await Publication.findOne({ createdBy: userId, tokenId: tokenId });
+    return publication;
+  } catch (error) {
+  }
+}
+
+export async function burnCreatorTokens(userId, payload) {
+  console.log("BURNING TOKENS");
+  console.log(payload);
+  console.log(userId);
+  try {
+    await getDBConnectionString();
+    const publication = await Publication.findOne({ createdBy: userId, tokenId: payload.tokenId });
+
+    const userData = await User.findOne({ _id: userId });
+    console.log(publication);
+    const tokenId = payload.tokenId;
+
+    const tokenSupply = await getTokenSupply(tokenId);
+    const creatorAllocation = await getCreatorAllocation(tokenId);
+    console.log(tokenSupply);
+    const burnAmount = payload.burnAmount;
+
+    const burnRequestPayload = {
+      totalSupply: BigInt(tokenSupply),
+      creatorAllocation: BigInt(creatorAllocation),
+      burnAmount: BigInt(payload.burnAmount)
+    }
+    console.log(burnRequestPayload);
+
+    const burnRefund = getOffchainBurnPrice(burnRequestPayload);
+
+    const { refundAmount, adminFees } = burnRefund;
+
+ 
+    const refundUserPayload = {
+      tokenId: tokenId,
+      amount: burnAmount,
+      minter: userData.custody,
+      returnAmount: refundAmount.toString(),
+      adminFee: adminFees.toString()
+    };
+
+    console.log(refundUserPayload);
+
+    await refundTokensToUser(refundUserPayload);
+
+    if (tokenSupply > 0) {
+      return;
+    }
+
+ 
+
+    return publication;
   } catch (error) {
   }
 }

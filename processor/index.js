@@ -16,7 +16,7 @@ app.use(express.json({ limit: '50mb', extended: true  }));
 const corsOptions = {
   origin: '*', // Adjust this to be more restrictive according to your needs
   methods: ['GET'], // Assuming you're only serving static files
-  allowedHeaders: ['Content-Type'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200,
   credentials: false, // This is important for setting `crossOrigin` to "anonymous"
 };

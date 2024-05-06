@@ -4,6 +4,8 @@ import { requestGenerateImage, createNewSession, getSessionGenerationStatus, pub
   saveIntermediate, getSessionDetails, publishSessionAndSetURI,
   requestOutpaintImage, getOrCreateSession,
   createAttestation} from '../models/Session.js';
+import { verifyUserAuth } from '../models/Auth.js';
+
 
 const router = express.Router();
 
@@ -39,8 +41,14 @@ router.post('/publish', async function(req, res) {
 });
 
 router.post('/publish_and_set_uri', async function(req, res) {
+  const headers = req.headers;
+  const userId = verifyUserAuth(headers);
+   if (!userId) {
+    res.status(401).send("Unauthorized");
+    return;
+  }
   const payload = req.body;
-  const sessionData = await publishSessionAndSetURI(payload);
+  const sessionData = await publishSessionAndSetURI(userId, payload);
   res.json(sessionData);
 });
 
