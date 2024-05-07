@@ -241,7 +241,10 @@ export async function publishSessionAndSetURI(userId, payload) {
     metadataHash: nftMetadataHash,
     tokenId: tokenId,
     generationHash: hash,
-    creatorInitAllocation: allocation
+    creatorInitAllocation: allocation,
+    nftName : payload.nft.name,
+    nftDescription: payload.nft.description,
+    creatorHandle: payload.creatorHandle,
 
   });
 

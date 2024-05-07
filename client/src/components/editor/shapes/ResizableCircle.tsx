@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { Circle, Group , Transformer } from 'react-konva';
 
+import { INIT_DIMENSIONS } from '../utils/ShapeUtils';
+
 export default function ResizableCircle(props: any) {
   const { config, isSelected, onSelect, onUnselect, id } = props;
   const circleRef = useRef(null);
@@ -21,8 +23,8 @@ export default function ResizableCircle(props: any) {
   return (
     <Group id={id}>
       <Circle
-        x={0}
-        y={0}
+        x={INIT_DIMENSIONS.x}
+        y={INIT_DIMENSIONS.y}
         radius={50}
         radius={radius || 70}
         fill={fill || 'red'}

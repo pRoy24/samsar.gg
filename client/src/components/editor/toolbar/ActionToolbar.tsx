@@ -33,12 +33,7 @@ export default function ActionToolbar(props) {
               Save
             </div>  
         </div>
-        <div className="text-center m-auto align-center mt-8 mb-8">
-          <FaUpload className="text-2xl ml-4 cursor-pointer" onClick={() => showUploadAction()}/>
-          <div className="text-[12px] tracking-tight m-auto text-center">
-              Upload
-            </div>  
-        </div>
+
       </div>
     </div>
   )

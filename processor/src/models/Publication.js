@@ -19,6 +19,7 @@ export async function getPublicationMeta(publicationId) {
   try {
     await getDBConnectionString();
     const publication = await Publication.findOne({ slug: publicationId });
+
     getContractMetaAndSave(publicationId);
 
     return publication;
@@ -56,11 +57,7 @@ async function getContractMetaAndSave(tokenId) {
 export async function getPublicationsListByUser(userId) {
   try {
     await getDBConnectionString();
-    console.log("UUSER ID " + userId);
-
     const publications = await Publication.find({ createdBy: userId }).limit(10);
-    console.log(publications);
-
     return publications;
   } catch (error) {
   }
@@ -76,20 +73,16 @@ export async function getPublicationDataForUser(userId, tokenId) {
 }
 
 export async function burnCreatorTokens(userId, payload) {
-  console.log("BURNING TOKENS");
-  console.log(payload);
-  console.log(userId);
+
   try {
     await getDBConnectionString();
     const publication = await Publication.findOne({ createdBy: userId, tokenId: payload.tokenId });
 
     const userData = await User.findOne({ _id: userId });
-    console.log(publication);
     const tokenId = payload.tokenId;
 
     const tokenSupply = await getTokenSupply(tokenId);
     const creatorAllocation = await getCreatorAllocation(tokenId);
-    console.log(tokenSupply);
     const burnAmount = payload.burnAmount;
 
     const burnRequestPayload = {
@@ -97,7 +90,6 @@ export async function burnCreatorTokens(userId, payload) {
       creatorAllocation: BigInt(creatorAllocation),
       burnAmount: BigInt(payload.burnAmount)
     }
-    console.log(burnRequestPayload);
 
     const burnRefund = getOffchainBurnPrice(burnRequestPayload);
 
@@ -112,7 +104,6 @@ export async function burnCreatorTokens(userId, payload) {
       adminFee: adminFees.toString()
     };
 
-    console.log(refundUserPayload);
 
     await refundTokensToUser(refundUserPayload);
 

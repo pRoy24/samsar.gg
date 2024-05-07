@@ -6,6 +6,7 @@ const publicationSchema = new Schema({
   sessionId: String,
   imageHash: String,
   createdBy: String,
+  creatorHandle: String,
   slug: String,
   title: String,
   description: String,
@@ -19,6 +20,8 @@ const publicationSchema = new Schema({
   currentSupply: Number,
   creatorMintAmount: Number,
   mintPrice: Number,
+  nftName: String,
+  nftDescription: String,
 
 
 }, { timestamps: true });

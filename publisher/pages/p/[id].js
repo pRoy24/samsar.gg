@@ -13,17 +13,38 @@ const IPFS_BASE = process.env.NEXT_PUBLIC_IPFS_BASE;
 
 export default function Page(props) {
   const { meta, id } = props;
+  console.log(meta);
+
   const tokenId = id;
   let imgSrc = ``;
   if (meta.imageHash) {
     imgSrc = `${IPFS_BASE}${meta.imageHash}`;
   }
-  
+
   return (
     <div>
       <Head>
         <title>{meta.title}</title>
-        
+        <link rel="icon" href="/favicon.png" type="image/x-icon" />
+        <meta name="description" content={meta.nftDescription} />
+
+
+        <meta property="og:title" content={meta.nftTitle} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://samsar.g/p/${id}`} />
+        <meta property="og:image" content={imgSrc} />
+        <meta property="og:description" content={meta.nftDescription} />
+        <meta property="og:site_name" content="Samsar GG" />
+        <meta property="og:locale" content="en_US" />
+
+
+        <meta name="og:image" content={imgSrc} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@samsar_gg" />
+        <meta name="twitter:title" content={meta.nftTitle} />
+        <meta name="twitter:description" content={meta.nftDescription} />
+        <meta name="twitter:image" content={imgSrc} />
+
         <FrameMetadata
           buttons={[
             {
@@ -54,7 +75,7 @@ export default function Page(props) {
         />
       </Head>
       <PLanding meta={meta}
-         tokenId={tokenId}
+        tokenId={tokenId}
       />
     </div>
   )

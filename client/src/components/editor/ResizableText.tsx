@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Text, Transformer, Group } from 'react-konva';
 
+import { INIT_DIMENSIONS } from './utils/ShapeUtils';
 
 const ResizableText = ({ text, isSelected, onSelect, ...props }) => {
   const textRef = useRef();
@@ -27,7 +28,8 @@ const ResizableText = ({ text, isSelected, onSelect, ...props }) => {
     <Group id={id}>
       <Text
         {...props}
-
+        x={INIT_DIMENSIONS.x}
+        y={INIT_DIMENSIONS.y}
         fontFamily={config.fontFamily}
         fontSize={config.fontSize}
         fill={config.fillColor}

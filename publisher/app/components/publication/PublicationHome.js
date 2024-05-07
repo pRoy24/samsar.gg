@@ -23,6 +23,7 @@ const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER || 'http://localhost:3002'
 export default function PublicationHome(props) {
   const [ currentView, setCurrentView ] = useState('details');
   const { meta , tokenId } = props;
+
   const [onChainMeta, setOnChainMeta] = useState(null);
 
   const activeAccount = useActiveAccount();
@@ -37,10 +38,6 @@ export default function PublicationHome(props) {
   });
 
 
-  console.log(data);
-  console.log(isLoading);
-
-
   const mintNFTTransaction = async () => {
 
     setCurrentView('details');
@@ -50,8 +47,6 @@ export default function PublicationHome(props) {
       method: 'currentMintPrice',
       params: [tokenId],
     });
-    console.log(mintPrice.toString());
-
 
 
     const transaction = prepareContractCall({
@@ -77,7 +72,7 @@ export default function PublicationHome(props) {
   useEffect(() => {
     if (meta.generationHash) {
       const metaFileURL = `${IPFS_BASE}${meta.metadataHash}`;
-      console.log(metaFileURL);
+
       fetch(metaFileURL)
         .then(response => response.json())
         .then(data => {
@@ -85,9 +80,6 @@ export default function PublicationHome(props) {
           setOnChainMeta(data);
         });
     }
-
-
-
 
   }, []);
 
@@ -130,14 +122,17 @@ export default function PublicationHome(props) {
 
   const gotoFarcasterLink = () => {
     const currentLink = window.location.href;
-    const message = 'Check out this NFT on Samsar.gg';
+    const message = `${meta.nftName} created by @${meta.creatorHandle}`;
+
     const farcasterURL = `https://warpcast.com/~/compose?text=${message}&embeds[]=${currentLink}`;
     window.open(farcasterURL, '_blank');
   }
 
   const gotoTwitterLink = () => {
     const currentLink = window.location.href;
-    const message = 'Check out this NFT on Samsar.gg';
+
+
+    const message = `${meta.nftName} via @samsar_gg`;
     const twitterURL = `https://twitter.com/intent/tweet?text=${message}&url=${currentLink}`;
     window.open(twitterURL, '_blank');
   }

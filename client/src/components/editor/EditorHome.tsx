@@ -13,9 +13,7 @@ import AttestationDialog from './utils/AttestationDialog.tsx';
 import PublishDialog from './utils/PublishDialog.tsx';
 import CommonContainer from '../common/CommonContainer.tsx';
 import ActionToolbar from './toolbar/ActionToolbar.tsx';
-import ResizableCircle from './shapes/ResizableCircle.tsx';
-import ResizablePolygon from './shapes/ResizablePolygon.tsx';
-import ResizableRectangle from './shapes/ResizableRectangle.tsx';
+
 import { CURRENT_TOOLBAR_VIEW , CANVAS_ACTION } from '../../constants/Types.ts';
 import { STAGE_DIMENSIONS } from '../../constants/Image.js';
 import { getHeaders } from '../../utils/web.js';
@@ -61,8 +59,8 @@ export default function EditorHome(props) {
 
 
   const [textConfig, setTextConfig] = useState({
-    fontSize: 16,
-    fontFamily: 'Arial',
+    fontSize: 40,
+    fontFamily: 'Times New Roman',
     fillColor: '#000000'
   });
 
@@ -90,6 +88,7 @@ export default function EditorHome(props) {
   const canvasRef = useRef(null);
   const maskGroupRef = useRef(null);
 
+  console.log(user);
 
   useEffect(() => {
     if (!id) {
@@ -108,7 +107,7 @@ export default function EditorHome(props) {
       } else {
         const nImageList: any = Object.assign([], activeItemList);
         if (nImageList.length === 0) {
-          nImageList.push({ id: 0, type: 'shape', shape: 'rectangle', config: { x: 0, y: 0, width: STAGE_DIMENSIONS.width, height: STAGE_DIMENSIONS.height, fill: 'white' } });
+          nImageList.push({ id: `base_rect`, type: 'shape', shape: 'rectangle', config: { x: 0, y: 0, width: STAGE_DIMENSIONS.width, height: STAGE_DIMENSIONS.height, fill: 'white' } });
           setActiveItemList(nImageList);
         }
       }
@@ -361,6 +360,8 @@ export default function EditorHome(props) {
 
   const onPublishDialog = (formData) => {
 
+    console.log(user);
+
     const nftData = {
       name: formData.get('nftName'),
       description: formData.get("nftDescription"),
@@ -384,6 +385,7 @@ export default function EditorHome(props) {
       const headers = getHeaders();
       sessionPayload.selectedChain = parseInt(selectedChain);
       sessionPayload.creatorAllocation = creatorAllocation;
+      sessionPayload.creatorHandle = user.username;
 
       axios.post(`${PROCESSOR_API_URL}/sessions/publish_and_set_uri`, sessionPayload, headers).then(function (dataResponse) {
         const publicationResponse = dataResponse.data;
@@ -461,18 +463,11 @@ export default function EditorHome(props) {
   }
 
   const showMoveAction = () => {
-
     console.log("Showing Move Action");
-    
-
-
   }
 
   const showResizeAction = () => {
-
     console.log("Showing Resize Action");
-
-
   }
 
   const showSaveAction = () => {
@@ -488,7 +483,7 @@ export default function EditorHome(props) {
 
     let currentLayerList: any = Object.assign([], activeItemList);
 
-    const shapeConfig = { x: 0, y: 0, width: 1024, height: 1024, fill: 'white', radius: 70 }
+    const shapeConfig = { x: 512, y: 200, width: 200, height: 200, fill: 'white', radius: 70 }
 
     currentLayerList.push({
       'type': 'shape',

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { RegularPolygon, Group, Transformer } from 'react-konva';
+import { INIT_DIMENSIONS } from '../utils/ShapeUtils';
 
 export default function ResizablePolygon(props) {
 
@@ -22,8 +23,8 @@ export default function ResizablePolygon(props) {
   return (
     <Group id={id}>
       <RegularPolygon
-        x={x || 100}
-        y={y || 150}
+        x={x || INIT_DIMENSIONS.x}
+        y={y || INIT_DIMENSIONS.y}
         sides={sides || 6}
         radius={radius || 70}
         fill={fill || 'red'}

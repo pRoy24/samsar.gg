@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Rect, Text, Circle, Line, Group, Transformer } from 'react-konva';
+import { INIT_DIMENSIONS } from '../utils/ShapeUtils';
 
 export default function ResizableRectangle(props) {
   const { shape, config, isSelected, onSelect, onUnselect, id } = props;
@@ -21,13 +22,14 @@ export default function ResizableRectangle(props) {
 
   const { x, y, width, height, fill, stroke, strokeWidth } = config;
 
+
   return (
     <Group id={id}>
       <Rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
+        x={x !== undefined ? x : INIT_DIMENSIONS.x}
+        y={y !== undefined ? y : INIT_DIMENSIONS.y}
+        width={width || 100}
+        height={height || 100}
         onClick={(e) => {
           e.cancelBubble = true; // Prevent event from bubbling to the stage
           onSelect();
