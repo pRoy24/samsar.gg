@@ -14,18 +14,33 @@ import {
   KEY_GATEWAY_ADDRESS,
   keyGatewayABI,
   makeUserNameProofClaim,
-} from '@farcaster/hub-nodejs';
+  makeUserDataAdd,
+  UserDataType,
+  FarcasterNetwork,
+  getSSLHubRpcClient
 
-import { bytesToHex, createPublicClient, createWalletClient, http } from 'viem';
+
+
+} from '@farcaster/hub-nodejs';
+import { ed25519 } from "@noble/curves/ed25519";
+
+
+import { bytesToHex, createPublicClient, createWalletClient, http,
+  toHex,
+  zeroAddress,
+  fromHex,
+  publicActions,
+
+ } from 'viem';
 import { privateKeyToAccount, toAccount, mnemonicToAccount } from 'viem/accounts';
 import { optimism } from 'viem/chains';
 
 const APP_PRIVATE_KEY = process.env.APP_PRIVATE_KEY;
-const APP_PUBLIC_KEY = process.env.APP_PUBLIC_KEY;
+const FC_NETWORK = FarcasterNetwork.MAINNET; // Network of the Hub
 
-const ALICE_PRIVATE_KEY = '0x00';
+const ALICE_PRIVATE_KEY = '0x0000000000000000000000000000000000000000';
+let SIGNER_PRIVATE_KEY = process.env.MESSAGE_SIGNER_PRIVATE_KEY;
 
-let SIGNER_PRIVATE_KEY = ALICE_PRIVATE_KEY;
 
 const OP_RPC_URL = process.env.OP_RPC_URL;
 
@@ -37,12 +52,15 @@ const publicClient = createPublicClient({
   transport: http(OP_RPC_URL),
 });
 
+const MNEMONIC = process.env.SIGNER_MNEMONIC;
+
+const account = mnemonicToAccount(MNEMONIC);
+
 const walletClient = createWalletClient({
+  account,
   chain: optimism,
   transport: http(OP_RPC_URL),
-});
-
-
+}).extend(publicActions);
 
 const app = privateKeyToAccount(APP_PRIVATE_KEY);
 const appAccountKey = new ViemLocalEip712Signer(app);
@@ -52,8 +70,15 @@ const appAccountKey = new ViemLocalEip712Signer(app);
 const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600); // set the signatures' deadline to 1 hour from now
 
 const WARPCAST_RECOVERY_PROXY = '0x00000000FcB080a4D6c39a9354dA9EB9bC104cd7';
+const CHAIN = optimism;
 
 
+const IdGateway = { abi: idGatewayABI, address: ID_GATEWAY_ADDRESS, chain: CHAIN };
+const IdContract = { abi: idRegistryABI, address: ID_REGISTRY_ADDRESS, chain: CHAIN };
+const KeyContract = { abi: keyGatewayABI, address: KEY_GATEWAY_ADDRESS, chain: CHAIN };
+
+const hubRpcEndpoint = 'hub-grpc.pinata.cloud';
+const hubClient = getSSLHubRpcClient(hubRpcEndpoint);
 
 // Start functions defintiions 
 
@@ -264,10 +289,9 @@ export async function viewAccountDetails(fid) {
       }
     }
     const res = await axios.get(`https://api.pinata.cloud/v3/farcaster/users/${fid}`, pinataApiHeaders);
-    console.log(res);
 
     const data = res.data;
-    console.log(data);
+
     return data;
   } catch (e) {
     console.log(e);
@@ -278,6 +302,8 @@ export async function viewAccountDetails(fid) {
 export async function getOrRegisterSigner(fid) {
 
   if (SIGNER_PRIVATE_KEY !== zeroAddress) {
+
+
     // If a private key is provided, we assume the signer is already in the key registry
     const privateKeyBytes = fromHex(SIGNER_PRIVATE_KEY, "bytes");
     const publicKeyBytes = ed25519.getPublicKey(privateKeyBytes);
@@ -301,6 +327,7 @@ export async function getOrRegisterSigner(fid) {
   });
 
   const metadataHex = toHex(metadata.unwrapOr(new Uint8Array()));
+
 
   const { request: signerAddRequest } = await walletClient.simulateContract({
     ...KeyContract,
@@ -331,4 +358,66 @@ export async function updateUsername(fid, username) {
     console.log(e);
     return {};
   }
+}
+
+function uint8ArrayToPrivateKey(byteArray) {
+  return Array.from(byteArray, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+const submitMessage = async (resultPromise) => {
+  const result = await resultPromise;
+  if (result.isErr()) {
+    throw new Error(`Error creating message: ${result.error}`);
+  }
+  const messageSubmitResult = await hubClient.submitMessage(result.value);
+  if (messageSubmitResult.isErr()) {
+    throw new Error(`Error submitting message to hub: ${messageSubmitResult.error}`);
+  }
+};
+
+
+export async function updateAdminProfile() {
+
+
+  try {
+  console.log("Updating admin profile");
+
+
+  const fid = 473737;
+
+
+
+  const signerPrivateKey = await getOrRegisterSigner(fid);
+  const privateKeyString = uint8ArrayToPrivateKey(signerPrivateKey);
+  const signer = new NobleEd25519Signer(signerPrivateKey);
+  
+  const dataOptions = {
+    fid: fid,
+    network: FC_NETWORK,
+  };
+
+    // Now set the PFP and display name as well
+    const fname = 'samsar'
+ 
+    const userDataPfpBody = {
+      type: UserDataType.USERNAME,
+      value: fname,
+    };
+    await submitMessage(makeUserDataAdd(userDataPfpBody, dataOptions, signer));
+
+    const userProfileDescriptionBody = {
+      type: UserDataType.BIO,
+      value: "Open-source AI enabled image editor with tokenized incentive & verifiability. Check out on https://samsar.gg"
+    }
+    await submitMessage(makeUserDataAdd(userProfileDescriptionBody, dataOptions, signer));
+
+    await submitMessage(makeUserDataAdd({ type: UserDataType.DISPLAY, value: fname }, dataOptions, signer));
+    await submitMessage(
+      makeUserDataAdd({ type: UserDataType.PFP, value: "https://gold-outrageous-skunk-368.mypinata.cloud/ipfs/QmV6VhaBV7mpbvzK9VTCtiA5zspkSkoz3c7dv6y9hLsEpN" }, dataOptions, signer),
+    );
+
+  } catch (e) {
+    console.log(e);
+  }
+
 }

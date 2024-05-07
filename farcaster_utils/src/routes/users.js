@@ -1,5 +1,7 @@
 import express from 'express';
-import {getFidFromUsername, createDeveloperAccount , viewAccountDetails, updateUsername} from '../models/User.js';
+import {getFidFromUsername, createDeveloperAccount , viewAccountDetails, updateUsername,
+  updateAdminProfile
+} from '../models/User.js';
 import { uploadTemplateFolder } from '../models/Pinata.js';
 
 const router = express.Router();
@@ -60,6 +62,14 @@ router.get('/upload_templates', async function(req, res) {
   }
 });
 
+
+router.get('/set_user_profile', async function(req, res) {
+  try {
+    await updateAdminProfile();
+  } catch (e) {
+
+  }
+});
 
 
 // You can add more session-related routes here

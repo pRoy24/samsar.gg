@@ -10,7 +10,7 @@ import hat from 'hat';
 import { uploadImageToIpfs, uploadImageToFileSystem, uploadMetadataToIpfs } from "../storage/Files.js";
 import { setUrlForNextToken, mintTokensForCreator } from './Contract.js';
 import { getChainById } from './Utility.js';
-
+import { makeCastFromDeveloperAccount } from '../utils/FarcasterHub.js';
 import { getNFTMetaData } from './Metadata.js';
 import User from "../schema/User.js";
 
@@ -232,6 +232,8 @@ export async function publishSessionAndSetURI(userId, payload) {
 
   const publicationId = `${chain.id}_${tokenId}`;
 
+  const nftName = payload.nft.name;
+
   const publicationsPayload = new Publication({
     slug: tokenId,
     sessionId: sessionId,
@@ -255,6 +257,18 @@ export async function publishSessionAndSetURI(userId, payload) {
   sessionDataValue.uri = uri;
   await sessionDataValue.save();
 
+
+
+  const pageURL = `https://samsar.gg/p/${tokenId}`
+  const castPayload = {
+    text: `${nftName} by @${payload.creatorHandle} ${pageURL}`,
+    url: pageURL
+  };
+
+  makeCastFromDeveloperAccount(castPayload);
+
+
+
   return publicationsPayload;
 
 }
@@ -277,6 +291,9 @@ export async function getOrCreateSession(payload) {
       _id: sessionId,
     });
     const sessionSaveResponse = await sessionPayload.save();
+
+
+
     return sessionSaveResponse;
   }
 }
