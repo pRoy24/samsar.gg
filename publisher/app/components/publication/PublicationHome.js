@@ -14,7 +14,7 @@ import { CHAIN_DEFINITIONS } from '@/utils/constants.js';
 
 
 const IPFS_BASE = process.env.NEXT_PUBLIC_IPFS_BASE;
-const chainId = 84532;
+const chainId = process.env.NEXT_PUBLIC_CHAIN_ID || 84532;
 
 const HOST_URL = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:3005';
 
@@ -126,7 +126,6 @@ export default function PublicationHome(props) {
 
    const newChain = CHAIN_DEFINITIONS.find(chain => chain.id.toString() === chainId.toString());
    switchChain(newChain);
-    //switchChain(chainId);
   }
 
   const gotoFarcasterLink = () => {
