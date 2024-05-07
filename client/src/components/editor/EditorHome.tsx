@@ -45,7 +45,6 @@ export default function EditorHome(props) {
   const [templateOptionList, setTemplateOptionList] = useState([]);
   const [activeItemList, setActiveItemList] = useState([]);
 
-
   const [editBrushWidth, setEditBrushWidth] = useState(5);
   const [editMasklines, setEditMaskLines] = useState([]);
 
@@ -54,9 +53,10 @@ export default function EditorHome(props) {
   const [selectedGenerationModel, setSelectedGenerationModel] = useState('SDXL');
   const [selectedEditModel, setSelectedEditModel] = useState('SDXL');
   const [ isGenerationPending , setIsGenerationPending ] = useState(false);
+  const [ isOutpaintPending, setIsOutpaintPending ] = useState(false);
+  const [ isPublicationPending, setIsPublicationPending ] = useState(false);
 
   const [ currentCanvasAction, setCurrentCanvasAction ] = useState(CANVAS_ACTION.DEFAULT);
-
 
   const [textConfig, setTextConfig] = useState({
     fontSize: 40,
@@ -68,7 +68,6 @@ export default function EditorHome(props) {
     console.log("Setting Current View:", view);
     setCurrentView(view);
   }
-
 
   const [nftData, setNftData] = useState({
     name: "",
@@ -87,8 +86,6 @@ export default function EditorHome(props) {
 
   const canvasRef = useRef(null);
   const maskGroupRef = useRef(null);
-
-  console.log(user);
 
   useEffect(() => {
     if (!id) {
@@ -304,6 +301,7 @@ export default function EditorHome(props) {
   }
 
   async function startOutpaintPoll() {
+    setIsOutpaintPending(true);
 
     const pollStatus = await axios.get(`${PROCESSOR_API_URL}/sessions/generate_status?id=${id}`);
 
@@ -321,6 +319,7 @@ export default function EditorHome(props) {
 
       setActiveItemList(nImageList);
       setSessionDetails(pollStatus.data);
+      setIsOutpaintPending(false);
       return;
     } else {
       setTimeout(() => {
@@ -360,7 +359,7 @@ export default function EditorHome(props) {
 
   const onPublishDialog = (formData) => {
 
-    console.log(user);
+    setIsPublicationPending(true);
 
     const nftData = {
       name: formData.get('nftName'),
@@ -390,7 +389,12 @@ export default function EditorHome(props) {
       axios.post(`${PROCESSOR_API_URL}/sessions/publish_and_set_uri`, sessionPayload, headers).then(function (dataResponse) {
         const publicationResponse = dataResponse.data;
         const publicationId = publicationResponse.slug;
+        setIsPublicationPending(false);
         window.location.href = `${PUBLISHER_URL}/p/${publicationId}`;
+
+      }).catch(function(err) {
+        console.log(err);
+        setIsPublicationPending(false);
       });
     }
   }
@@ -407,8 +411,9 @@ export default function EditorHome(props) {
 
   const showPublishDialg = () => {
     const publishDialog = <PublishDialog onSubmit={onPublishDialog}
-   selectedChain={selectedChain}
+      selectedChain={selectedChain}
       setSelectedChain={setSelectedChain}
+      isPublicationPending={isPublicationPending}
     />
     openAlertDialog(publishDialog);
   }
@@ -564,6 +569,8 @@ export default function EditorHome(props) {
               selectedEditModel={selectedEditModel}
               setSelectedEditModel={setSelectedEditModel}
               isGenerationPending={isGenerationPending}
+              isOutpaintPending={isOutpaintPending}
+              isPublicationPending={isPublicationPending}
               setSelectedShape={setSelectedShape}
 
 

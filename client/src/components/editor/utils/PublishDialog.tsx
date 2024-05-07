@@ -2,7 +2,7 @@ import React from "react";
 import CommonButton from "../../common/CommonButton.tsx";
 
 export default function PublishDialog(props) {
-  const { onSubmit, selectedChain, setSelectedChain, chainList } = props;
+  const { onSubmit, selectedChain, setSelectedChain, chainList, isPublicationPending } = props;
 
   const onFormSubmit = (evt) => {
     evt.preventDefault();
@@ -46,7 +46,7 @@ export default function PublishDialog(props) {
         </div>
 
         <div className="mt-4">
-          <CommonButton>
+          <CommonButton disabled={isPublicationPending}>
             Publish
           </CommonButton>
         </div>

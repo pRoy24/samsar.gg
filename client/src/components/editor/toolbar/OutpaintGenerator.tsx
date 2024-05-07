@@ -5,7 +5,8 @@ import { IMAGE_EDIT_MODEL_TYPES } from "../../../constants/Types.ts";
 
 export default function OutpaintGenerator(props) {
   const { promptText, setPromptText, submitOutpaintRequest,
-    selectedEditModel, setSelectedEditModel 
+    selectedEditModel, setSelectedEditModel ,
+    isOutpaintPending
    } = props;
 
 
@@ -36,7 +37,7 @@ export default function OutpaintGenerator(props) {
 
       <textarea onChange={(evt) => setPromptText((evt.target.value))} className="w-full m-auto p-4 rounded-lg" />
       <div>
-        <CommonButton onClick={submitOutpaintRequest}>
+        <CommonButton onClick={submitOutpaintRequest} isPending={isOutpaintPending}>
           Submit
         </CommonButton>
       </div>

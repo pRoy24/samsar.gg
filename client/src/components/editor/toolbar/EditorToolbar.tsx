@@ -30,6 +30,7 @@ export default function EditorToolbar(props: any) {
     selectedGenerationModel, setSelectedGenerationModel,
     editMasklines, setEditMaskLines,
     setSelectedShape,
+    isOutpaintPending,
     
   } = props;
 
