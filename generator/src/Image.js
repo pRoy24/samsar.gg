@@ -14,6 +14,9 @@ export async function processPendingImageRequests() {
 
   const pendingRequests = await Generation.find({});
 
+  console.log("PENDING REQUESTS");
+  console.log(pendingRequests);
+
   for (let pendingRequestData of pendingRequests) {
     let requestId;
     try {

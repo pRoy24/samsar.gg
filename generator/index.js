@@ -15,9 +15,6 @@ export async function listenToGenerationRequests() {
       await getTimeout(1000);
     }
 
-
-  
-
 }
 
 async function getTimeout(timeout = 1000) {
