@@ -125,7 +125,7 @@ export async function saveIntermediate(payload) {
   // Ensure the queue doesn't exceed 10 items
   if (intermediates.length > 10) {
     const imgNameToDelete = intermediates.pop();  // Remove the oldest item if the array length exceeds 10
-    await deleteImageFile(imgNameToDelete);
+    // await deleteImageFile(imgNameToDelete);
   }
 
   // Save the updated intermediates back to the database
