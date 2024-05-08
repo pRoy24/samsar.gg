@@ -249,7 +249,7 @@ export async function publishSessionAndSetURI(userId, payload) {
   const nftName = nftPayload.name;
   const userData = await User.findOne({ _id: userId });
 
-  const fid = userData.fid;
+  const fid = parseInt(userData.fid);
   
   const publicationsPayload = new Publication({
     slug: tokenId,
