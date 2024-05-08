@@ -41,12 +41,15 @@ def generate_image():
 @app.route("/edit", methods=["POST"])
 def edit_image():
   content = request.json
+  print(content)
 
   image_url = content.get('imageURL')
   mask_url = content.get('maskImageURL')
   prompt = content.get('prompt')
   guidance_scale = content.get('guidanceScale') or 6.0
   num_inference_steps = content.get('numInferenceSteps') or 26
+  print(num_inference_steps)
+  
   strength = content.get('strength') or 0.7
 
 
