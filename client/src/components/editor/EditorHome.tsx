@@ -170,7 +170,10 @@ export default function EditorHome(props) {
   }
 
 
-  const submitOutpaintRequest = async () => {
+  const submitOutpaintRequest = async (evt) => {
+    evt.preventDefault();
+
+    
 
     const baseImageData = await exportBaseGroup();
     let maskImageData;
@@ -181,13 +184,26 @@ export default function EditorHome(props) {
     }
 
 
+    const formData = new FormData(evt.target);
+    const promptText = formData.get('promptText');
+    const guidanceScale = formData.get('guidanceScale');
+    const numInferenceSteps = formData.get('numInferenceSteps');
+    const strength = formData.get('strength');
+
     const payload = {
       image: baseImageData,
       maskImage: maskImageData,
       sessionId: id,
       prompt: promptText,
       model: selectedEditModel,
+      guidanceScale: guidanceScale,
+      numInferenceSteps: numInferenceSteps,
+      strength: strength
+
     }
+    console.log(payload);
+    console.log("EE TEEEEEE");
+    
     const outpaintStatus = await axios.post(`${PROCESSOR_API_URL}/sessions/request_outpaint`, payload);
     startOutpaintPoll();
   }
@@ -390,6 +406,8 @@ export default function EditorHome(props) {
         const publicationResponse = dataResponse.data;
         const publicationId = publicationResponse.slug;
         setIsPublicationPending(false);
+        resetSession();
+
         window.location.href = `${PUBLISHER_URL}/p/${publicationId}`;
 
       }).catch(function(err) {

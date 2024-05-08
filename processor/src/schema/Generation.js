@@ -13,6 +13,11 @@ const generationSchema = new Schema({
   model: String,
   generationStatus: String,
 
+  guidanceScale: Number,
+  numInferenceSteps: Number,
+  strength: Number,
+  
+
 }, { timestamps: true });
 
 // 3. Create a Model.

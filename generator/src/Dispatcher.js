@@ -24,7 +24,7 @@ export async function getImageFromText(payload) {
 
 export async function getOutpaintImageFromText(payload) {
 
-  const { prompt, model, image, maskImage } = payload;
+  const { prompt, model, image, maskImage, guidanceScale, numInferenceSteps, strength } = payload;
 
   const pwd = process.cwd();
 
@@ -40,8 +40,15 @@ export async function getOutpaintImageFromText(payload) {
     const requestPayload = {
       prompt,
       imageURL: imageURL,
-      maskImageURL: maskImageURL
+      maskImageURL: maskImageURL,
+      guidanceScale,
+      numInferenceSteps,
+      strength
     }
+
+    console.log("EDIT REQUEST PAYLOAD");
+    console.log(requestPayload);
+    
  
     const response = await getEditedImageFromWebModel(requestPayload);
     return response;

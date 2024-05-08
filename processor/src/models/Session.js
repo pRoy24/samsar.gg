@@ -59,6 +59,7 @@ export async function requestOutpaintImage(payload) {
 
   sessionDataValue.outpaintStatus = "PENDING";
   sessionDataValue.prompt = payload.prompt;
+
   await addImageOutpaintRequest(payload);
 
   const saveRes = await sessionDataValue.save();

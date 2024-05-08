@@ -12,6 +12,9 @@ const generationSchema = new Schema({
   prompt: String,
   model: String,
   generationStatus: String,
+  guidanceScale: Number,
+  numInferenceSteps: Number,
+  strength: Number,
 
 }, { timestamps: true });
 

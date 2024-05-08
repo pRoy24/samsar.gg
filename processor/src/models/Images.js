@@ -46,9 +46,12 @@ export async function addImageOutpaintRequest(payload) {
     operationType: "OUTPAINT",
     prompt: payload.prompt,
     model: payload.model,
+    guidanceScale: payload.guidanceScale,
+    numInferenceSteps: payload.numInferenceSteps,
+    strength: payload.strength,
   });
 
-  await queuePayload.save();
+  await queuePayload.save({});
   return queuePayload;
 
 
