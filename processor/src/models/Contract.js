@@ -198,8 +198,6 @@ function calculatePrice(totalSupply, finalPrice, maxSupply, creatorMintAmount) {
   return priceETH.toFixed(8);
 }
 
-
-
 export async function getBurnPrice(tokenId) {
 
 }

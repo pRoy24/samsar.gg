@@ -30,6 +30,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.2",
     "pinata-fdk": "^3.7.2",
+    "sharp": "^0.33.3",
     "thirdweb": "^5.5.0",
     "uuid": "^9.0.1",
     "viem": "^2.9.16"

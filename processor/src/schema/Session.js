@@ -12,6 +12,9 @@ const sessionSchema = new Schema({
     generationStatus: String,
     outpaintStatus: String,
     
+    witnesses: Array,
+    intermediates: Array,
+    
 
 }, { timestamps: true });
 

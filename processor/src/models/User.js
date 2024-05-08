@@ -1,6 +1,3 @@
-import { getUsersDB } from '../storage/Documents.js';
-
-import { createFarcasterSigner, pollSignerForCompletion, getUserExtradata } from '../utils/PinataUtils.js';
 
 import { generateAuthToken, verifyAuthToken } from './Auth.js';
 import 'dotenv/config';

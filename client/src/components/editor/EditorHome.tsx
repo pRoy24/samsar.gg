@@ -117,6 +117,27 @@ export default function EditorHome(props) {
   }, []);
 
 
+  const prevLengthRef = useRef(activeItemList.length);
+
+  useEffect(() => {
+    // Get the current length of activeItemList
+    const currentLength = activeItemList.length;
+
+    // Check if previous length is not equal to current length
+    if (prevLengthRef.current !== currentLength) {
+   
+      setTimeout(() => {
+        saveIntermediateImage();
+      }, 5000);
+    
+    }
+
+    // Update the ref with the new length for the next render
+    prevLengthRef.current = currentLength;
+  }, [activeItemList.length]);  
+
+
+
   useEffect(() => {
     if (user && user.fid && id) {
       axios.post(`${PROCESSOR_API_URL}/sessions/get_or_create_session`, {
@@ -291,6 +312,7 @@ export default function EditorHome(props) {
       setActiveItemList(nImageList);
       setSessionDetails(pollStatus.data);
       setIsGenerationPending(false);
+     // saveIntermediateImage();
       return;
     } else {
       setTimeout(() => {
@@ -320,6 +342,7 @@ export default function EditorHome(props) {
       setActiveItemList(nImageList);
       setSessionDetails(pollStatus.data);
       setIsOutpaintPending(false);
+    //  saveIntermediateImage();
       return;
     } else {
       setTimeout(() => {
@@ -327,29 +350,6 @@ export default function EditorHome(props) {
       }, 1000);
     }
 
-  }
-
-  const onAttestationDialogClose = () => {
-
-  }
-  const submitAttestation = () => {
-    if (sessionDetails.attestationId) {
-
-    } else {
-
-      const payload = {
-        sessionId: id,
-        fid: user.fid.toString(),
-      };
-
-      axios.post(`${PROCESSOR_API_URL}/sessions/create_attestation`, payload).then((response) => {
-
-        showPublishDialg();
-
-      }).catch((error) => {
-
-      });
-    }
   }
 
   const showTemplatesSelect = () => {

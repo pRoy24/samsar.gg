@@ -5,11 +5,11 @@ import FrameActionButton from '../common/FrameActionButton.js';
 import { prepareMintTransaction, burnTransaction, getContractObject } from '../../../utils/ContractOperations.js';
 
 import './publication.css';
-import { FaTwitter } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaLink, FaTwitter } from 'react-icons/fa';
 import { SiFarcaster } from "react-icons/si";
 
 import { sendTransaction, readContract, prepareContractCall, toWei } from 'thirdweb';
-import { useActiveAccount, useSendTransaction, useReadContract, useSwitchActiveWalletChain,  useActiveWalletChain} from "thirdweb/react";
+import { useActiveAccount, useSendTransaction, useReadContract, useSwitchActiveWalletChain, useActiveWalletChain } from "thirdweb/react";
 import { CHAIN_DEFINITIONS } from '@/utils/constants.js';
 
 
@@ -21,8 +21,8 @@ const HOST_URL = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:3005';
 const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER || 'http://localhost:3002';
 
 export default function PublicationHome(props) {
-  const [ currentView, setCurrentView ] = useState('details');
-  const { meta , tokenId } = props;
+  const [currentView, setCurrentView] = useState('details');
+  const { meta, tokenId } = props;
 
   const [onChainMeta, setOnChainMeta] = useState(null);
 
@@ -31,7 +31,7 @@ export default function PublicationHome(props) {
   const { mutate: sendTransaction, isPending } = useSendTransaction();
 
 
-  const { data, isLoading} = useReadContract({
+  const { data, isLoading } = useReadContract({
     contract,
     method: 'currentMintPrice',
     params: [tokenId],
@@ -76,7 +76,6 @@ export default function PublicationHome(props) {
       fetch(metaFileURL)
         .then(response => response.json())
         .then(data => {
-          console.log(data);
           setOnChainMeta(data);
         });
     }
@@ -87,8 +86,10 @@ export default function PublicationHome(props) {
   let descriptionBlock = <span />;
   if (onChainMeta) {
     descriptionBlock = (
-      <div className="">
-        <div className='font-bold'>{onChainMeta.name}</div>
+      <div className="cursor-pointer" onClick={() => (setCurrentView('details'))}>
+        <div className='font-bold'>
+          {onChainMeta.name}
+        </div>
         <p> {onChainMeta.description}</p>
       </div>
     )
@@ -116,8 +117,8 @@ export default function PublicationHome(props) {
 
   if (activeWalletChain && chainId && activeWalletChain.id !== chainId) {
 
-   const newChain = CHAIN_DEFINITIONS.find(chain => chain.id.toString() === chainId.toString());
-   switchChain(newChain);
+    const newChain = CHAIN_DEFINITIONS.find(chain => chain.id.toString() === chainId.toString());
+    switchChain(newChain);
   }
 
   const gotoFarcasterLink = () => {
@@ -141,29 +142,127 @@ export default function PublicationHome(props) {
     setCurrentView('info');
   }
 
+
   let currentDetailImage = <img src={`${IPFS_BASE}${meta.imageHash}`} className="m-auto w-[640px]" />;
+
   if (currentView === 'info') {
     currentDetailImage = (
       <img src={`${API_SERVER}/price/${tokenId}.png`} className="m-auto w-[640px]" />
     )
   }
-  
+
+  const witnessList = meta.witnessList || [];
+  const witnessListLength = witnessList.length;
+
+  if (currentView === 'witness') {
+    currentDetailImage = (
+      <div>
+        <div>
+          <div className='text-[14px] font-bold text-gray-800 ml-1 mt-2  mb-2'>Witnessed {witnessListLength} intermediate images</div>
+        </div>
+        <div className='grid grid-cols-3 cols-gap-1 mt-2 mb-2'>
+          {meta.witnessList.map((witness, index) => {
+            return (
+              <div >
+                <img src={`${API_SERVER}/intermediates/${witness.image}`} />
+                <a href={`https://scan.witness.co/leaf/${witness.hash}`} target='_blank'>
+                  <div className='overflow-hidden font-gray-950 text-xs mt-1 mb-1 flex underline cursor-pointer'>
+
+                    <div className='inline-block w-[90%] overflow-hidden pl-1 pr-1'>
+                      {witness.hash}
+                    </div>
+                    <div className='inline-flex w-[8%]'>
+                      <FaExternalLinkAlt className='inline-flex' />
+                    </div>
+
+                  </div>
+                </a>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
+
+  let witnessStrength = <span />;
+  if (witnessListLength > 0) {
+    if (witnessListLength < 2) {
+      witnessStrength = (
+        <div>
+          <div className='w-[40px] h-[16px] bg-red-500 text-white text-[12px] rounded-lg text-center inline-flex'>
+          </div>
+          <div className='inline-flex text-xs align-text-top ml-1 tracking-tight'>
+            {witnessListLength} intermediates
+          </div>
+        </div>
+      )
+    } else if (witnessListLength < 5) {
+      witnessStrength = (
+        <div>
+          <div className='w-[40px] h-[16px] bg-yellow-500 text-white text-[12px] rounded-lg text-center inline-flex'>
+          </div>
+          <div className='inline-flex text-xs align-text-top ml-1 tracking-tight'>
+            {witnessListLength} intermediates
+          </div>
+        </div>
+      )
+    
+    } else {
+      witnessStrength = (
+        <div>
+          <div className='w-[40px] h-[16px] bg-green-500 text-white text-[12px] rounded-lg text-center inline-flex'>
+          </div>
+          <div className='inline-flex text-xs align-text-top ml-1 tracking-tight'>
+            {witnessListLength} intermediates
+          </div>
+        </div>
+      )
+    }
+
+  }
   return (
     <CommonContainer>
-      <div className="w-[640px] m-auto p-4 bg-slate-50 mt-2 rounded-lg border-2 border-color-neutral-400 shadow-lg">
+      <div className="w-[640px] m-auto pt-1 p-4 bg-slate-50 mt-2 rounded-lg border-2 border-color-neutral-400 shadow-lg">
         <div>
           <div className='flex flex-row w-full'>
-            <div className='basis-3/4'>
-            {descriptionBlock}
+            <div className='basis-1/4'>
+              {descriptionBlock}
             </div>
-            <div className='basis-1/4 '>
-                <div className='inline-flex ml-2 mr-2 text-[30px]' onClick={gotoFarcasterLink}>
-                  <SiFarcaster />
+            <div className='basis-1/4 pt-1'>
+              <div className='text-[14px] text-gray-950 cursor-pointer'>
+                <a href={`https://warpcast.com/${meta.creatorHandle}`} target='_blank'>
+                  @{meta.creatorHandle}
+                </a>
+              </div>
+              <div className="text-xs font-bold text-gray-800">
+                Creator
+              </div>
+            </div>
+            <div className='basis-1/4 pt-1'>
+              <div onClick={() => setCurrentView('witness')} >
+                <div className='text-[14px] text-gray-950 cursor-pointer'>
+                  {witnessStrength}
                 </div>
-                <div className='inline-flex ml-2 mr-2 text-[30px]' onClick={gotoTwitterLink}>
-                <FaTwitter />
+                <div className="text-xs font-bold text-gray-800">
+
+                  Witness <FaLink className='inline-flex' />
+
                 </div>
               </div>
+
+            </div>
+            <div className='basis-1/4 '>
+              <div className='mt-2'>
+                <div className='inline-flex ml-2 mr-2 text-[30px] cursor-pointer' onClick={gotoFarcasterLink}>
+                  <SiFarcaster />
+                </div>
+                <div className='inline-flex ml-2 mr-2 text-[30px] cursor-pointer' onClick={gotoTwitterLink}>
+                  <FaTwitter />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div>
@@ -171,7 +270,7 @@ export default function PublicationHome(props) {
         </div>
         <p>{meta.description}</p>
         <div className="grid grid-cols-3 gap-1">
-        <FrameActionButton onClick={mintNFTTransaction}>
+          <FrameActionButton onClick={mintNFTTransaction}>
             Mint
           </FrameActionButton>
           <FrameActionButton onClick={burnNFTTransaction}>

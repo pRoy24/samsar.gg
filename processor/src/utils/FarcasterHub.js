@@ -135,12 +135,6 @@ export async function getOrRegisterSigner(fid) {
 export async function makeCastFromDeveloperAccount(castData) {
 
   try {
-
-
-
-    console.log(fid);
-
-
     const dataOptions = {
       fid: fid,
       network: FC_NETWORK,
@@ -148,17 +142,7 @@ export async function makeCastFromDeveloperAccount(castData) {
 
     const signerPrivateKey = await getOrRegisterSigner(fid);
 
-
-
-
     const signer = new NobleEd25519Signer(signerPrivateKey);
-
-
-
-    console.log(dataOptions);
-    console.log(signer);
-
-
     const submitPublicationCast = await makeCastAdd(
       {
         text: castData.text,
@@ -170,17 +154,11 @@ export async function makeCastFromDeveloperAccount(castData) {
       dataOptions,
       signer,
     );
-      console.log(submitPublicationCast);
+
+    const cast = submitPublicationCast._unsafeUnwrap();
 
 
-
-      const cast = submitPublicationCast._unsafeUnwrap();
-
-
-      const messageResponse = await hubClient.submitMessage(cast);
-
-      console.log(messageResponse);
-
+    const messageResponse = await hubClient.submitMessage(cast);
 
     return submitPublicationCast;
 

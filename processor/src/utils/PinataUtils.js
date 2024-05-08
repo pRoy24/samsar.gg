@@ -25,10 +25,7 @@ export async function createFarcasterSigner() {
 }
 
 export async function pollSignerForCompletion(token) {
-  const pollData = await fdk.pollSigner(token);
-  console.log("RIBBON");
-  console.log(pollData);
-  
+  const pollData = await fdk.pollSigner(token);  
   return pollData; 
 }
 

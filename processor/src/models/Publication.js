@@ -1,4 +1,3 @@
-import { getPublicationsDB } from "../storage/Documents.js";
 import { getDBConnectionString } from "./DBString.js";
 import User from "../schema/User.js";
 import Publication from "../schema/Publication.js";

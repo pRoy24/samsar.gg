@@ -22,6 +22,8 @@ const publicationSchema = new Schema({
   mintPrice: Number,
   nftName: String,
   nftDescription: String,
+  witnessList: Array,
+  witnessHash: String,
 
 
 }, { timestamps: true });

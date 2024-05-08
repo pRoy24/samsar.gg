@@ -33,9 +33,6 @@ export async function uploadImageToIpfs(fileData) {
     };
 
     const uploadResponse = await pinata.pinFileToIPFS(imageStream, options);
-    console.log("Pinned image to ipfs");
-    console.log(uploadResponse);
-
     return uploadResponse;
   } catch (error) {
     console.log(error);

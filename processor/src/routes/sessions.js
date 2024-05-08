@@ -2,8 +2,7 @@
 import express from 'express';
 import { requestGenerateImage, createNewSession, getSessionGenerationStatus, publishSession,
   saveIntermediate, getSessionDetails, publishSessionAndSetURI,
-  requestOutpaintImage, getOrCreateSession,
-  createAttestation} from '../models/Session.js';
+  requestOutpaintImage, getOrCreateSession} from '../models/Session.js';
 import { verifyUserAuth } from '../models/Auth.js';
 
 
@@ -67,9 +66,8 @@ router.get('/details', async function(req, res) {
 
 router.post('/create_attestation', async function(req, res) {
   const payload = req.body;
-  const sessionData = await createAttestation(payload);
-  res.json(sessionData);
 
+  res.send("Not implemented");
 });
 
 router.post('/get_or_create_session', async function(req, res) {

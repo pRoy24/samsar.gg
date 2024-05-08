@@ -4,7 +4,7 @@ export function getNFTMetaData(nftPayload) {
     name: nftPayload.name,
     description: nftPayload.description,
     image: nftPayload.image,
-    attributes: [],
+    attributes: nftPayload.attributes ? nftPayload.attributes : [],
   };
   return metadata;
 }

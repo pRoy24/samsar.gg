@@ -26,7 +26,7 @@ export async function generateWitnessForFile(imageFile) {
   await witness.postLeaf(leafHash);
 
   // Wait for the data to be included in an onchain checkpoint.
-  await witness.waitForCheckpointedLeafHash(leafHash);
+  // await witness.waitForCheckpointedLeafHash(leafHash);
   return leafHash;
 }
 

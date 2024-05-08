@@ -11,7 +11,6 @@ const pinata = new pinataSDK({ pinataJWTKey: PINATA_JWT});
 export async function getPinnedTemplatesList() {
 
   try {
-
     const filters = {
       metadata: {
         keyvalues: {
@@ -25,11 +24,7 @@ export async function getPinnedTemplatesList() {
   }
 
     const fileList = await pinata.pinList(filters)
-
-    console.log(fileList);
     return fileList.rows;
-
-
   } catch (e) {
 
     console.log(e);
