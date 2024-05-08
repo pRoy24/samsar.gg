@@ -14,14 +14,9 @@ export async function processPendingImageRequests() {
 
   const pendingRequests = await Generation.find({});
 
-  console.log("PENDING REQUESTS");
-  console.log(pendingRequests);
-
   for (let pendingRequestData of pendingRequests) {
     let requestId;
     try {
-
-
       requestId = pendingRequestData._id;
       const operationType = pendingRequestData.operationType;
       if (operationType === "GENERATE") {
@@ -33,9 +28,6 @@ export async function processPendingImageRequests() {
 
       
     } catch (e) {
-      console.log("CAUGHT ERROR");
-    
-      console.log(e);
 
       if (requestId) {
         try {
