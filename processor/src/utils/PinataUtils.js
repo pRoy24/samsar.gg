@@ -39,3 +39,31 @@ export async function getUserExtradata(fid) {
   const response = resData.data;
   return response;
 }
+
+export async function getCastsForDeveloperAccount() {
+  const developerFid = process.env.FARCASTER_DEVELOPER_FID;
+  const headers = {
+    headers: {
+      Authorization: `Bearer ${PINATA_JWT}`
+    }
+  
+  }
+  const dataRes = await axios.get(`https://api.pinata.cloud/v3/farcaster/casts?fid=${developerFid}`, headers);
+
+  const data = dataRes.data;
+  return data.data.casts;
+}
+
+export  async function removeCastFromDeveloperAccount(hash) {
+  const headers = {
+    headers: {
+      Authorization: `Bearer ${PINATA_JWT}`
+    }
+  }
+
+  const resData = await axios.delete(`https://api.pinata.cloud/v3/farcaster/casts/${hash}`, headers);
+  const response = resData.data;
+  console.log(response);
+
+
+}

@@ -13,6 +13,7 @@ import {
   keyGatewayABI,
   FarcasterNetwork,
   getSSLHubRpcClient,
+  makeCastRemove,
   makeCastAdd,
 } from '@farcaster/hub-nodejs';
 import { ed25519 } from "@noble/curves/ed25519";
@@ -144,13 +145,7 @@ export async function makeCastFromDeveloperAccount(castData) {
 
     const signer = new NobleEd25519Signer(signerPrivateKey);
     const submitPublicationCast = await makeCastAdd(
-      {
-        text: castData.text,
-        embeds: [{ url: castData.url }],
-        embedsDeprecated: [],
-        mentions: [],
-        mentionsPositions: [],
-      },
+      castData,
       dataOptions,
       signer,
     );
@@ -173,7 +168,41 @@ export async function makeCastFromDeveloperAccount(castData) {
 
 
 export async function removeCastFromDeveloperAccount(castData) {
+  console.log(castData);
+  
+
+  try {
+    const dataOptions = {
+      fid: fid,
+      network: FC_NETWORK,
+    };
+
+    const signerPrivateKey = await getOrRegisterSigner(fid);
+
+    const signer = new NobleEd25519Signer(signerPrivateKey);
+    const submitPublicationCast = await makeCastRemove(
+      {
+        targetHash: castData.hash,
+      },
+      dataOptions,
+      signer,
+    );
+
+    const cast = submitPublicationCast._unsafeUnwrap();
+    const messageResponse = await hubClient.submitMessage(cast);
+
+    return submitPublicationCast;
+
+
+  } catch (e) {
+
+    console.log(e);
+    return {};
+
+  }
 
 
 
 }
+
+

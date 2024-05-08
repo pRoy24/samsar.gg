@@ -27,8 +27,6 @@ export default function Page(props) {
         <title>{meta.title}</title>
         <link rel="icon" href="/favicon.png" type="image/x-icon" />
         <meta name="description" content={meta.nftDescription} />
-
-
         <meta property="og:title" content={meta.nftTitle} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://samsar.g/p/${id}`} />

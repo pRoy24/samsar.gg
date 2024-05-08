@@ -16,6 +16,7 @@ import User from "../schema/User.js";
 import sharp from 'sharp';
 import fs from 'fs';
 import { generateWitnessForFile } from './Attestation.js';
+import { byteIndexOf , truncateTo320Bytes} from '../utils/StringUtils.js';
 
 
 
@@ -182,11 +183,8 @@ async function updateWitnessForIntermediate(sessionId, imageFile) {
     hash: leafHash,
   });
 
-  console.log("SAVING WITNESS");
-  console.log(sessionData.witnesses);
-
   await sessionData.save({});
-  console.log("FINISH");
+
 
 }
 
@@ -249,7 +247,10 @@ export async function publishSessionAndSetURI(userId, payload) {
   const creatorInitHash = creatorInitHashData.transactionHash;
 
   const nftName = nftPayload.name;
+  const userData = await User.findOne({ _id: userId });
 
+  const fid = userData.fid;
+  
   const publicationsPayload = new Publication({
     slug: tokenId,
     sessionId: sessionId,
@@ -275,13 +276,21 @@ export async function publishSessionAndSetURI(userId, payload) {
   await sessionDataValue.save({});
 
   const pageURL = `https://samsar.gg/p/${tokenId}`
+  const castText = truncateTo320Bytes(`${nftName} by \n ${nftPayload.description}`);
+  const mentionsPosition = byteIndexOf(castText, "\n");
+
   const castPayload = {
-    text: `${nftName} by @${payload.creatorHandle} ${pageURL}`,
-    url: pageURL
+    text: castText,
+    embeds: [{ url: pageURL }],
+    mentions: [fid],
+    embedsDeprecated: [],
+    mentionsPositions: [mentionsPosition]
   };
 
-  makeCastFromDeveloperAccount(castPayload);
-
+  const CURRENT_ENV=process.env.CURRENT_ENV;
+  if (CURRENT_ENV === 'production') {
+    makeCastFromDeveloperAccount(castPayload);
+  }
   return publicationsPayload;
 }
 
