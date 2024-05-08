@@ -29,20 +29,20 @@ export default function OutpaintGenerator(props) {
 
     editOptionsDisplay = (<div className="grid grid-cols-3 gap-1">
       <div>
-        <input type="text" className="w-[96%] pl-2 pr-2" name="guidanceScale" defaultValue={6}/>
+        <input type="text" className="w-[96%] pl-2 pr-2" name="guidanceScale" defaultValue={5}/>
         <div className="text-xs ">
             Guidance 
          </div> 
       </div>
       <div>
-        <input type="text" className="w-[96%] pl-2 pr-2" name="numInferenceSteps" defaultValue={26}/>
+        <input type="text" className="w-[96%] pl-2 pr-2" name="numInferenceSteps" defaultValue={30}/>
         <div className="text-xs">
           Inference
         </div>  
       </div>
       <div>
 
-        <input type="text" className="w-[96%] pl-2 pr-2" name="strength" defaultValue={0.7} />
+        <input type="text" className="w-[96%] pl-2 pr-2" name="strength" defaultValue={0.99} />
         <div className="text-xs">
           Strength
         </div>  
