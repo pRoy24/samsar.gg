@@ -24,20 +24,29 @@ export default function Page(props) {
 
   const title = meta.nftTitle ? meta.nftTitle : "Samsar GG Publication";
 
+  const description = meta.nftDescription ? meta.nftDescription : "Samsar GG Publication";
   return (
     <div>
       <Head>
         <title>{meta.title}</title>
         <link rel="icon" href="/favicon.png" type="image/x-icon" />
-        <meta name="description" content={meta.nftDescription} />
+        <meta name="description" content={description} />
         <meta property="og:title" content={title} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://samsar.g/p/${id}`} />
         <meta property="og:image" content={imgSrc} />
-        <meta property="og:description" content={meta.nftDescription} />
+        <meta property="og:description" content={description} />
         <meta property="og:site_name" content="Samsar GG" />
         <meta property="og:locale" content="en_US" />
         <meta name="twitter:card" content="summary_large_image" />
+        
+
+        <meta name="twitter:site" content="@samsar_gg" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={imgSrc} />
+        <meta name="twitter:creator" content="@samsar_gg" />
+
         <FrameMetadata
           buttons={[
             {
