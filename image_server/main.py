@@ -45,7 +45,7 @@ def edit_image():
   image_url = content.get('imageURL')
   mask_url = content.get('maskImageURL')
   prompt = content.get('prompt')
-  guidance_scale = content.get('guidanceScale') or 5.0
+  guidance_scale = content.get('guidanceScale') or 6.0
   num_inference_steps = content.get('numInferenceSteps') or 30
   strength = content.get('strength') or 0.99
 

@@ -1,5 +1,5 @@
 import { validateMessage, getFarcasterAccountAddress } from "../../../utils/pinata";
-import { getERC1155PreparedEncodedMintData , getMintPrice } from "../../../utils/tx-frame";
+import { getERC1155PreparedEncodedMintData , getMintPrice, getBalanceForUserForTokenId } from "../../../utils/tx-frame";
 import { abi } from "../../../utils/contractABI";
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID;
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_DEPLOYMENT_ADDRESS;
@@ -21,6 +21,14 @@ export default async function handler(req, res) {
   }
 
   const address = await getFarcasterAccountAddress(message.data.fid);
+  if (!address) {
+    return res.status(400).json({ error: 'Bad Request', message: 'User needs to connect an address.' })
+  }
+  const userBalance = await getBalanceForUserForTokenId(address, tokenId);
+  if (userBalance > 0) {
+    return res.status(400).json({ error: 'Bad Request', message: 'User already owns this token.' })
+  }
+
   const encodedData = await getERC1155PreparedEncodedMintData(address, tokenId);
   
   const value = await getMintPrice(tokenId);

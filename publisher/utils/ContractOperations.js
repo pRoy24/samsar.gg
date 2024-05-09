@@ -24,9 +24,7 @@ export function getContractObject() {
     chain: chainData,
     abi: abi,
     address: CONTRACT_ADDRESS
-  });
-  console.log(contract);
-  
+  });  
   return contract;
 }
 

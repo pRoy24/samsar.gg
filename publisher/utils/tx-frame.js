@@ -66,3 +66,19 @@ export async function getMintPrice(tokenId) {
 
 
 }
+
+export async function getBalanceForUserForTokenId(address, tokenId) {
+  const contract = getContract({
+    client: client,
+    chain: CHAIN,
+    address: contractAddress,
+    abi: abi
+  });
+
+  const balance = await readContract({
+    contract,
+    method: 'balanceOf',
+    params: [address, tokenId],
+  });
+  return parseInt(balance.toString());
+}

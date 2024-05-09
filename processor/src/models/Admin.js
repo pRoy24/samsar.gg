@@ -41,16 +41,19 @@ export async function createAttestationSignerSchema() {
 export async function makeCastFromAccount(reqBody) {
 
 
-  let { text, url, fid } = reqBody;
+  console.log(reqBody);
+  
+
+  let { text, url } = reqBody;
   text = truncateTo320Bytes(text);
   const mentionsPosition = byteIndexOf(text, "\n");
 
   const castPayload = {
     text,
     embeds: [{url: url}],
-    mentions: [fid],
+    mentions: [],
     embedsDeprecated: [],
-    mentionsPositions: [mentionsPosition]
+    mentionsPositions: []
   }
 
   console.log(castPayload);

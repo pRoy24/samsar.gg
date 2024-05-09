@@ -1,5 +1,5 @@
 import { validateMessage, getFarcasterAccountAddress } from "../../../utils/pinata";
-import { getERC1155PreparedEncodedBurnData } from "../../../utils/tx-frame";
+import { getERC1155PreparedEncodedBurnData, getBalanceForUserForTokenId } from "../../../utils/tx-frame";
 import { abi } from "../../../utils/contractABI";
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID;
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_DEPLOYMENT_ADDRESS;
@@ -13,6 +13,10 @@ export default async function handler(req, res) {
 
   const tokenId = req.query.id;
 
+
+  console.log("GGG");
+  console.log(req.body);
+
   const { isValid, message} = await validateMessage(req.body); 
 
 
@@ -20,7 +24,16 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Bad Request', message: 'Invalid message' })
   }
 
+
+
   const address = await getFarcasterAccountAddress(message.data.fid);
+
+  const userBalance = await getBalanceForUserForTokenId(address, tokenId);
+
+  if (userBalance === 0) {
+    return res.status(400).json({ error: 'Bad Request', message: 'User does not own this token' })
+  }
+
   const encodedData = await getERC1155PreparedEncodedBurnData(address, tokenId);
 
 
