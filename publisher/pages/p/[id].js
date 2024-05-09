@@ -20,6 +20,9 @@ export default function Page(props) {
   if (meta.imageHash) {
     imgSrc = `${IPFS_BASE}${meta.imageHash}`;
   }
+  
+
+  const title = meta.nftTitle ? meta.nftTitle : "Samsar GG Publication";
 
   return (
     <div>
@@ -27,7 +30,7 @@ export default function Page(props) {
         <title>{meta.title}</title>
         <link rel="icon" href="/favicon.png" type="image/x-icon" />
         <meta name="description" content={meta.nftDescription} />
-        <meta property="og:title" content={meta.nftTitle} />
+        <meta property="og:title" content={title} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://samsar.g/p/${id}`} />
         <meta property="og:image" content={imgSrc} />
@@ -35,6 +38,10 @@ export default function Page(props) {
         <meta property="og:site_name" content="Samsar GG" />
         <meta property="og:locale" content="en_US" />
 
+        <meta name="twitter:card" content="summary_large_image" />
+
+
+        <meta name="twitter:description" content={meta.nftDescription} />
 
         <FrameMetadata
           buttons={[
