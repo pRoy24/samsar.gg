@@ -38,9 +38,6 @@ export default function Page(props) {
         <meta property="og:site_name" content="Samsar GG" />
         <meta property="og:locale" content="en_US" />
 
-        <meta name="twitter:card" content="summary_large_image" />
-
-
         <meta name="twitter:description" content={meta.nftDescription} />
 
         <FrameMetadata
