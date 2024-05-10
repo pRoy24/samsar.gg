@@ -466,7 +466,7 @@ export default function EditorHome(props) {
 
   const addImageToCanvas = (templateOption) => {
 
-    const templateURL = `${IPFS_URL_BASE}/ipfs/${templateOption.ipfs_pin_hash}`;
+    const templateURL = `${PROCESSOR_API_URL}/templates/mm_final/${templateOption}`;
 
     const nImageList: any = Object.assign([], activeItemList);
     const currentItemId = nImageList.length;
