@@ -118,7 +118,7 @@ export default function PublicationHome(props) {
   if (activeWalletChain && chainId && activeWalletChain.id !== chainId) {
 
     const newChain = CHAIN_DEFINITIONS.find(chain => chain.id.toString() === chainId.toString());
-    switchChain(newChain);
+   // switchChain(newChain);
   }
 
   const gotoFarcasterLink = () => {

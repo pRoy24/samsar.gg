@@ -13,8 +13,6 @@ const IPFS_BASE = process.env.NEXT_PUBLIC_IPFS_BASE;
 
 export default function Page(props) {
   const { meta, id } = props;
-  console.log(meta);
-
   const tokenId = id;
   let imgSrc = ``;
   if (meta.imageHash) {
