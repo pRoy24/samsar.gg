@@ -63,7 +63,7 @@ export default function SelectTemplate(props) {
       <div className='max-w-6xl mx-auto p-4'>
         <div className='columns-4 gap-2'>
           {templateOptionList.map((templateOption, index) => (
-            <div key={`${index}_${templateOption}`}
+            <div key={`${index}_template_item_${currentPage}`}
               className='break-inside-avoid mb-4 cursor-pointer'
               onClick={() => addImageToCanvas(templateOption)}>
               <img alt={`Template ${index}`}
