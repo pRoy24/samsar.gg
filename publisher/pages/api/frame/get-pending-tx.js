@@ -8,10 +8,12 @@ export default async function handler(req, res) {
   const tokenId = req.query.id;
   const imageHash = req.query.imageHash;
 
+  const imageURL = `${IPFS_BASE}${imageHash}?rand=${Math.random() * 1000}`;
+
   const frameMetadata = `
   <meta name="fc:frame" content="vNext">
-  <meta name="og:image" content="${IPFS_BASE}${imageHash}">
-  <meta name="fc:frame:image" content="${IPFS_BASE}${imageHash}">
+  <meta name="og:image" content="${imageURL}">
+  <meta name="fc:frame:image" content="${imageURL}">
   <meta name="fc:frame:image:aspect_ratio" content="1:1">
   <meta name="fc:frame:button:1" content="Mint">
   <meta name="fc:frame:button:1:action" content="tx">
