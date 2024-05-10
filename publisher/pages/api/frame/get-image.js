@@ -1,4 +1,4 @@
-import { getPinataClient } from "../../../utils/pinata";
+
 const HOST_URL = process.env.NEXT_PUBLIC_HOST_URL;
 
 const IPFS_BASE = process.env.NEXT_PUBLIC_IPFS_BASE;
@@ -7,7 +7,6 @@ export default async function handler(req, res) {
 
   const tokenId = req.query.id;
   const imageHash = req.query.imageHash;
-  const fdk = getPinataClient();
 
   const frameMetadata = `
   <meta name="fc:frame" content="vNext">
@@ -23,8 +22,6 @@ export default async function handler(req, res) {
   <meta name="fc:frame:button:3" content="Info">
   <meta name="fc:frame:button:3:action" content="post">
   <meta name="fc:frame:button:3:target" content="${HOST_URL}/api/frame/get-info?id=${tokenId}">
-  
-
   `;
 
   const htmlContent = `
