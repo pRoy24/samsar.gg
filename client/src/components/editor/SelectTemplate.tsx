@@ -33,20 +33,20 @@ export default function SelectTemplate(props) {
 
           <div className=''>
             <div className='w-90px text-left float-left pl-2 cursor-pointer ' onClick={() => resetCurrentView()} >
-            <FaChevronLeft className='inline-flex align-baseline'/>
-            <div className='text-2xl inline-flex'>Templates</div>
+              <FaChevronLeft className='inline-flex align-baseline' />
+              <div className='text-2xl inline-flex'>Templates</div>
             </div>
 
           </div>
 
           <div className=' ml-auto'>
-         
+
           </div>
 
           <div className=''>
             <div className='inline-flex cursor-pointer bg-gray-200 rounded-md p-2 h-[30px] align-top' onClick={() => handlePageChange(currentPage - 1)} >
               <FaChevronLeft />
-               <div className='inline-flex text-sm font-bold mb-1'>Prev</div>
+              <div className='inline-flex text-sm font-bold mb-1'>Prev</div>
             </div>
             <div className='inline-flex mt-1'>
               <span className="mx-2">{`Page ${currentPage} of ${totalPages}`}</span>
@@ -61,18 +61,20 @@ export default function SelectTemplate(props) {
 
       </div>
       <div className='max-w-6xl mx-auto p-4'>
-        <div className='columns-4 gap-2'>
+        <div className='flex flex-wrap -mx-1'>
           {templateOptionList.map((templateOption, index) => (
             <div key={`${index}_template_item_${currentPage}`}
-              className='break-inside-avoid mb-4 cursor-pointer'
+              className='px-1 mb-4 w-1/4 cursor-pointer'
               onClick={() => addImageToCanvas(templateOption)}>
               <img alt={`Template ${index}`}
                 src={`${API_SERVER}/templates/mm_final/${templateOption}`}
-                className='w-full rounded-lg' 
-                loading="lazy"/>
+                className='w-full rounded-lg'
+                loading="lazy" />
             </div>
           ))}
         </div>
+
+
       </div>
 
 
