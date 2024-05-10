@@ -94,13 +94,8 @@ export async function getOrRegisterSigner(fid) {
   const privateKey = ed25519.utils.randomPrivateKey();
   const publicKey = toHex(ed25519.getPublicKey(privateKey));
 
-  console.log(`Created new signer for test with private key: ${toHex(privateKey)}`);
-
   // To add a key, we need to sign the metadata with the fid of the app we're adding the key on behalf of
   // We'll use our own fid and custody address for simplicity. This can also be a separate App specific fid.
-
-  console.log("Generate metadata");
-  console.log(fid);
 
   const eip712signer = new ViemLocalEip712Signer(app);
   const metadata = await eip712signer.getSignedKeyRequestMetadata({

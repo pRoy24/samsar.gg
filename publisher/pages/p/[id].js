@@ -61,7 +61,7 @@ export default function Page(props) {
             {
               label: 'Info',
               action: 'post',
-              target: `${HOST_URL}/api/frame/get-info?id=${tokenId}`
+              target: `${HOST_URL}/api/frame/get-info?id=${tokenId}&imageHash=${meta.imageHash}`
             },
           ]}
           image={{

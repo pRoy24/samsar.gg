@@ -6,6 +6,7 @@ const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER;
 export default async function handler(req, res) {
 
   const tokenId = req.query.id;
+  const imageHash = req.query.imageHash;
   const fdk = getPinataClient();
 
   const frameMetadata = `
@@ -21,7 +22,7 @@ export default async function handler(req, res) {
   <meta name="fc:frame:button:2:target" content="${HOST_URL}/api/frame/get-burn-tx?id=${tokenId}">
   <meta name="fc:frame:button:3" content="Image">
   <meta name="fc:frame:button:3:action" content="post">
-  <meta name="fc:frame:button:3:target" content="${HOST_URL}/api/frame/get-image?id=${tokenId}">
+  <meta name="fc:frame:button:3:target" content="${HOST_URL}/api/frame/get-image?id=${tokenId}&imageHash=${imageHash}">
 
   `;
 
