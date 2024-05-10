@@ -68,7 +68,8 @@ export default function SelectTemplate(props) {
               onClick={() => addImageToCanvas(templateOption)}>
               <img alt={`Template ${index}`}
                 src={`${API_SERVER}/templates/mm_final/${templateOption}`}
-                className='w-full rounded-lg' />
+                className='w-full rounded-lg' 
+                loading="lazy"/>
             </div>
           ))}
         </div>
