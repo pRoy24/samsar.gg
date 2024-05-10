@@ -32,6 +32,7 @@
     "pinata-fdk": "^3.7.2",
     "sharp": "^0.33.3",
     "thirdweb": "^5.5.0",
+    "twitter-api-v2": "^1.16.4",
     "uuid": "^9.0.1",
     "viem": "^2.9.16"
   }

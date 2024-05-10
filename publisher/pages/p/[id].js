@@ -36,7 +36,8 @@ export default function Page(props) {
         <meta property="og:description" content={description} />
         <meta property="og:site_name" content="Samsar GG" />
         <meta property="og:locale" content="en_US" />
-        \
+        <meta property="og:image:width" content="1024" />
+<meta property="og:image:height" content="1024" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@samsar_gg" />
         <meta name="twitter:title" content={title} />
