@@ -11,7 +11,7 @@ const PINATA_JWT = process.env.PINATA_JWT;
 const pinata = new pinataSDK({ pinataJWTKey: PINATA_JWT});
 
 export async function getPinnedTemplatesList(pageNumber) {
-  const numItemsPerPage = 100;
+  const numItemsPerPage = 50;
   const pwd = process.cwd();
   const folderPath = path.join(pwd, 'assets/templates/mm_final'); // Adjust the path as necessary
 

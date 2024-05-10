@@ -10,7 +10,7 @@ export default function SelectTemplate(props) {
 
   // State for managing pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(22);  // Assuming you know the total pages
+  const [totalPages, setTotalPages] = useState(44);  // Assuming you know the total pages
 
   // Fetch data when the component mounts and when currentPage changes
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function SelectTemplate(props) {
               className='px-1 mb-4 w-1/4 cursor-pointer'
               onClick={() => addImageToCanvas(templateOption)}>
               <img alt={`Template ${index}`}
-                src={`${API_SERVER}/templates/mm_final/${templateOption}`}
+                src={`${API_SERVER}/templates/mm_final/${encodeURI(templateOption)}`}
                 className='w-full rounded-lg'
                 loading="lazy" />
             </div>
