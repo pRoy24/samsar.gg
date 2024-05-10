@@ -73,17 +73,9 @@ export async function normalizeFileNamesAndUpload(directory) {
           }
       };
 
-      console.log(pinataOptions);
-
       const readableStreamForFile = standardFS.createReadStream(filePath);
 
       const res = await pinata.pinFileToIPFS(readableStreamForFile, pinataOptions)
-      console.log(res)
-      console.log("GOIN TO NEXT");
-
-
-
-
 
 
       }

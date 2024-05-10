@@ -117,6 +117,10 @@ export default function EditorHome(props) {
   }, []);
 
 
+  const resetCurrentView = () => {
+    setCurrentView(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
+  }
+
   const prevLengthRef = useRef(activeItemList.length);
 
   useEffect(() => {
@@ -436,8 +440,8 @@ export default function EditorHome(props) {
     openAlertDialog(publishDialog);
   }
 
-  const getRemoteTemplateData = () => {
-    axios.get(`${PROCESSOR_API_URL}/utils/template_list`).then((response) => {
+  const getRemoteTemplateData = (page) => {
+    axios.get(`${PROCESSOR_API_URL}/utils/template_list?page=${page}`).then((response) => {
 
       const generatedImageUrlName = response.data.activeGeneratedImage;
       const generatedURL =
@@ -524,7 +528,9 @@ export default function EditorHome(props) {
   if (currentView === CURRENT_TOOLBAR_VIEW.SHOW_TEMPLATES_DISPLAY) {
     viewDisplay = (
       <SelectTemplate getRemoteTemplateData={getRemoteTemplateData}
-        templateOptionList={templateOptionList} addImageToCanvas={addImageToCanvas} />
+        templateOptionList={templateOptionList} addImageToCanvas={addImageToCanvas} 
+        resetCurrentView={resetCurrentView}
+        />
     )
   } else {
     viewDisplay = (

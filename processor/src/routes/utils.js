@@ -14,7 +14,8 @@ router.get('/chain_list', async function(req, res) {
 
 
 router.get('/template_list', async function(req, res) {
-  const templateURLList = await getPinnedTemplatesList();
+  const page = req.query.page;
+  const templateURLList = await getPinnedTemplatesList(page);
   res.json(templateURLList);
 });
 
