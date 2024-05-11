@@ -8,7 +8,7 @@ export default function CommonButton(props) {
 
   let isBtnDisabled = false;
 
-  if (!user || !user.fid) {
+  if (!user || !user.custody) {
     isBtnDisabled = true;
   }
   
