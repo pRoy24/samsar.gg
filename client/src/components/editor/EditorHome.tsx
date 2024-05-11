@@ -143,7 +143,7 @@ export default function EditorHome(props) {
 
 
   useEffect(() => {
-    if (user && user.fid && id) {
+    if (user && id) {
       axios.post(`${PROCESSOR_API_URL}/sessions/get_or_create_session`, {
         userId: user._id.toString(),
         sessionId: id
