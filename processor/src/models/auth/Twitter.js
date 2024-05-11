@@ -12,10 +12,11 @@ const TWITTER_BEARER_TOKEN = process.env.TWITTER_BEARER_KEY;
 
 const CLIENT_ID = process.env.TWITTER_CLIENT_ID;
 const CLIENT_SECRET = process.env.TWITTER_CLIENT_SECRET;
+const API_SERVER = process.env.API_SERVER;
 
 const client = new TwitterApi({ clientId: CLIENT_ID, clientSecret: CLIENT_SECRET });
 
-const CALLBACK_URL = `https://4b7f-49-49-10-122.ngrok-free.app/users/twitter_login_callback`;
+const CALLBACK_URL = `${API_SERVER}/users/twitter_login_callback`;
 
 export async function getTwitterLogin() {
 
