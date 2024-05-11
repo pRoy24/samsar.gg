@@ -132,3 +132,11 @@ export async function pollSignerForUser(payload) {
   // }
   // return signerData;
 }
+
+export async function addCustodyAddress(userId, payload) {
+  const { address } = payload;
+  const userData = await User.findOne({ _id: userId });
+  userData.custody = address;
+  await userData.save();
+  return userData;
+}

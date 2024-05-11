@@ -11,6 +11,12 @@ import { useAlertDialog } from '../../contexts/AlertDialogContext';
 import { IoMdLogIn } from "react-icons/io";
 import { AlertDialog } from './AlertDialog.tsx';
 import { SiFarcaster } from "react-icons/si";
+import {
+  ConnectButton,
+} from "thirdweb/react";
+import { client, wallets, getAuth, getAuthPayload, verifyAuthPayload } from '../../utils/thirdweb.js';
+
+import { IoMdWallet } from "react-icons/io";
 
 
 import './common.css';
@@ -21,7 +27,7 @@ const PROCESSOR_SERVER = process.env.REACT_APP_PROCESSOR_API;
 
 export default function TopNav(props) {
 
-  const { resetCurrentSession } = props;
+  const { resetCurrentSession, addCustodyAddress } = props;
   const farcasterSignInButtonRef = useRef(null);
 
   const { openAlertDialog, closeAlertDialog } = useAlertDialog();
@@ -31,7 +37,7 @@ export default function TopNav(props) {
     closeAlertDialog();
   }
 
-  const {  user, setUser } = useUser();
+  const { user, setUser } = useUser();
   const navigate = useNavigate();
 
   const [userProfileData, setUserProfileData] = useState({});
@@ -39,78 +45,66 @@ export default function TopNav(props) {
   let userProfile = <span />;
 
   const verifyAndSetUserProfile = (profile) => {
-    axios.post(`${PROCESSOR_SERVER}/users/verify`, profile).then(function(dataRes) {
-      console.log(dataRes);
+    axios.post(`${PROCESSOR_SERVER}/users/verify`, profile).then(function (dataRes) {
       const userData = dataRes.data;
       const authToken = userData.authToken;
       localStorage.setItem('authToken', authToken);
       setUser(userData);
-    
+
     })
-
-    //setUserProfileData(profile);
   }
-
-
-
 
   const gotoUserAccount = () => {
     navigate('/account');
-
   }
 
 
   const siginToTwitter = () => {
-    console.log('signing in to twitter');
-    axios.get(`${PROCESSOR_SERVER}/users/twitter_login`).then(function(dataRes) {
-      console.log(dataRes);
-      const twitterAuthUrl = dataRes.data.authUrl;
-      window.location.href = twitterAuthUrl;
+    axios.get(`${PROCESSOR_SERVER}/users/twitter_login`).then(function (dataRes) {
+      const authPayload = dataRes.data;
+      const twitterAuthUrl = authPayload.loginUrl;
+      window.open(twitterAuthUrl, '_blank');
     })
+    closeAlertDialog();
 
   }
 
   const showLoginDialog = () => {
-    console.log('show login dialog');
-
     const loginComponent = (
       <div>
-        <div className='flex flex-row text-center'>
+        <div className='mt-4 mb-4 text-center font-bold'>
+          Choose a social provider to login
+        </div>
 
-        <div className='basis-1/2'>
+        <div className='flex flex-row text-center mb-4'>
+          <div className='basis-1/2 pl-4 pr-4'>
+            <div className='bg-emerald-800 text-neutral-100 p-2 rounded-lg cursor-pointer h-[50px]
+            text-center m-auto' onClick={() => siginToTwitter()}>
+              <div className='text-center text-lg font-bold pt-[2px]'>
+                <FaTwitter className='inline-block mr-1' />
+                <div className='inline-block'>
+                  Twitter
+                </div>
 
-          <div className='bg-green-800 text-neutral-100 p-2 rounded-lg cursor-pointer' onClick={() => siginToTwitter()}>
-            <div className='flex'>
-            <FaTwitter className='inline-flex' /> 
-            <div className='inline-flex'>
-            Twitter
               </div>
+
             </div>
-
-      
-
-           </div>
-
           </div>
-          <div className='basis-1/2'>
- 
+          <div className='basis-1/2 pl-4 pr-4'>
             <SignInButton
               onSuccess={verifyAndSetUserProfile}
-              ref={farcasterSignInButtonRef}
             />
           </div>
-
         </div>
 
       </div>
     )
     openAlertDialog(loginComponent);
-
-
-
   }
 
-  if (user && user.fid) {
+
+
+  if (user && user._id) {
     userProfile = (
       <div className='flex cursor' onClick={gotoUserAccount} >
         <div className='inline-flex text-lg mr-2'>
@@ -124,11 +118,11 @@ export default function TopNav(props) {
     const nonce = Math.random().toString(36).substring(7);
     userProfile = (
       <div className='mt-1'>
-      <button className='m-auto text-center min-w-16
-    rounded-lg shadow-sm text-neutral-100 bg-green-800 pl-8 pr-8 pt-2 pb-2 text-bold
-    cursor:pointer' onClick={() => {showLoginDialog()}}>
-        <IoMdLogIn className='inline-flex'/> Creator Login 
-      </button>  
+        <button className='m-auto text-center min-w-16
+    rounded-lg shadow-sm text-neutral-100 bg-emerald-800 pl-8 pr-8 pt-1 pb-2 text-bold
+    cursor:pointer font-bold text-lg' onClick={() => { showLoginDialog() }}>
+          <IoMdLogIn className='inline-flex' /> Login
+        </button>
       </div>
     )
   }
@@ -163,7 +157,49 @@ export default function TopNav(props) {
     )
     openAlertDialog(alertDialogComponent);
   }
-  let addFarcasterWallet = <span />;
+  let addSecondaryWallet = <span />;
+  if (user && !user.custody) {
+
+    const thirdwebAuth = getAuth();
+
+
+
+    addSecondaryWallet = (
+      <div className='mt-1'>
+        <ConnectButton
+          client={client}
+          wallets={wallets}
+          theme={"dark"}
+          connectModal={{
+            size: "wide",
+            showThirdwebBranding: false,
+          }}
+
+          auth={{
+            isLoggedIn: async (address) => {
+              console.log("checking if logged in!", { address });
+
+            },
+            doLogin: async (params) => {
+              console.log("logging in!");
+              const verifiedData = await verifyAuthPayload(params);
+              console.log(verifiedData);
+              const { valid, payload } = verifiedData;
+              if (valid) {
+                const custodyAddress = payload.address;
+                await addCustodyAddress(custodyAddress);
+              }
+            },
+            getLoginPayload: async ({ address }) => {
+              const qd = await getAuthPayload(address);
+              return qd;
+            }
+          }}
+
+        />
+      </div>
+    )
+  }
 
 
   return (
@@ -180,7 +216,7 @@ export default function TopNav(props) {
         </div>
         <div>
           <div className='inline-flex'>
-            {addFarcasterWallet}
+            {addSecondaryWallet}
           </div>
           <div className='inline-flex'>
             {userProfile}

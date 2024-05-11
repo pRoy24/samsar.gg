@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import { UserProvider } from './contexts/UserContext';
 import { AlertDialogProvider } from './contexts/AlertDialogContext';
-
+import { ThirdwebProvider } from "thirdweb/react";
 import Home from './components/landing/Home.tsx'
 import '@farcaster/auth-kit/styles.css';
 import { AuthKitProvider } from '@farcaster/auth-kit';
@@ -20,13 +20,15 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-        <UserProvider>
-        <AlertDialogProvider>
-          <AuthKitProvider config={config}>
-            <Home />
-          </AuthKitProvider>
-          </AlertDialogProvider>
-        </UserProvider>
+        <ThirdwebProvider>
+          <UserProvider>
+            <AlertDialogProvider>
+              <AuthKitProvider config={config}>
+                <Home />
+              </AuthKitProvider>
+            </AlertDialogProvider>
+          </UserProvider>
+        </ThirdwebProvider>
       </BrowserRouter>
     </div>
   );

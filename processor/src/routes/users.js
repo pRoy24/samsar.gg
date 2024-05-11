@@ -1,21 +1,18 @@
 import express from 'express';
 import {
   setUserData, getUserData, createSponsoredSigner, pollSignerForUser, verifyUserSession,
-  verifyUserToken
+  verifyUserToken, addCustodyAddress
 } from '../models/User.js';
-import { TwitterApi } from 'twitter-api-v2';
+import { verifyUserAuth } from '../models/Auth.js';
+
+import { getTwitterLogin, loginTwitterClient } from '../models/auth/Twitter.js';
+
 
 import ('dotenv/config');
 
+const CLIENT_APP = process.env.CLIENT_APP;
 const API_SERVER = process.env.API_SERVER;
 
-
-const TWITTER_API_KEY = process.env.TWITTER_API_KEY;
-const TWITTER_API_SECRET = process.env.TWITTER_API_SECRET;
-
-const TWITTER_BEARER_TOKEN = process.env.TWITTER_BEARER_KEY;
-
-const twitterClient = new TwitterApi(TWITTER_BEARER_TOKEN);
 
 const router = express.Router();
 
@@ -79,38 +76,30 @@ router.post('/poll_signer', async (req, res) => {
 });
 
 router.get('/twitter_login', async (req, res) => {
-  const CALLBACK_URL = `${API_SERVER}/users/twitter_login_callback`;
-  const { url, codeVerifier, state } = await twitterClient.generateOAuth2AuthLink(CALLBACK_URL, { scope: ['tweet.read', 'users.read', 'offline.access'] });
-  res.json(response);
+  const loginUrl = await getTwitterLogin();
+  console.log(loginUrl);
+
+  res.json({ loginUrl });
 });
 
 router.get('/twitter_login_callback', async (req, res) => {
-  const { state, code } = req.query;
+  const authToken = await loginTwitterClient(req.query);
+  res.redirect(`${CLIENT_APP}/verify?authToken=${authToken}`)
 
-  if (state !== req.session.state) {
-    return res.status(403).send('State mismatch');
+});
+
+
+router.post('/add_custody_address', async (req, res) => {
+  const payload = req.body;
+  const headers = req.headers;
+
+  const userId = verifyUserAuth(req.headers);
+  if (!userId) {
+    res.status(401).send("Unauthorized");
+    return;
   }
-
-  try {
-    const { client: loggedClient, accessToken, refreshToken } = await twitterClient.loginWithOAuth2({
-      code,
-      codeVerifier: req.session.codeVerifier,
-      redirectUri: CALLBACK_URL,
-    });
-
-    const userInfo = await loggedClient.v2.me();
-
-    console.log(userInfo);
-
-
-    // Create JWT
-  //  const token = jwt.sign({ id: userInfo.data.id }, 'your_jwt_secret', { expiresIn: '1h' });
-
-    //res.json({ token, userInfo: userInfo.data });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-
+  const response = await addCustodyAddress(userId, payload);
+  res.json(response);
 });
 
 // You can add more session-related routes here

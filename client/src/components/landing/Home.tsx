@@ -6,6 +6,7 @@ import EditorLanding from '../editor/EditorLanding.tsx';
 import UserAccount from "../account/UserAccount.tsx";
 import ListProduct from "../product/ListProduct.tsx";
 import PublicationHome from "../publication/PublicationHome.tsx";
+import VerificationHome from "../verification/VerificationHome.tsx";
 
 import AppHome from "./AppHome.tsx";
 import axios from "axios";
@@ -29,6 +30,16 @@ export default function Home() {
     }
   }, []);
 
+
+  const channel = new BroadcastChannel('oauth_channel');
+  channel.onmessage = (event) => {
+    if (event.data === 'oauth_complete') {
+        console.log('OAuth authentication completed');
+        getUserAPI();
+    }
+  };
+
+
   return (
     <>
       <Routes>
@@ -36,6 +47,7 @@ export default function Home() {
         <Route path="/session/:id" element={<EditorHome />} />
         <Route path="/account" element={<UserAccount />} />
         <Route path="/publication/:id" element={<PublicationHome />} />
+        <Route path="/verify" element={<VerificationHome />} />  
         {/* Add more routes as needed */}
       </Routes>
 

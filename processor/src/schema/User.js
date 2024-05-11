@@ -7,7 +7,7 @@ const userSchema = new Schema({
 
   bio: String,
   custody: String,
-  custody: String,
+
   displayName: String,
   message: String,
   nonce: String,
@@ -16,6 +16,7 @@ const userSchema = new Schema({
   state: String,
   username: String,
   verifications: Array,
+  twitterId: String,
 
 }, { timestamps: true });
 

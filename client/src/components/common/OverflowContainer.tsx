@@ -8,6 +8,18 @@ export default function OverflowContainer(props) {
 
   const { getUserAPI } = useUser();
 
+
+  const resetCurrentSession = () => {
+    if (props.resetSession) {
+      props.resetSession();
+    
+    }
+  }
+
+  const addCustodyAddress = (address) => {
+    
+  }
+
   useEffect(() => {
     const userFid = localStorage.getItem("fid");
     if (userFid) {
@@ -18,7 +30,9 @@ export default function OverflowContainer(props) {
 
   return (
     <div className='h-[100vh] overflow-y-auto'>
-      <TopNav />
+      <TopNav 
+      resetCurrentSession={resetCurrentSession}
+      addCustodyAddress={addCustodyAddress}/>
       <div>
         <AlertDialog />
         {children}

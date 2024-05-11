@@ -4,6 +4,8 @@
     span  {
       display: none;
     }
+    height: 50px;
+    background-color: #065f46;
   }
 
   button::after {
