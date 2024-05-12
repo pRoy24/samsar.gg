@@ -249,7 +249,7 @@ export async function publishSessionAndSetURI(userId, payload) {
   const nftName = nftPayload.name;
   const userData = await User.findOne({ _id: userId });
 
-  const fid = userData.fid ? parseInt(userData.fid) : -1;
+
   
   const publicationsPayload = new Publication({
     slug: tokenId,
@@ -278,16 +278,25 @@ export async function publishSessionAndSetURI(userId, payload) {
   const pageURL = `https://samsar.gg/p/${tokenId}`
   const castText = truncateTo320Bytes(`${nftName} by \n ${nftPayload.description}`);
   const mentionsPosition = byteIndexOf(castText, "\n");
+  let fid = -1;
+  try {
+    fid =  parseInt(userData.fid);
+  } catch (e) {
 
+  }
+  if (isNaN(fid)) {
+    fid = -1;
+  }
   let castPayload = {
     text: castText,
     embeds: [{ url: pageURL }],
     embedsDeprecated: [],
-    mentionsPositions: [mentionsPosition]
+
   };
 
   if (fid > -1) {
     castPayload.mentions = [fid];
+    castPayload.mentionsPositions = [mentionsPosition]
   }
 
   const CURRENT_ENV=process.env.CURRENT_ENV;
