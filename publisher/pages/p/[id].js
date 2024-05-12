@@ -20,11 +20,9 @@ export default function Page(props) {
     imgSrc = `${IPFS_BASE}${meta.imageHash}`;
   }
   
-  console.log(meta);
-  
-
-  const title = meta.nftTitle ? meta.nftTitle : "Samsar GG Publication";
+  const title = meta.nftName ? meta.nftName : "Samsar GG Publication";
   const description = meta.nftDescription ? meta.nftDescription : "Samsar GG Publication";
+  const twitterImage = meta.twitterOGImage ? meta.twitterOGImage : imgSrc;
 
   return (
     <div>
@@ -43,7 +41,7 @@ export default function Page(props) {
         <meta name="twitter:site" content="@samsar_gg" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={meta.twitterOGImage} />
+        <meta name="twitter:image" content={twitterImage} />
         <meta name="twitter:creator" content="@samsar_gg" />
 
         <FrameMetadata
