@@ -249,7 +249,7 @@ export async function publishSessionAndSetURI(userId, payload) {
   const nftName = nftPayload.name;
   const userData = await User.findOne({ _id: userId });
 
-  const fid = parseInt(userData.fid);
+  const fid = userData.fid ? parseInt(userData.fid) : -1;
   
   const publicationsPayload = new Publication({
     slug: tokenId,
@@ -279,13 +279,16 @@ export async function publishSessionAndSetURI(userId, payload) {
   const castText = truncateTo320Bytes(`${nftName} by \n ${nftPayload.description}`);
   const mentionsPosition = byteIndexOf(castText, "\n");
 
-  const castPayload = {
+  let castPayload = {
     text: castText,
     embeds: [{ url: pageURL }],
-    mentions: [fid],
     embedsDeprecated: [],
     mentionsPositions: [mentionsPosition]
   };
+
+  if (fid) {
+    castPayload.mentions = [fid];
+  }
 
   const CURRENT_ENV=process.env.CURRENT_ENV;
   if (CURRENT_ENV === 'production') {
