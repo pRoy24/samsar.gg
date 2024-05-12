@@ -286,7 +286,7 @@ export async function publishSessionAndSetURI(userId, payload) {
     mentionsPositions: [mentionsPosition]
   };
 
-  if (fid) {
+  if (fid > -1) {
     castPayload.mentions = [fid];
   }
 
