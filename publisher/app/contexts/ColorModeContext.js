@@ -15,16 +15,13 @@ export const ColorModeProvider = ({ children }) => {
 
     const handleStorageChange = () => {
       // Check the value from localStorage and update colorMode accordingly
-      const isDarkMode = localStorage.getItem('isDarkMode') && localStorage.getItem('isDarkMode').toString() === 'true';
-      console.log(isDarkMode);
-
-      setColorMode(isDarkMode ? 'dark' : 'light');
+      const colorMode = localStorage.getItem('colorMode')  || 'dark';
+      setColorMode(colorMode);
     };
 
     // Add event listener to storage change
     window.addEventListener('storage', handleStorageChange);
 
-    // Call the handler right away in case the isDarkMode is already set in localStorage
     handleStorageChange();
 
     // Cleanup the event listener when the component unmounts
@@ -35,7 +32,7 @@ export const ColorModeProvider = ({ children }) => {
     // Toggle the color mode and update localStorage
     const newMode = colorMode === 'light' ? 'dark' : 'light';
     setColorMode(newMode);
-    localStorage.setItem('isDarkMode', newMode === 'dark');
+    localStorage.setItem('colorMode', newMode);
   };
 
   return (

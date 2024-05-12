@@ -40,7 +40,7 @@ export default function TopNav() {
   } else {
     actionLinks = (
       <div>
-        <div className="inline-flex">
+        <div className="inline-flex align-top">
           <UserAuthentication />
         </div>
         <div className="inline-flex align-text-bottom ml-2 mt-1">

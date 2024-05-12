@@ -4,31 +4,38 @@ import { useColorMode } from '../../contexts/ColorModeContext';
 import './toggleButton.css'; // Make sure to import the CSS file
 
 function ToggleButton() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [colorMode, setColorMode] = useState('dark');
 
-  const { toggleColorMode, colorMode } = useColorMode();
+  const { toggleColorMode,  } = useColorMode();
 
   useEffect(() => {
-    const isDarkMode = localStorage.getItem('isDarkMode') === 'true';
-    setIsDarkMode(isDarkMode);
+    const colorMode = localStorage.getItem('colorMode');
+    const newColorMode = colorMode || 'dark';
+    setColorMode(newColorMode);
   }, []);
 
   const toggleMode = () => {
-    const isDarkMode = localStorage.getItem('isDarkMode') === 'true';
-    localStorage.setItem('isDarkMode', String(!isDarkMode));
+    const colorMode = localStorage.getItem('colorMode') || 'dark';
 
-    setIsDarkMode(!isDarkMode);
-    //document.body.classList.toggle('dark-mode');
-    const currentDarkMode = localStorage.getItem('isDarkMode')
-    console.log("Current Dark Mode: ", currentDarkMode)
+    let newColorMode;
+    if (colorMode === 'dark') {
+      newColorMode = 'light';
+    } else {
+      newColorMode = 'dark';
+    }
+
+    localStorage.setItem('colorMode', newColorMode);
+
+    setColorMode(newColorMode);
     toggleColorMode();
   };
-  let currentMode = isDarkMode ? 'Dark' : 'Light';
+  let currentMode = colorMode;
+
 
   return (
     <div>
       <div className="toggle-container" onClick={toggleMode}>
-        <div className={`toggle-btn ${isDarkMode ? 'toggle-btn-dark' : ''}`}>
+        <div className={`toggle-btn ${currentMode === 'dark' ? 'toggle-btn-dark' : ''}`}>
           <div className="toggle-circle"></div>
         </div>
       </div>
