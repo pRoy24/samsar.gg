@@ -24,6 +24,7 @@ export default function Page(props) {
   const description = meta.nftDescription ? meta.nftDescription : "Samsar GG Publication";
   const twitterImage = meta.twitterOGImage ? meta.twitterOGImage : imgSrc;
 
+  console.log("TWITTER IMAGE " + twitterImage);
   return (
     <div>
       <Head>
