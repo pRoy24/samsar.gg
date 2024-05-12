@@ -34,7 +34,7 @@ export default function Page(props) {
         <meta property="og:title" content={title} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://samsar.g/p/${id}`} />
-        <meta property="og:image" content={imgSrc} />
+        <meta property="og:image" content={twitterImage} />
         <meta property="og:description" content={description} />
         <meta property="og:site_name" content="Samsar GG" />
         <meta property="og:locale" content="en_US" />
@@ -44,6 +44,8 @@ export default function Page(props) {
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={twitterImage} />
         <meta name="twitter:creator" content="@samsar_gg" />
+        <meta property="og:logo" content={`${HOST_URL}/logo.png`} />
+
 
         <FrameMetadata
           buttons={[

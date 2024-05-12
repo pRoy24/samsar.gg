@@ -27,12 +27,7 @@ export async function getPublicationMeta(tokenId) {
     const pwd = process.cwd();
     
     const publicationOGImage = path.join(pwd, 'assets/twitter', `${publicationId}.png`);
-  
-    console.log("OG IMAG " + publicationOGImage);
-
     let payloadResponse = Object.assign({}, publication._doc);
-    
-
     if (fs.existsSync(publicationOGImage)) {
       const imageURL = `${API_SERVER}/twitter/${publicationId}.png`;
       payloadResponse.twitterOGImage = imageURL;
