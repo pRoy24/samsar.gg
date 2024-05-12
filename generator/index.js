@@ -8,8 +8,8 @@ export async function listenToGenerationRequests() {
 
 
     while (true) {
-      console.log("Waiting for records");
-      // await createReplicas();
+
+ 
 
       await processPendingImageRequests();
       await getTimeout(1000);
