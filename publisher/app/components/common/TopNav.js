@@ -55,12 +55,16 @@ export default function TopNav() {
   if (colorMode === 'light') {
     bgColor = 'from-green-700 to-green-400  text-neutral-900';
   }
+  
+  const gotoCreator = () => {
+    router.push('/');
+  }
 
   return (
     <div className={`bg-gradient-to-r ${bgColor}  h-[50px]`}>
       <div className='grid grid-cols-4'>
         <div>
-          <img src={'/logo.png'} />
+          <img src={'/logo.png'} className="cursor-pointer" onClick={() => gotoCreator()}/>
         </div>
         <div>
 

@@ -9,7 +9,7 @@ const ColorModeContext = createContext({
 
 // Step 3: Create the Context Provider
 export const ColorModeProvider = ({ children }) => {
-  const [colorMode, setColorMode] = useState('light'); // Default to 'light'
+  const [colorMode, setColorMode] = useState('dark'); // Default to 'light'
 
   useEffect(() => {
 
