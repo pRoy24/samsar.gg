@@ -41,26 +41,39 @@ export async function uploadImageToIpfs(fileData) {
 }
 
 export async function generateTwitterOgImage(payload) {
-  console.log("generating twitter image");
-  console.log(payload);
+  const RESIZE_WIDTH = 675;  // Set new resize dimensions
+  const RESIZE_HEIGHT = 675;
 
-  const RESIZE_WIDTH = 800;
-  const publicationId = payload.publicationId;
-
-  const RESIZE_HEIGHT = 800;
+  const CANVAS_WIDTH = 1200;  // Set canvas dimensions
+  const CANVAS_HEIGHT = 675;
 
   const imageData = decodeBase64Image(payload.image);
   const imageBaseDirectory = `./assets/twitter/`;
   if (!fs.existsSync(imageBaseDirectory)) {
     fs.mkdirSync(imageBaseDirectory, { recursive: true });
   }
+  const publicationId = payload.publicationId;
   const imageName = `${publicationId}.png`;
-  const resizedBuffer = await sharp(imageData).resize(RESIZE_WIDTH, RESIZE_HEIGHT).toBuffer();
-  
-  const imageFileName = `${imageBaseDirectory}${imageName}`;
-  fs.writeFileSync(imageFileName, resizedBuffer);
-  return imageFileName;
 
+  // Resize the image to the new dimensions
+  const resizedBuffer = await sharp(imageData)
+    .resize(RESIZE_WIDTH, RESIZE_HEIGHT)
+    .toBuffer();
+
+  // Extend the canvas and center the image
+  const extendedBuffer = await sharp(resizedBuffer)
+    .extend({
+      top: 0,
+      bottom: 0,
+      left: (CANVAS_WIDTH - RESIZE_WIDTH) / 2,  // Calculate left offset to center the image
+      right: (CANVAS_WIDTH - RESIZE_WIDTH) / 2,
+      background: { r: 0, g: 0, b: 0, alpha: 0 }  // Use a transparent background
+    })
+    .toBuffer();
+
+  const imageFileName = `${imageBaseDirectory}${imageName}`;
+  fs.writeFileSync(imageFileName, extendedBuffer);
+  return imageFileName;
 }
 
 export async function uploadImageToFileSystem(imageFile, imageName) {
