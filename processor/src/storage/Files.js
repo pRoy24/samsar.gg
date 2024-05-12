@@ -67,7 +67,7 @@ export async function generateTwitterOgImage(payload) {
       bottom: 0,
       left: Math.round((CANVAS_WIDTH - RESIZE_WIDTH) / 2),  // Calculate and round left offset to center the image
       right: Math.round((CANVAS_WIDTH - RESIZE_WIDTH) / 2),
-      background: { r: 0, g: 0, b: 0, alpha: 0 }  // Use a transparent background
+      background: { r: 31, g: 41, b: 55, alpha: 0 }  // Use a transparent background
     })
     .toBuffer();
 
