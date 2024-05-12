@@ -1,8 +1,13 @@
 import { getDBConnectionString } from "./DBString.js";
 import User from "../schema/User.js";
 import Publication from "../schema/Publication.js";
+import path from 'path';
+import fs from 'fs';
 import { getTokenSupply , getContractMeta, getCreatorAllocation, refundTokensToUser} from "./Contract.js";
 import { getOffchainBurnPrice } from "../utils/TokenUtils.js";
+
+const API_SERVER = process.env.API_SERVER;
+const IPFS_BASE = process.env.IPFS_BASE;
 
 export async function getPublicationsList() {
   try {
@@ -14,15 +19,28 @@ export async function getPublicationsList() {
   }
 }
 
-export async function getPublicationMeta(publicationId) {
+export async function getPublicationMeta(tokenId) {
   try {
     await getDBConnectionString();
-    const publication = await Publication.findOne({ slug: publicationId });
+    const publication = await Publication.findOne({ slug: tokenId });
+    const publicationId = publication._id.toString();
+    const pwd = process.cwd();
+    
+    const publicationOGImage = path.join(pwd, 'assets/twitter', `${publicationId}.png`);
+  
+    const payloadResponse = Object.assign({}, publication._doc);
 
+    if (fs.existsSync(publicationOGImage)) {
+      const imageURL = `${API_SERVER}/twitter/${publicationId}.png`;
+      payloadResponse.twitterOGImage = imageURL;
+    } else {
+      payloadResponse.twitterOGImage =  `${IPFS_BASE}${publication.imageHash}`;
+    }
     getContractMetaAndSave(publicationId);
-
-    return publication;
+    return payloadResponse;
   } catch (error) {
+    console.log(error);
+
   }
 }
 
@@ -102,8 +120,6 @@ export async function burnCreatorTokens(userId, payload) {
       returnAmount: refundAmount.toString(),
       adminFee: adminFees.toString()
     };
-
-
     await refundTokensToUser(refundUserPayload);
 
     if (tokenSupply > 0) {

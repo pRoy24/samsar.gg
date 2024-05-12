@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import { UserProvider } from './contexts/UserContext';
 import { AlertDialogProvider } from './contexts/AlertDialogContext';
+import { ColorModeProvider } from './contexts/ColorMode';
 import { ThirdwebProvider } from "thirdweb/react";
 import Home from './components/landing/Home.tsx'
 import '@farcaster/auth-kit/styles.css';
@@ -23,9 +24,11 @@ function App() {
         <ThirdwebProvider>
           <UserProvider>
             <AlertDialogProvider>
-              <AuthKitProvider config={config}>
-                <Home />
-              </AuthKitProvider>
+              <ColorModeProvider>
+                <AuthKitProvider config={config}>
+                  <Home />
+                </AuthKitProvider>
+              </ColorModeProvider>
             </AlertDialogProvider>
           </UserProvider>
         </ThirdwebProvider>

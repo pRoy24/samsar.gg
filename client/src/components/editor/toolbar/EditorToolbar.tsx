@@ -9,10 +9,7 @@ import { FaCircle, FaHand } from "react-icons/fa6";
 import { FaRegCircle } from "react-icons/fa";
 import { MdOutlineRectangle } from "react-icons/md";
 import { IoTriangleOutline } from "react-icons/io5";
-
-
-
-
+import { useColorMode } from '../../../contexts/ColorMode.js';
 import LayersDisplay from './LayersDisplay.tsx';
 import { CURRENT_TOOLBAR_VIEW } from '../../../constants/Types.ts';
 
@@ -31,7 +28,6 @@ export default function EditorToolbar(props: any) {
     editMasklines, setEditMaskLines,
     setSelectedShape,
     isOutpaintPending,
-    
   } = props;
 
 
@@ -39,7 +35,7 @@ export default function EditorToolbar(props: any) {
   const [showAddTextDisplay, setShowAddTextDisplay] = useState(false);
 
   const [addText, setAddText] = useState('');
-
+  const { colorMode} = useColorMode();
 
   const toggleShowgenerateDisplay = () => {
     setShowGenerateDisplay(!showGenerateDisplay);
@@ -149,9 +145,6 @@ export default function EditorToolbar(props: any) {
     )
   }
 
-  const setComingSoon = () => {
-
-  }
 
   let addShapeDisplay = (
     
@@ -185,16 +178,21 @@ export default function EditorToolbar(props: any) {
     )
   
 
+  let bgColor = "bg-cyber-black border-blue-900 text-white ";
+  if (colorMode === 'light') {
+    bgColor = "bg-neutral-50  text-neutral-900 ";
+  }
+
+  let buttonBgcolor = "bg-gray-900  text-white";
+  if (colorMode === 'light') {
+    buttonBgcolor = "bg-stone-200  text-neutral-900";
+  }
+  
   return (
-    <div className='bg-neutral-50 h-full m-auto fixed top-0 overflow-y-auto ml-4 mr-4 w-[16%]'>
-
-      <div>
-
-
-      </div>
+    <div className={`border-l-2 ${bgColor} h-full m-auto fixed top-0 overflow-y-auto pl-4 r-4 w-[17%] pr-4`}>
       <div className='mt-[80px] '>
 
-        <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm  text-left pl-2 pr-2'>
+        <div className={`pt-4 pb-4 ${buttonBgcolor} mt-4 rounded-sm  text-left pl-2 pr-2`}>
           <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_GENERATE_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
               Generate
@@ -205,7 +203,7 @@ export default function EditorToolbar(props: any) {
           </div>
           {generateDisplay}
         </div>
-        <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm  text-left pl-2 pr-2'>
+        <div className={`pt-4 pb-4 ${buttonBgcolor}  mt-4 rounded-sm  text-left pl-2 pr-2`}>
           <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_EDIT_MASK_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
               Edit
@@ -216,7 +214,7 @@ export default function EditorToolbar(props: any) {
           {editDisplay}
         </div>
 
-        <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm text-left pl-2 pr-2'>
+        <div className={`pt-4 pb-4 ${buttonBgcolor}  mt-4 rounded-sm  text-left pl-2 pr-2`}>
           <div className='text-lg font-bold  m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_ADD_TEXT_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
               Add Text
@@ -225,7 +223,7 @@ export default function EditorToolbar(props: any) {
           </div>
           {addTextDisplay}
         </div>
-        <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm text-left pl-2 pr-2'>
+        <div className={`pt-4 pb-4 ${buttonBgcolor}  mt-4 rounded-sm  text-left pl-2 pr-2`}>
           <div className='text-lg font-bold  m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_ADD_TEXT_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
               Add Shape
@@ -237,7 +235,7 @@ export default function EditorToolbar(props: any) {
 
         </div>
 
-        <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm text-left pl-2 pr-2'>
+        <div className={`pt-4 pb-4 ${buttonBgcolor}  mt-4 rounded-sm  text-left pl-2 pr-2`}>
           <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_LAYERS_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
               Layers
@@ -246,7 +244,7 @@ export default function EditorToolbar(props: any) {
           </div>
           {layersDisplay}
         </div>
-        <div className='pt-4 pb-4 bg-stone-200 mt-4 rounded-sm text-left pl-2 pr-2'>
+        <div className={`pt-4 pb-4 ${buttonBgcolor}  mt-4 rounded-sm  text-left pl-2 pr-2`}>
 
           <div className='text-lg font-bold m-auto cursor-pointer' onClick={showAttestationDialog}>
             <div className='inline-flex ml-4 pl-4'>

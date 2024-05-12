@@ -1,13 +1,14 @@
 import React from "react";
 import CommonButton from "../../common/CommonButton.tsx";
 import { IMAGE_EDIT_MODEL_TYPES } from "../../../constants/Types.ts";
-
+import { useColorMode } from "../../../contexts/ColorMode.js";
 
 export default function OutpaintGenerator(props) {
   const { promptText, setPromptText, submitOutpaintRequest,
     selectedEditModel, setSelectedEditModel,
     isOutpaintPending
   } = props;
+  const { colorMode } = useColorMode();
 
 
   const modelOptionMap = IMAGE_EDIT_MODEL_TYPES.map((model) => {
@@ -24,25 +25,27 @@ export default function OutpaintGenerator(props) {
 
   let editOptionsDisplay = <span />;
 
+  const formElementBG = colorMode === "dark" ? "bg-gray-800 text-neutral-50" : "bg-gray-100 text-neutral-800 ";
+  const textElementBG = colorMode === "dark" ? "bg-gray-800 text-neutral-50" : "bg-gray-100 text-neutral-800 border-gray-600 border-2"; 
 
   if (selectedEditModel === "SDXL") {
 
     editOptionsDisplay = (<div className="grid grid-cols-3 gap-1">
       <div>
-        <input type="text" className="w-[96%] pl-2 pr-2" name="guidanceScale" defaultValue={5}/>
+        <input type="text" className={`${formElementBG} w-[96%] pl-2 pr-2`} name="guidanceScale" defaultValue={5}/>
         <div className="text-xs ">
             Guidance 
          </div> 
       </div>
       <div>
-        <input type="text" className="w-[96%] pl-2 pr-2" name="numInferenceSteps" defaultValue={30}/>
+        <input type="text" className={`${formElementBG} w-[96%] pl-2 pr-2`} name="numInferenceSteps" defaultValue={30}/>
         <div className="text-xs">
           Inference
         </div>  
       </div>
       <div>
 
-        <input type="text" className="w-[96%] pl-2 pr-2" name="strength" defaultValue={0.99} />
+        <input type="text" className={`${formElementBG} w-[96%] pl-2 pr-2`} name="strength" defaultValue={0.99} />
         <div className="text-xs">
           Strength
         </div>  
@@ -58,20 +61,18 @@ export default function OutpaintGenerator(props) {
           <div className="text-xs font-bold">
             Model
           </div>
-          <select onChange={setSelectedModelDisplay}  className="inline-flex w-[75%]">
+          <select onChange={setSelectedModelDisplay}  className={`${formElementBG} inline-flex w-[75%]`}>
             {modelOptionMap}
           </select>
-
         </div>
-
-
         <div className="block">
           {editOptionsDisplay}
         </div>
       </div>
 
-      <textarea name="promptText" onChange={(evt) => setPromptText((evt.target.value))} className="w-full m-auto p-4 rounded-lg" />
-      <div>
+      <textarea name="promptText" onChange={(evt) => setPromptText((evt.target.value))}
+        className={`${textElementBG} w-full m-auto p-4 rounded-lg`} />
+      <div className="text-center">
         <CommonButton type="submit"  isPending={isOutpaintPending}>
           Submit
         </CommonButton>

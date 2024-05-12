@@ -550,7 +550,7 @@ export default function EditorHome(props) {
     <CommonContainer resetSession={resetSession}>
       <div className='m-auto'>
         <div className='block'>
-          <div className='w-[6%] '>
+          <div className='w-[5%] bg-cyber-black inline-block'>
             <ActionToolbar
               setCurrentAction={setCurrentAction}
               setCurrentViewDisplay={setCurrentViewDisplay}
@@ -560,10 +560,10 @@ export default function EditorHome(props) {
               showUploadAction={showUploadAction}
             />
           </div>
-          <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto p-4 mb-8 '>
+          <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto  mb-8 '>
             {viewDisplay}
           </div>
-          <div className='w-[16%] inline-block  '>
+          <div className='w-[17%] inline-block bg-cyber-black '>
             <EditorToolbar promptText={promptText} setPromptText={setPromptText}
               submitGenerateRequest={submitGenerateRequest}
               submitOutpaintRequest={submitOutpaintRequest}

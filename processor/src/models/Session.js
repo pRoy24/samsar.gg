@@ -7,7 +7,7 @@ import { getDBConnectionString } from "./DBString.js";
 import { v4 as uuidv4 } from 'uuid';
 import { addImageGeneratorRequest, addImageOutpaintRequest } from "./Images.js";
 import hat from 'hat';
-import { uploadImageToIpfs, uploadImageToFileSystem, uploadMetadataToIpfs } from "../storage/Files.js";
+import { uploadImageToIpfs, uploadImageToFileSystem, uploadMetadataToIpfs, generateTwitterOgImage } from "../storage/Files.js";
 import { setUrlForNextToken, mintTokensForCreator } from './Contract.js';
 import { getChainById } from './Utility.js';
 import { makeCastFromDeveloperAccount } from '../utils/FarcasterHub.js';
@@ -17,7 +17,6 @@ import sharp from 'sharp';
 import fs from 'fs';
 import { generateWitnessForFile } from './Attestation.js';
 import { byteIndexOf , truncateTo320Bytes} from '../utils/StringUtils.js';
-
 
 
 export async function createNewSession(userId, payload) {
@@ -271,7 +270,7 @@ export async function publishSessionAndSetURI(userId, payload) {
 
 
 
-  await publicationsPayload.save({});
+  const publicationRes = await publicationsPayload.save({});
   const uri = `https://gateway.ipfs.io/ipfs/${imageHash}`;
   sessionDataValue.uri = uri;
   await sessionDataValue.save({});
@@ -292,6 +291,14 @@ export async function publishSessionAndSetURI(userId, payload) {
   if (CURRENT_ENV === 'production') {
     makeCastFromDeveloperAccount(castPayload);
   }
+  const twitterOGPayload = {
+    image: payload.image,
+    publicationId: publicationRes._id,
+    tokenId: tokenId,
+  };
+
+  generateTwitterOgImage(twitterOGPayload);
+
   return publicationsPayload;
 }
 

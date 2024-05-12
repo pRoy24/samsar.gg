@@ -1,7 +1,7 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { useAlertDialog } from '../../contexts/AlertDialogContext';
-
+import { useColorMode } from '../../contexts/ColorMode';
 import axios from 'axios';
 import { useUser } from '../../contexts/UserContext';
 
@@ -13,6 +13,9 @@ export function AlertDialog(props) {
   const { isAlertDialogOpen, alertDialogContent, closeAlertDialog , alertDialogSubmit} = useAlertDialog();
 
   const { children,  } = props;
+  const { colorMode } = useColorMode();
+
+
 
   if (!isAlertDialogOpen) return null;
 
@@ -20,11 +23,13 @@ export function AlertDialog(props) {
 
     closeAlertDialog();
   }
+
+  let bgColor = colorMode === 'dark' ? 'bg-gray-800 text-neutral-100' : 'bg-neutral-100 text-neutral-900';
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="my-modal"
     style={{zIndex: 100}}>
       
-      <div className="relative top-20 mx-auto pt-1 pb-5 p-5 border w-96 shadow-lg rounded-md bg-neutral-100">
+      <div className={`relative top-20 mx-auto pt-1 pb-5 p-5 border w-96 shadow-lg rounded-md ${bgColor}`}>
 
         <button 
           className="absolute top-2 right-2 text-gray-400 hover:text-gray-500 focus:outline-none"

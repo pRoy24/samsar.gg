@@ -9,6 +9,7 @@ import { STAGE_DIMENSIONS } from '../../constants/Image.js';
 import ResizableRectangle from "./shapes/ResizableRectangle.tsx";
 import ResizablePolygon from "./shapes/ResizablePolygon.tsx";
 import ResizableCircle from "./shapes/ResizableCircle.tsx";
+import { useColorMode } from '../../contexts/ColorMode.js';
 
 const IMAGE_BASE = `${process.env.REACT_APP_PROCESSOR_API}`;
 
@@ -217,8 +218,10 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
     setIsPainting(false);
   };
 
+  const { colorMode } = useColorMode();
+  const bgColor = colorMode === 'dark' ? `bg-gray-900` : `bg-neutral-300`;
   return (
-    <div className={`m-auto bg-stone-400 pt-8 pb-8  shadow-lg  `}>
+    <div className={`m-auto ${bgColor} pb-8  shadow-lg pt-[60px] `}>
       <Stage
         width={STAGE_DIMENSIONS.width}
         height={STAGE_DIMENSIONS.height}

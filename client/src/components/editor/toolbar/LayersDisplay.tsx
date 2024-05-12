@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
-
+import { useColorMode } from '../../../contexts/ColorMode';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 // a little function to help us with reordering the result
@@ -27,16 +27,29 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   ...draggableStyle
 });
 
-const getListStyle = isDraggingOver => ({
-  background: isDraggingOver ? "lightblue" : "lightgrey",
-  padding: grid,
-  width: 250
-});
+
 
 export default function LayersDisplay(props: any) {
 
   const { activeItemList, setActiveItemList } = props;
 
+  const { colorMode } = useColorMode();
+  console.log('colorMode', colorMode);
+
+  const bgColorDragging = colorMode === 'dark' ? '#1f2937' : '#fafafa';
+  const bgColorDraggingOver = colorMode === 'dark' ? '#030712' : '#f5f5f5';
+  
+  const getListStyle = (isDraggingOver)  => {
+    console.log('isDraggingOver', isDraggingOver);
+
+    return {
+      background: isDraggingOver ? bgColorDraggingOver: bgColorDragging,
+      padding: grid,
+      width: 200
+    };
+  }
+
+  
   const onDragEnd = result => {
     // dropped outside the list
     if (!result.destination) {
@@ -52,16 +65,19 @@ export default function LayersDisplay(props: any) {
 
   };
   
-  const deleteItem = (id) => {
-
-    console.log("IIII");
-    console.log(id);
-    
+  const deleteItem = (id) => {    
     // Filter out the item with the matching id
     const filteredItems = activeItemList.filter(item => item.id !== id);
     // Update the activeItemList with the filtered items
     setActiveItemList(filteredItems);
   };
+
+
+  let isDraggingBGColor = colorMode === 'dark' ? '#263B4A' : '#a8a29e';
+  let isStableBGColor = colorMode === 'dark' ? '171717' : '#d6d3d1';
+  let textColor = colorMode === 'dark' ? 'white' : '#171717';
+
+  
 
 
   return (
@@ -83,15 +99,20 @@ export default function LayersDisplay(props: any) {
                   ref={provided.innerRef}
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
-                  style={getItemStyle(
-                    snapshot.isDragging,
-                    provided.draggableProps.style
-                  )}
+                  style={{
+                    ...provided.draggableProps.style,
+                    margin: '8px',
+                    backgroundColor: snapshot.isDragging ? isDraggingBGColor : isStableBGColor,
+                    border: '1px solid #64748b',
+                    color: textColor,
+                    padding: '16px',
+                    borderRadius: '5px'
+                  }}
                 >
                   {itemContent}
                   <button
                     onClick={() => deleteItem(item.id)}
-                    style={{ marginLeft: 'auto', background: '#64748b', color: 'white' , float: 'right'}}
+                    style={{ marginLeft: 'auto', marginTop: '5px', color: 'white' , float: 'right'}}
                   >
                     <FaTimes />
                   </button>

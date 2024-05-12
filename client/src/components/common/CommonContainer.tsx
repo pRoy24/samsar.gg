@@ -39,7 +39,7 @@ export default function CommonContainer(props) {
 
 
   return (
-    <div className='h-[100vh] overflow-hidden'>
+    <div className='h-[100vh] overflow-hidden bg-cyber-black'>
       <TopNav resetCurrentSession={resetCurrentSession} addCustodyAddress={addCustodyAddress}/>
       <div>
         <AlertDialog />

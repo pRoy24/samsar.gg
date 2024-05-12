@@ -13,16 +13,19 @@ const IPFS_BASE = process.env.NEXT_PUBLIC_IPFS_BASE;
 
 export default function Page(props) {
   const { meta, id } = props;
+
   const tokenId = id;
   let imgSrc = ``;
   if (meta.imageHash) {
     imgSrc = `${IPFS_BASE}${meta.imageHash}`;
   }
   
+  console.log(meta);
+  
 
   const title = meta.nftTitle ? meta.nftTitle : "Samsar GG Publication";
-
   const description = meta.nftDescription ? meta.nftDescription : "Samsar GG Publication";
+
   return (
     <div>
       <Head>
@@ -36,13 +39,11 @@ export default function Page(props) {
         <meta property="og:description" content={description} />
         <meta property="og:site_name" content="Samsar GG" />
         <meta property="og:locale" content="en_US" />
-        <meta property="og:image:width" content="1024" />
-<meta property="og:image:height" content="1024" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@samsar_gg" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={imgSrc} />
+        <meta name="twitter:image" content={meta.twitterOGImage} />
         <meta name="twitter:creator" content="@samsar_gg" />
 
         <FrameMetadata

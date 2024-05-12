@@ -11,11 +11,12 @@ import { useAlertDialog } from '../../contexts/AlertDialogContext';
 import { IoMdLogIn } from "react-icons/io";
 import { AlertDialog } from './AlertDialog.tsx';
 import { SiFarcaster } from "react-icons/si";
+import ToggleButton from './ToggleButton.tsx';
 import {
   ConnectButton,
 } from "thirdweb/react";
 import { client, wallets, getAuth, getAuthPayload, verifyAuthPayload } from '../../utils/thirdweb.js';
-
+import { useColorMode } from '../../contexts/ColorMode.js';
 import { IoMdWallet } from "react-icons/io";
 
 
@@ -26,12 +27,16 @@ import { FaTwitter } from 'react-icons/fa6';
 const PROCESSOR_SERVER = process.env.REACT_APP_PROCESSOR_API;
 
 export default function TopNav(props) {
-
   const { resetCurrentSession, addCustodyAddress } = props;
   const farcasterSignInButtonRef = useRef(null);
-
+  const { colorMode } = useColorMode();
   const { openAlertDialog, closeAlertDialog } = useAlertDialog();
+  
+  let bgColor = 'from-cyber-black via-blue-900 to-neutral-900 text-neutral-50';
 
+  if (colorMode === 'light') {
+    bgColor = 'from-green-700 to-green-400  text-neutral-900';
+  }
   const resetSession = () => {
     resetCurrentSession();
     closeAlertDialog();
@@ -119,7 +124,7 @@ export default function TopNav(props) {
     userProfile = (
       <div className='mt-1'>
         <button className='m-auto text-center min-w-16
-    rounded-lg shadow-sm text-neutral-100 bg-emerald-800 pl-8 pr-8 pt-1 pb-2 text-bold
+    rounded-lg shadow-lg text-neutral-100 bg-cyber-black pl-8 pr-8 pt-1 pb-2 text-bold
     cursor:pointer font-bold text-lg' onClick={() => { showLoginDialog() }}>
           <IoMdLogIn className='inline-flex' /> Login
         </button>
@@ -203,7 +208,8 @@ export default function TopNav(props) {
 
 
   return (
-    <div className='bg-gradient-to-r from-green-700 to-green-400  h-[50px] fixed w-[100vw] shadow-lg z-10'>
+    <div className={`bg-gradient-to-r ${bgColor}
+      h-[50px] fixed w-[100vw] shadow-lg z-10`}>
       <div className='grid grid-cols-4'>
         <div>
           <img src={'/logo.png'} className='cursor-pointer' onClick={() => gotoHome()} />
@@ -220,6 +226,10 @@ export default function TopNav(props) {
           </div>
           <div className='inline-flex'>
             {userProfile}
+            <div className='inline-flex ml-2 mr-2'>
+
+              <ToggleButton />
+            </div>  
           </div>
 
         </div>

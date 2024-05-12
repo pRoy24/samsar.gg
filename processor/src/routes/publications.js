@@ -35,24 +35,18 @@ router.get('/token_info', async function(req, res) {
 
 
 router.get('/list_user_publications', async function(req, res) {
-  console.log("LIST LIST");
-  console.log(req.headers);
-
   const userId = verifyUserAuth(req.headers);
   if (!userId) {
     res.status(401).send("Unauthorized");
     return;
   }
-
   const publicationsList = await getPublicationsListByUser(userId);
   res.json(publicationsList);
 });
 
 
 router.get('/user_publication', async function(req, res) {
-
   const tokenId = req.query.tokenId;
-
   const userId = verifyUserAuth(req.headers);
   if (!userId) {
     res.status(401).send("Unauthorized");
@@ -64,9 +58,7 @@ router.get('/user_publication', async function(req, res) {
 });
 
 router.post('/burn_creator', async function(req, res) {
-
   const payload = req.body;
-
   const userId = verifyUserAuth(req.headers);
   if (!userId) {
     res.status(401).send("Unauthorized");

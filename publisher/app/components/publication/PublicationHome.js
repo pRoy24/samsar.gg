@@ -11,6 +11,7 @@ import { SiFarcaster } from "react-icons/si";
 import { sendTransaction, readContract, prepareContractCall, toWei } from 'thirdweb';
 import { useActiveAccount, useSendTransaction, useReadContract, useSwitchActiveWalletChain, useActiveWalletChain } from "thirdweb/react";
 import { CHAIN_DEFINITIONS } from '@/utils/constants.js';
+import { useColorMode } from '@/app/contexts/ColorModeContext.js';
 
 
 const IPFS_BASE = process.env.NEXT_PUBLIC_IPFS_BASE;
@@ -36,6 +37,12 @@ export default function PublicationHome(props) {
     method: 'currentMintPrice',
     params: [tokenId],
   });
+  const { colorMode } = useColorMode();
+  const bgColor = colorMode === 'light' ? 'bg-neutral-100 border-color-neutral-400 ' : 'bg-gray-800 border-gray-700';
+
+  const textDark = colorMode === 'light' ? 'text-gray-950' : 'text-neutral-100';
+  const textLight = colorMode === 'light' ? 'text-gray-800' : 'text-neutral-50';
+
 
 
   const mintNFTTransaction = async () => {
@@ -86,11 +93,11 @@ export default function PublicationHome(props) {
   let descriptionBlock = <span />;
   if (onChainMeta) {
     descriptionBlock = (
-      <div className="cursor-pointer" onClick={() => (setCurrentView('details'))}>
+      <div className={`cursor-pointer ${textLight} ml-1 mr-1 line-clamp-1 overflow-hidden whitespace-normal` } onClick={() => (setCurrentView('details'))}>
         <div className='font-bold'>
           {onChainMeta.name}
         </div>
-        <p> {onChainMeta.description}</p>
+        <p className='line-clamp-2 overflow-hidden whitespace-normal'> {onChainMeta.description}</p>
       </div>
     )
   }
@@ -222,30 +229,31 @@ export default function PublicationHome(props) {
     }
 
   }
+
   return (
     <CommonContainer>
-      <div className="w-[640px] m-auto pt-1 p-4 bg-slate-50 mt-2 rounded-lg border-2 border-color-neutral-400 shadow-lg">
+      <div className={`w-[640px] m-auto pt-1 p-4 ${bgColor} mt-4 mb-8 rounded-lg border-2 shadow-lg`}>
         <div>
-          <div className='flex flex-row w-full'>
-            <div className='basis-1/4'>
+          <div className='flex flex-row w-full min-h-[90px] pt-1'>
+            <div className='basis-1/2'>
               {descriptionBlock}
             </div>
-            <div className='basis-1/4 pt-1'>
-              <div className='text-[14px] text-gray-950 cursor-pointer'>
+            <div className='basis-1/5 pt-1'>
+              <div className={`text-[14px] ${textDark} cursor-pointer`}>
                 <a href={`https://warpcast.com/${meta.creatorHandle}`} target='_blank'>
                   @{meta.creatorHandle}
                 </a>
               </div>
-              <div className="text-xs font-bold text-gray-800">
+              <div className={`text-xs font-bold ${textLight}`}>
                 Creator
               </div>
             </div>
-            <div className='basis-1/4 pt-1'>
+            <div className='basis-1/5 pt-1'>
               <div onClick={() => setCurrentView('witness')} >
-                <div className='text-[14px] text-gray-950 cursor-pointer'>
+                <div className={`text-[14px] ${textDark} cursor-pointer`}>
                   {witnessStrength}
                 </div>
-                <div className="text-xs font-bold text-gray-800">
+                <div className={`text-xs font-bold ${textLight}`}>
 
                   Witness <FaLink className='inline-flex' />
 
@@ -253,12 +261,12 @@ export default function PublicationHome(props) {
               </div>
 
             </div>
-            <div className='basis-1/4 '>
+            <div className='basis-1/5 '>
               <div className='mt-2'>
-                <div className='inline-flex ml-2 mr-2 text-[30px] cursor-pointer' onClick={gotoFarcasterLink}>
+                <div className={`inline-flex ml-2 mr-2 text-[30px] cursor-pointer ${textLight}`} onClick={gotoFarcasterLink}>
                   <SiFarcaster />
                 </div>
-                <div className='inline-flex ml-2 mr-2 text-[30px] cursor-pointer' onClick={gotoTwitterLink}>
+                <div className={`inline-flex ml-2 mr-2 text-[30px] cursor-pointer ${textLight}`} onClick={gotoTwitterLink}>
                   <FaTwitter />
                 </div>
               </div>
@@ -269,7 +277,7 @@ export default function PublicationHome(props) {
           {currentDetailImage}
         </div>
         <p>{meta.description}</p>
-        <div className="grid grid-cols-3 gap-1">
+        <div className={`grid grid-cols-3 gap-1 `}>
           <FrameActionButton onClick={mintNFTTransaction}>
             Mint
           </FrameActionButton>

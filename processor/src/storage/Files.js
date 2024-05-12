@@ -5,6 +5,7 @@ import fs from 'fs';
 import { Readable } from 'stream';
 
 import pinataSDK from '@pinata/sdk';
+import sharp from 'sharp';
 
 const PINATA_API_KEY = process.env.PINATA_API_KEY;
 const PINATA_SECRET_API_KEY = process.env.PINATA_API_SECRET;
@@ -39,6 +40,28 @@ export async function uploadImageToIpfs(fileData) {
   }
 }
 
+export async function generateTwitterOgImage(payload) {
+  console.log("generating twitter image");
+  console.log(payload);
+
+  const RESIZE_WIDTH = 800;
+  const publicationId = payload.publicationId;
+
+  const RESIZE_HEIGHT = 800;
+
+  const imageData = decodeBase64Image(payload.image);
+  const imageBaseDirectory = `./assets/twitter/`;
+  if (!fs.existsSync(imageBaseDirectory)) {
+    fs.mkdirSync(imageBaseDirectory, { recursive: true });
+  }
+  const imageName = `${publicationId}.png`;
+  const resizedBuffer = await sharp(imageData).resize(RESIZE_WIDTH, RESIZE_HEIGHT).toBuffer();
+  
+  const imageFileName = `${imageBaseDirectory}${imageName}`;
+  fs.writeFileSync(imageFileName, resizedBuffer);
+  return imageFileName;
+
+}
 
 export async function uploadImageToFileSystem(imageFile, imageName) {
   const imageData = decodeBase64Image(imageFile);
