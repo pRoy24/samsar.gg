@@ -41,38 +41,26 @@ export async function uploadImageToIpfs(fileData) {
 }
 
 export async function generateTwitterOgImage(payload) {
-  const RESIZE_WIDTH = 675;  // Set new resize dimensions
-  const RESIZE_HEIGHT = 675;
-
-  const CANVAS_WIDTH = 1200;  // Set canvas dimensions
-  const CANVAS_HEIGHT = 675;
+  const RESIZE_WIDTH = 1080;  // Set new resize dimensions
+  const RESIZE_HEIGHT = 1080;
 
   const imageData = decodeBase64Image(payload.image);
   const imageBaseDirectory = `./assets/twitter/`;
+
+  // Ensure the directory exists
   if (!fs.existsSync(imageBaseDirectory)) {
     fs.mkdirSync(imageBaseDirectory, { recursive: true });
   }
+
   const publicationId = payload.publicationId;
   const imageName = `${publicationId}.png`;
-
-  // Resize the image to the new dimensions
-  const resizedBuffer = await sharp(imageData)
-    .resize(RESIZE_WIDTH, RESIZE_HEIGHT)
-    .toBuffer();
-
-  // Extend the canvas and center the image
-  const extendedBuffer = await sharp(resizedBuffer)
-    .extend({
-      top: 0,
-      bottom: 0,
-      left: Math.round((CANVAS_WIDTH - RESIZE_WIDTH) / 2),  // Calculate and round left offset to center the image
-      right: Math.round((CANVAS_WIDTH - RESIZE_WIDTH) / 2),
-      background: { r: 31, g: 41, b: 55, alpha: 1 }  // Use a transparent background
-    })
-    .toBuffer();
-
   const imageFileName = `${imageBaseDirectory}${imageName}`;
-  fs.writeFileSync(imageFileName, extendedBuffer);
+
+  // Resize the image directly to the new dimensions and save it
+  await sharp(imageData)
+    .resize(RESIZE_WIDTH, RESIZE_HEIGHT)
+    .toFile(imageFileName);  // This saves the file directly, no need to handle Buffer
+
   return imageFileName;
 }
 

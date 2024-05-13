@@ -3,7 +3,7 @@ import axios from "axios";
 import Head from 'next/head';
 import { FrameMetadata } from '@coinbase/onchainkit/frame';
 import '@/app/globals.css';
-import PLanding from "@/app/components/publication/PLanding.js";
+import GLanding from "@/app/components/generation/GLanding.js";
 
 const HOST_URL = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:3005';
 
@@ -20,8 +20,8 @@ export default function Page(props) {
     imgSrc = `${IPFS_BASE}${meta.imageHash}`;
   }
   
-  const title = meta.nftName ? meta.nftName : "Samsar GG Publication";
-  const description = meta.nftDescription ? meta.nftDescription : "Samsar GG Publication";
+  const title = meta.name ? meta.name : "Samsar GG Publication";
+  const description = meta.description ? meta.description : "Samsar GG Publication";
   const twitterImage = meta.twitterOGImage ? meta.twitterOGImage : imgSrc;
 
   return (
@@ -75,7 +75,7 @@ export default function Page(props) {
 
         />
       </Head>
-      <PLanding meta={meta}
+      <GLanding meta={meta}
         tokenId={tokenId}
       />
     </div>
