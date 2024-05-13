@@ -13,6 +13,7 @@ import AttestationDialog from './utils/AttestationDialog.tsx';
 import PublishDialog from './utils/PublishDialog.tsx';
 import CommonContainer from '../common/CommonContainer.tsx';
 import ActionToolbar from './toolbar/ActionToolbar.tsx';
+import { useColorMode } from '../../contexts/ColorMode.js';
 
 import { CURRENT_TOOLBAR_VIEW , CANVAS_ACTION } from '../../constants/Types.ts';
 import { STAGE_DIMENSIONS } from '../../constants/Image.js';
@@ -45,7 +46,7 @@ export default function EditorHome(props) {
   const [templateOptionList, setTemplateOptionList] = useState([]);
   const [activeItemList, setActiveItemList] = useState([]);
 
-  const [editBrushWidth, setEditBrushWidth] = useState(5);
+  const [editBrushWidth, setEditBrushWidth] = useState(25);
   const [editMasklines, setEditMaskLines] = useState([]);
 
   const [currentView, setCurrentView] = useState(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
@@ -58,10 +59,19 @@ export default function EditorHome(props) {
 
   const [ currentCanvasAction, setCurrentCanvasAction ] = useState(CANVAS_ACTION.DEFAULT);
 
+  const { colorMode } = useColorMode();
+
+  const initFillColor = colorMode === 'dark' ?  '#000000': '#ffffff' ;
+  const initTextFillColor = colorMode === 'dark' ?  '#ffffff': '#000000' ;
+
+  const [ fillColor, setFillColor ] = useState(initFillColor);
+  const [ strokeColor, setStrokeColor ] = useState(initFillColor);
+  const [ strokeWidthValue, setStrokeWidthValue ] = useState(2);
+
   const [textConfig, setTextConfig] = useState({
     fontSize: 40,
     fontFamily: 'Times New Roman',
-    fillColor: '#000000'
+    fillColor: initTextFillColor
   });
 
   const setCurrentViewDisplay = (view) => {
@@ -104,7 +114,9 @@ export default function EditorHome(props) {
       } else {
         const nImageList: any = Object.assign([], activeItemList);
         if (nImageList.length === 0) {
-          nImageList.push({ id: `base_rect`, type: 'shape', shape: 'rectangle', config: { x: 0, y: 0, width: STAGE_DIMENSIONS.width, height: STAGE_DIMENSIONS.height, fill: 'white' } });
+          nImageList.push({ id: `base_rect`, type: 'shape', shape: 'rectangle', config: { 
+            x: 0, y: 0, width: STAGE_DIMENSIONS.width, height: STAGE_DIMENSIONS.height, 
+            fill: fillColor , stroke: strokeColor, strokeWidth: strokeWidthValue} });
           setActiveItemList(nImageList);
         }
       }
@@ -116,6 +128,8 @@ export default function EditorHome(props) {
 
   }, []);
 
+  
+
 
   const resetCurrentView = () => {
     setCurrentView(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
@@ -123,6 +137,7 @@ export default function EditorHome(props) {
 
   const prevLengthRef = useRef(activeItemList.length);
 
+  const [ isIntermediateSaving, setIsIntermediateSaving ] = useState(false);
   useEffect(() => {
     // Get the current length of activeItemList
     const currentLength = activeItemList.length;
@@ -131,7 +146,10 @@ export default function EditorHome(props) {
     if (prevLengthRef.current !== currentLength) {
    
       setTimeout(() => {
-        saveIntermediateImage();
+        if (!isIntermediateSaving) {
+          setIsIntermediateSaving(true);
+          saveIntermediateImage();
+        }
       }, 5000);
     
     }
@@ -203,10 +221,7 @@ export default function EditorHome(props) {
       guidanceScale: guidanceScale,
       numInferenceSteps: numInferenceSteps,
       strength: strength
-
     }
-    console.log(payload);
-    console.log("EE TEEEEEE");
     
     const outpaintStatus = await axios.post(`${PROCESSOR_API_URL}/sessions/request_outpaint`, payload);
     startOutpaintPoll();
@@ -460,6 +475,7 @@ export default function EditorHome(props) {
       }
       axios.post(`${PROCESSOR_API_URL}/sessions/save_intermediate`, sessionPayload, headers).then(function (dataResponse) {
         console.log(dataResponse);
+        setIsIntermediateSaving(false);
       });
     }
   }
@@ -510,7 +526,9 @@ export default function EditorHome(props) {
 
     let currentLayerList: any = Object.assign([], activeItemList);
 
-    const shapeConfig = { x: 512, y: 200, width: 200, height: 200, fill: 'white', radius: 70 }
+    const shapeConfig = { x: 512, y: 200, width: 200, height: 200, fill: fillColor,  radius: 70,
+      stroke: strokeColor, strokeWidth: strokeWidthValue
+     }
 
     currentLayerList.push({
       'type': 'shape',
@@ -543,6 +561,8 @@ export default function EditorHome(props) {
         editMasklines={editMasklines}
         setEditMaskLines={setEditMaskLines}
         currentCanvasAction={currentCanvasAction}
+        fillColor={fillColor}
+        strokeColor={strokeColor}
       />
     )
   }
@@ -596,8 +616,12 @@ export default function EditorHome(props) {
               isOutpaintPending={isOutpaintPending}
               isPublicationPending={isPublicationPending}
               setSelectedShape={setSelectedShape}
-
-
+              fillColor={fillColor}
+              setFillColor={setFillColor}
+              strokeColor={strokeColor}
+              setStrokeColor={setStrokeColor}
+              strokeWidthValue={strokeWidthValue}
+              setStrokeWidthValue={setStrokeWidthValue}
             />
           </div>
         </div>

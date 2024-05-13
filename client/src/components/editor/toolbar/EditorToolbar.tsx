@@ -4,11 +4,8 @@ import PromptGenerator from './PromptGenerator.tsx';
 import OutpaintGenerator from './OutpaintGenerator.tsx';
 import RangeSlider from '../utils/RangeSlider.js';
 import AddText from './AddText.tsx';
-import { FaChevronDown, FaChevronUp, FaRobot, FaExpandArrowsAlt } from 'react-icons/fa';
-import { FaCircle, FaHand } from "react-icons/fa6";
-import { FaRegCircle } from "react-icons/fa";
-import { MdOutlineRectangle } from "react-icons/md";
-import { IoTriangleOutline } from "react-icons/io5";
+import { FaChevronDown, FaRobot, } from 'react-icons/fa';
+import AddShapeDisplay from '../utils/AddShapeDisplay.tsx';
 import { useColorMode } from '../../../contexts/ColorMode.js';
 import LayersDisplay from './LayersDisplay.tsx';
 import { CURRENT_TOOLBAR_VIEW } from '../../../constants/Types.ts';
@@ -28,6 +25,9 @@ export default function EditorToolbar(props: any) {
     editMasklines, setEditMaskLines,
     setSelectedShape,
     isOutpaintPending,
+    fillColor, setFillColor,
+    strokeColor, setStrokeColor,
+    strokeWidthValue, setStrokeWidthValue
   } = props;
 
 
@@ -35,7 +35,7 @@ export default function EditorToolbar(props: any) {
   const [showAddTextDisplay, setShowAddTextDisplay] = useState(false);
 
   const [addText, setAddText] = useState('');
-  const { colorMode} = useColorMode();
+  const { colorMode } = useColorMode();
 
   const toggleShowgenerateDisplay = () => {
     setShowGenerateDisplay(!showGenerateDisplay);
@@ -91,6 +91,7 @@ export default function EditorToolbar(props: any) {
   if (currentViewDisplay === CURRENT_TOOLBAR_VIEW.SHOW_EDIT_MASK_DISPLAY) {
     editDisplay = (
       <div>
+  
         <RangeSlider editBrushWidth={editBrushWidth} setEditBrushWidth={setEditBrushWidth} />
         <OutpaintGenerator {...props} />
       </div>
@@ -145,38 +146,28 @@ export default function EditorToolbar(props: any) {
     )
   }
 
+  const toggleCurrentViewDisplay = (view: string) => {
+    if (view === currentViewDisplay) {
+      setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
+    } else {
+      setCurrentViewDisplay(view);
+    }
+  }
+
 
   let addShapeDisplay = (
-    
-      <div className='grid grid-cols-3'>
-        <div className='text-center pl-2 pr-2'>
-          <div className='text-sm font-bold m-auto cursor-pointer' onClick={() => setSelectedShape("circle")}>
-            <FaRegCircle className='m-auto'/>
-            <div className='text-[10px] font-bold'>
-              Circle
-            </div>
-          </div>
-        </div>
-        <div className='text-center pl-2 pr-2'>
-          <div className='text-sm font-bold m-auto cursor-pointer' onClick={() => setSelectedShape("rectangle")}>
-            <MdOutlineRectangle className='m-auto'/>
-            <div className='text-[10px] font-bold'>
-              Rectangle
-            </div>  
-          </div>
-        </div>
-        <div className='text-center pl-2 pr-2'>
-          <div className='text-sm font-bold m-auto cursor-pointer' onClick={() => setSelectedShape("triangle")}>
-            <IoTriangleOutline className='m-auto'/>
-            <div className='text-[10px] font-bold'>
-              Polygon
-            </div>
+    <AddShapeDisplay 
+      setSelectedShape={setSelectedShape}
+      setStrokeColor={setStrokeColor}
+      setFillColor={setFillColor}
+      fillColor={fillColor}
+      strokeColor={strokeColor}
+      strokeWidthValue={strokeWidthValue}
+      setStrokeWidthValue={setStrokeWidthValue}
+    />
 
-          </div>
-        </div>
-      </div>
-    )
-  
+  )
+
 
   let bgColor = "bg-cyber-black border-blue-900 text-white ";
   if (colorMode === 'light') {
@@ -187,13 +178,13 @@ export default function EditorToolbar(props: any) {
   if (colorMode === 'light') {
     buttonBgcolor = "bg-stone-200  text-neutral-900";
   }
-  
+
   return (
     <div className={`border-l-2 ${bgColor} h-full m-auto fixed top-0 overflow-y-auto pl-4 r-4 w-[17%] pr-4`}>
       <div className='mt-[80px] '>
 
         <div className={`pt-4 pb-4 ${buttonBgcolor} mt-4 rounded-sm  text-left pl-2 pr-2`}>
-          <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_GENERATE_DISPLAY)}>
+          <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => toggleCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_GENERATE_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
               Generate
             </div>
@@ -204,7 +195,7 @@ export default function EditorToolbar(props: any) {
           {generateDisplay}
         </div>
         <div className={`pt-4 pb-4 ${buttonBgcolor}  mt-4 rounded-sm  text-left pl-2 pr-2`}>
-          <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_EDIT_MASK_DISPLAY)}>
+          <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => toggleCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_EDIT_MASK_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
               Edit
             </div>
@@ -215,28 +206,25 @@ export default function EditorToolbar(props: any) {
         </div>
 
         <div className={`pt-4 pb-4 ${buttonBgcolor}  mt-4 rounded-sm  text-left pl-2 pr-2`}>
-          <div className='text-lg font-bold  m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_ADD_TEXT_DISPLAY)}>
+          <div className='text-lg font-bold  m-auto cursor-pointer' onClick={() => toggleCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_ADD_TEXT_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
-              Add Text
+              Text
             </div>
             <FaChevronDown className='inline-flex float-right mr-4 mt-2 text-sm' />
           </div>
           {addTextDisplay}
         </div>
         <div className={`pt-4 pb-4 ${buttonBgcolor}  mt-4 rounded-sm  text-left pl-2 pr-2`}>
-          <div className='text-lg font-bold  m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_ADD_TEXT_DISPLAY)}>
+          <div className='text-lg font-bold  m-auto cursor-pointer' onClick={() => toggleCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_ADD_TEXT_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
-              Add Shape
+              Shape
             </div>
             <FaChevronDown className='inline-flex float-right mr-4 mt-2 text-sm' />
           </div>
-          
           {addShapeDisplay}
-
         </div>
-
         <div className={`pt-4 pb-4 ${buttonBgcolor}  mt-4 rounded-sm  text-left pl-2 pr-2`}>
-          <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => setCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_LAYERS_DISPLAY)}>
+          <div className='text-lg font-bold m-auto cursor-pointer' onClick={() => toggleCurrentViewDisplay(CURRENT_TOOLBAR_VIEW.SHOW_LAYERS_DISPLAY)}>
             <div className='inline-flex ml-4 pl-4'>
               Layers
             </div>

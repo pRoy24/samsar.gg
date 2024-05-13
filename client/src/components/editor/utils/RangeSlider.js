@@ -10,11 +10,12 @@ function RangeSlider(props) {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div >
+
       <input
         type="range"
         min="5"
-        max="50"
+        max="100"
         value={editBrushWidth}
         onChange={handleSliderChange}
         className='w-full'
@@ -27,6 +28,9 @@ function RangeSlider(props) {
           transition: 'background 0.3s ease-in-out',
         }}
       />
+            <div className='text-xs text-center font-bold'>
+          Brush width
+        </div>
 
     </div>
   );

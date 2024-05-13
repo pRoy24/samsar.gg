@@ -121,7 +121,13 @@ export async function saveIntermediate(payload) {
   // Add the new item (imageName in this case) to the beginning of the queue
   intermediates.unshift(imageFile);
 
-  updateWitnessForIntermediate(payload.sessionId, imageFile);
+  const currentTime = new Date();
+  const lastWitnessSavedAt = sessionDataValue.lastWitnessSavedAt || new Date(0);
+
+  const timeDiff = currentTime - lastWitnessSavedAt;
+  if (timeDiff > 30000) {
+    await updateWitnessForIntermediate(payload.sessionId, imageFile);
+  }
 
   // Ensure the queue doesn't exceed 10 items
   if (intermediates.length > 10) {
@@ -183,6 +189,7 @@ async function updateWitnessForIntermediate(sessionId, imageFile) {
     hash: leafHash,
   });
 
+  sessionData.lastWitnessSavedAt = new Date();
   await sessionData.save({});
 
 

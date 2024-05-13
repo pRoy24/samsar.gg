@@ -14,6 +14,8 @@ const sessionSchema = new Schema({
     
     witnesses: Array,
     intermediates: Array,
+
+    lastWitnessSavedAt: Date,
     
 
 }, { timestamps: true });
