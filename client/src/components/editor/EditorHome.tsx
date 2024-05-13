@@ -14,7 +14,7 @@ import PublishDialog from './utils/PublishDialog.tsx';
 import CommonContainer from '../common/CommonContainer.tsx';
 import ActionToolbar from './toolbar/ActionToolbar.tsx';
 import { useColorMode } from '../../contexts/ColorMode.js';
-
+import UploadImageDialog from './utils/UploadImageDialog.js';
 import { CURRENT_TOOLBAR_VIEW , CANVAS_ACTION } from '../../constants/Types.ts';
 import { STAGE_DIMENSIONS } from '../../constants/Image.js';
 import { getHeaders } from '../../utils/web.js';
@@ -61,7 +61,7 @@ export default function EditorHome(props) {
 
   const { colorMode } = useColorMode();
 
-  const initFillColor = colorMode === 'dark' ?  '#000000': '#ffffff' ;
+  const initFillColor = colorMode === 'dark' ?  '#030712': '#f5f5f5' ;
   const initTextFillColor = colorMode === 'dark' ?  '#ffffff': '#000000' ;
 
   const [ fillColor, setFillColor ] = useState(initFillColor);
@@ -88,7 +88,7 @@ export default function EditorHome(props) {
   });
 
 
-  const { openAlertDialog, } = useAlertDialog();
+  const { openAlertDialog, closeAlertDialog } = useAlertDialog();
   const { user } = useUser();
 
   const [sessionDetails, setSessionDetails] = useState({});
@@ -128,7 +128,19 @@ export default function EditorHome(props) {
 
   }, []);
 
-  
+ 
+
+  const [uploadedImage, setUploadedImage] = useState(null);
+
+  //const [image] = useImage(uploadedImage?.url);
+
+  const setUploadURL = (data) => {
+    // setUploadedImage(data);
+    const nImageList: any = Object.assign([], activeItemList);
+    nImageList.push({ src: data.url, id: `upload_${nImageList.length}`, type: 'image',  });
+    setActiveItemList(nImageList);
+    closeAlertDialog();
+  };
 
 
   const resetCurrentView = () => {
@@ -485,7 +497,6 @@ export default function EditorHome(props) {
     const templateURL = `${PROCESSOR_API_URL}/templates/mm_final/${templateOption}`;
 
     const nImageList: any = Object.assign([], activeItemList);
-    const currentItemId = nImageList.length;
     nImageList.push({ src: templateURL, id: nImageList.length, type: 'image',  });
     setActiveItemList(nImageList);
     setCurrentView(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
@@ -518,8 +529,7 @@ export default function EditorHome(props) {
   }
 
   const showUploadAction = () => {
-
-   //  showPublishDialg();
+    openAlertDialog(<UploadImageDialog  setUploadURL={setUploadURL}/>);
   }
 
   const setSelectedShape = (shapeKey) => {
@@ -578,6 +588,7 @@ export default function EditorHome(props) {
               showResizeAction={showResizeAction}
               showSaveAction={showSaveAction}
               showUploadAction={showUploadAction}
+             
             />
           </div>
           <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto  mb-8 '>
@@ -622,6 +633,7 @@ export default function EditorHome(props) {
               setStrokeColor={setStrokeColor}
               strokeWidthValue={strokeWidthValue}
               setStrokeWidthValue={setStrokeWidthValue}
+
             />
           </div>
         </div>

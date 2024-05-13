@@ -16,7 +16,7 @@ import User from "../schema/User.js";
 import sharp from 'sharp';
 import fs from 'fs';
 import { generateWitnessForFile } from './Attestation.js';
-import { byteIndexOf , truncateTo320Bytes} from '../utils/StringUtils.js';
+import { byteIndexOf, truncateTo320Bytes } from '../utils/StringUtils.js';
 
 
 export async function createNewSession(userId, payload) {
@@ -135,13 +135,20 @@ export async function saveIntermediate(payload) {
     // await deleteImageFile(imgNameToDelete);
   }
 
-  // Save the updated intermediates back to the database
-  sessionDataValue.intermediates = intermediates;
-  sessionDataValue.activeSelectedImage = imageName;
+  if (imageName) {
+    try {
+      // Save the updated intermediates back to the database
+      sessionDataValue.intermediates = intermediates;
+      sessionDataValue.activeSelectedImage = imageName;
 
-  await sessionDataValue.save();
-  return sessionDataValue;
+      await sessionDataValue.save({});
+      return sessionDataValue;
 
+    } catch (e) {
+
+    }
+
+  }
 }
 
 async function updateWitnessForIntermediate(sessionId, imageFile) {
@@ -167,12 +174,12 @@ async function updateWitnessForIntermediate(sessionId, imageFile) {
 
 
   thumbnailImage.toFile(outputImagePath, (err, info) => {
-      if (err) {
-        console.error('Error during image processing:', err);
-      } else {
-        console.log('Image processed successfully:', info);
-      }
-    });
+    if (err) {
+      console.error('Error during image processing:', err);
+    } else {
+      console.log('Image processed successfully:', info);
+    }
+  });
 
 
   const leafHash = await generateWitnessForFile(imageb64);
@@ -257,7 +264,7 @@ export async function publishSessionAndSetURI(userId, payload) {
   const userData = await User.findOne({ _id: userId });
 
 
-  
+
   const publicationsPayload = new Publication({
     slug: tokenId,
     sessionId: sessionId,
@@ -287,7 +294,7 @@ export async function publishSessionAndSetURI(userId, payload) {
   const mentionsPosition = byteIndexOf(castText, "\n");
   let fid = -1;
   try {
-    fid =  parseInt(userData.fid);
+    fid = parseInt(userData.fid);
   } catch (e) {
 
   }
@@ -306,7 +313,7 @@ export async function publishSessionAndSetURI(userId, payload) {
     castPayload.mentionsPositions = [mentionsPosition]
   }
 
-  const CURRENT_ENV=process.env.CURRENT_ENV;
+  const CURRENT_ENV = process.env.CURRENT_ENV;
   if (CURRENT_ENV === 'production') {
     makeCastFromDeveloperAccount(castPayload);
   }
