@@ -9,7 +9,6 @@ from flask import send_file, Response
 
 torch.cuda.empty_cache() 
 
-
 app = Flask(__name__)
 
 # Load models (this may vary depending on how you're handling model loading)

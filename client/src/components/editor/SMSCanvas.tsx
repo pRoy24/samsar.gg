@@ -1,21 +1,20 @@
 import React, { forwardRef, useRef, useEffect, useState } from "react";
-import { Stage, Layer, Star, Text, Image, Transformer, Group, Line } from 'react-konva';
+import { Stage, Layer, Group, Line } from 'react-konva';
 import { CURRENT_TOOLBAR_VIEW } from '../../constants/Types.ts';
 import { useImage } from 'react-konva-utils';
 import ResizableImage from "./ResizableImage.tsx";
 import ResizableText from "./ResizableText.tsx";
-import ResizableShape from "./ResizableShape.js";
 import { STAGE_DIMENSIONS } from '../../constants/Image.js';
 import ResizableRectangle from "./shapes/ResizableRectangle.tsx";
 import ResizablePolygon from "./shapes/ResizablePolygon.tsx";
 import ResizableCircle from "./shapes/ResizableCircle.tsx";
 import { useColorMode } from '../../contexts/ColorMode.js';
+import { FaChevronCircleDown, FaChevronCircleUp } from "react-icons/fa";
 
 const IMAGE_BASE = `${process.env.REACT_APP_PROCESSOR_API}`;
 
 const SMSCanvas = forwardRef((props: any, ref: any) => {
-
-  const { sessionDetails, activeItemList, currentView, editBrushWidth, maskGroupRef ,
+  const { sessionDetails, activeItemList, setActiveItemList, currentView, editBrushWidth, maskGroupRef,
     editMasklines, setEditMaskLines, currentCanvasAction
   } = props;
   const [showMask, setShowMask] = useState(false);
@@ -25,6 +24,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
   const imageSrc = `${IMAGE_BASE}/generations/${sessionDetails?.activeSelectedImage}`;
   const [image, status] = useImage(imageSrc, 'anonymous');
   const [selectedId, selectImage] = useState(null);
+  const [buttonPositions, setButtonPositions] = useState([]);
 
   useEffect(() => {
     if (currentCanvasAction === 'MOVE') {
@@ -42,45 +42,43 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
     }
   }, [currentCanvasAction]);
 
-  const handleStageClick = (e) => {
-    // if (selectedId === null) return;
+  const handleLayerClick = (e) => {
 
-    // const clickedOnEmpty = e.target === e.target.getStage();
-    // const isSelectedItem = e.target.attrs.id === selectedId || (e.target.getParent() && e.target.getParent().attrs.id === selectedId);
-  
-    // // If the click is on an empty stage area or not on the selected item or its transformer
-    // if (clickedOnEmpty || !isSelectedItem) {
-    //   selectImage(null); // Deselect any selected image
-    // }
+    const clickedItem = e.target.attrs.id || e.target.getParent().attrs.id;
+
+    if (clickedItem) {
+      selectImage(clickedItem);
+    } else {
+      selectImage(null);
+    }
   };
 
+  useEffect(() => {
+    const stage = ref.current.getStage();
+    const positions = activeItemList.map(item => {
+      const itemId = item.id.toString();
+      const node = stage.findOne(`#${itemId}`);
+      if (node) {
+        const absPos = node.getClientRect({
+          skipTransform: false,
+          skipShadow: false,
+          skipStroke: false,
+        });
+
+        return { id: item.id, x: absPos.x + 30, y: absPos.y + 30 };
+      }
+      return null;
+    }).filter(Boolean);
+    setButtonPositions(positions);
+  }, [activeItemList, ref, selectedId]);
 
   useEffect(() => {
-    const stage = ref.current.getStage(); // Assuming `ref` is the ref to your Stage component
-  
-    const checkIfClickedOutside = (e) => {
-      // Get the clicked shape or the stage
-      const clickedShape = e.target;
-      // Check if the clicked shape is part of the stage but not part of the selected group/item
-      const isOutside = clickedShape === stage || // Click on empty stage
-                        (selectedId && !clickedShape.findAncestor(`#${selectedId}`)); // No ancestor with selectedId
-  
-      if (isOutside) {
-        selectImage(null); // Deselect any selected image
-      }
-    };
-  
-    // Add event listener to the Konva stage
-    stage.on('click tap', checkIfClickedOutside);
-  
-    // Remove event listener on cleanup
+    const stage = ref.current.getStage();
+    stage.on('click tap', handleLayerClick);
     return () => {
-      stage.off('click tap', checkIfClickedOutside);
+      stage.off('click tap', handleLayerClick);
     };
   }, [selectedId, ref]);
-
-
-
 
   const setItemAsSelected = (itemId) => {
     selectImage(itemId);
@@ -89,7 +87,6 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
   const generateCursor = (size) => {
     return `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'><circle cx='${size / 2}' cy='${size / 2}' r='${size / 2 - 1}' fill='%23000' /></svg>") ${size / 2} ${size / 2}, auto`;
   };
-
 
   useEffect(() => {
     setShowMask(false);
@@ -105,89 +102,104 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
       const stage = ref.current.getStage();
       const container = stage.container();
       container.style.cursor = 'default';
-
     }
   }, [currentView]);
 
-
-
   useEffect(() => {
     const checkIfClickedOutside = (e) => {
-      // This function will be triggered by any click on the webpage.
       if (!document.getElementById('samsar-konva-stage').contains(e.target)) {
-        // If the clicked element is not part of the Konva stage
         selectImage(null);
       }
     };
 
-    // Add event listener when the component mounts
     document.addEventListener('click', checkIfClickedOutside);
-
-    // Remove event listener on cleanup
     return () => {
       document.removeEventListener('click', checkIfClickedOutside);
     };
   }, []);
 
   if (currentView === CURRENT_TOOLBAR_VIEW.SHOW_EDIT_MASK_DISPLAY) {
-
     const stage = ref.current.getStage();
     const container = stage.container();
     container.style.cursor = generateCursor(editBrushWidth);
   }
 
+  const moveItem = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= activeItemList.length) {
+      return; // Out of bounds, do nothing
+    }
+  
+    const newList = [...activeItemList];
+    const [item] = newList.splice(index, 1);
+    newList.splice(newIndex, 0, item);
+    setActiveItemList(newList);
+  };
+  
+
   let imageStackList = <span />;
 
   if (activeItemList && activeItemList.length > 0) {
-    
-    imageStackList = activeItemList.map(function (item, index) {
-
+    imageStackList = activeItemList.map((item, index) => {
       if (item.type === 'image') {
         return (
-          <ResizableImage
-            key={`group_image_${item.id}`}
-            id={`group_image_${item.id}`}
-            image={item}
-            isSelected={selectedId === item.id}
-            onSelect={() => setItemAsSelected(item.id)}
-            onUnselect={() => selectImage(null)}
-            showMask={showMask}
-          />
-        )
+          <Group key={`group_image_${item.id}`} id={item.id}>
+            <ResizableImage
+              {...item}
+              image={item}
+              isSelected={selectedId === item.id}
+              onSelect={() => setItemAsSelected(item.id)}
+              onUnselect={() => selectImage(null)}
+              showMask={showMask}
+            />
+          </Group>
+        );
       } else if (item.type === 'text') {
         return (
-          <ResizableText
-            key={`group_text_${item.id}`}
-            id={`group_text_${item.id}`}
-            text={item.text}
-            config={item.config} 
-            isSelected={selectedId === item.id}
-            onSelect={() => selectImage(item.id)}
-            onUnselect={() => selectImage(null)}
-          />
-        )
+          <Group key={`group_text_${item.id}`} id={item.id}>
+            <ResizableText
+              {...item}
+              isSelected={selectedId === item.id}
+              onSelect={() => selectImage(item.id)}
+              onUnselect={() => selectImage(null)}
+            />
+          </Group>
+        );
       } else if (item.type === 'shape') {
         if (item.shape === 'circle') {
-          return <ResizableCircle {...item}
-          key={`group_circle_${item.id}`}
-          isSelected={selectedId === item.id}
-          onSelect={() => setItemAsSelected(item.id)}
-          onUnselect={() => selectImage(null)}
-        />
+          return (
+            <Group key={`group_circle_${item.id}`} id={item.id}>
+              <ResizableCircle
+                {...item}
+                isSelected={selectedId === item.id}
+                onSelect={() => setItemAsSelected(item.id)}
+                onUnselect={() => selectImage(null)}
+              />
+            </Group>
+          );
         } else if (item.shape === 'rectangle') {
-          return <ResizableRectangle config={item.config} {...item}
-          key={`group_rectangle_${item.id}`}
-          isSelected={selectedId === item.id}
-          onSelect={() => setItemAsSelected(item.id)}
-          onUnselect={() => selectImage(null)}
-          />
+          return (
+            <Group key={`group_rectangle_${item.id}`} id={item.id}>
+              <ResizableRectangle
+                config={item.config}
+                {...item}
+                isSelected={selectedId === item.id}
+                onSelect={() => setItemAsSelected(item.id)}
+                onUnselect={() => selectImage(null)}
+              />
+            </Group>
+          );
         } else {
-          return <ResizablePolygon {...item}
-          key={`group_polygon_${item.id}`}
-          isSelected={selectedId === item.id}
-          onSelect={() => setItemAsSelected(item.id)}
-          onUnselect={() => selectImage(null)}
-           />
+          return (
+            <Group key={`group_polygon_${item.id}`} id={item.id}>
+              <ResizablePolygon
+                {...item}
+                isSelected={selectedId === item.id}
+                onSelect={() => setItemAsSelected(item.id)}
+                onUnselect={() => selectImage(null)}
+              />
+            </Group>
+          );
         }
       }
     }).filter(Boolean);
@@ -204,7 +216,6 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
     setEditMaskLines([...editMasklines, { points, stroke: 'white', strokeWidth: editBrushWidth }]);
   };
 
-
   const handleLayerMouseMove = (e) => {
     if (!isPainting || editMasklines.length === 0) return;
     const stage = e.target.getStage();
@@ -220,15 +231,15 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
 
   const { colorMode } = useColorMode();
   const bgColor = colorMode === 'dark' ? `bg-gray-900` : `bg-neutral-300`;
+
   return (
-    <div className={`m-auto ${bgColor} pb-8  shadow-lg pt-[60px] `}>
+    <div className={`m-auto relative ${bgColor} pb-8 shadow-lg pt-[60px]`}>
       <Stage
         width={STAGE_DIMENSIONS.width}
         height={STAGE_DIMENSIONS.height}
         ref={ref}
-        onClick={handleStageClick}
-        id="samsar-konva-stage"  
-
+        onClick={handleLayerClick}
+        id="samsar-konva-stage"
       >
         <Layer
           onMouseDown={handleLayerMouseDown}
@@ -247,8 +258,32 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
             </Group>
           )}
         </Layer>
-
       </Stage>
+      {buttonPositions.map((pos, index) => {
+
+        console.log("CJECL SOME LOGIN");
+        console.log(pos);
+        console.log(index);
+        console.log(selectedId);
+
+
+        if (selectedId && pos.id && selectedId !== pos.id) return null; // Show buttons only for the selected item
+
+        return (
+          <div key={pos.id} style={{
+            position: 'absolute', left: pos.x, top: pos.y, background: "#030712",
+            width: "100px", borderRadius: "5px", padding: "5px", display: "flex", justifyContent: "center",
+            zIndex: 1000
+          }}>
+            <button onClick={() => moveItem(index, -1)}>
+              <FaChevronCircleDown className="text-white" />
+            </button>
+            <button onClick={() => moveItem(index, 1)} style={{ marginLeft: '10px' }}>
+              <FaChevronCircleUp className="text-white" />
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 });

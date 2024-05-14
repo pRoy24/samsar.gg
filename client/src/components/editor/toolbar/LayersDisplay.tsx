@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { useColorMode } from '../../../contexts/ColorMode';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
@@ -27,21 +27,16 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   ...draggableStyle
 });
 
-
-
-export default function LayersDisplay(props: any) {
+export default function LayersDisplay(props) {
 
   const { activeItemList, setActiveItemList } = props;
 
   const { colorMode } = useColorMode();
-  console.log('colorMode', colorMode);
 
   const bgColorDragging = colorMode === 'dark' ? '#1f2937' : '#fafafa';
   const bgColorDraggingOver = colorMode === 'dark' ? '#030712' : '#f5f5f5';
   
-  const getListStyle = (isDraggingOver)  => {
-    console.log('isDraggingOver', isDraggingOver);
-
+  const getListStyle = (isDraggingOver) => {
     return {
       background: isDraggingOver ? bgColorDraggingOver: bgColorDragging,
       padding: grid,
@@ -49,20 +44,17 @@ export default function LayersDisplay(props: any) {
     };
   }
 
-  
   const onDragEnd = result => {
     // dropped outside the list
     if (!result.destination) {
       return;
     }
-
     const newItems = reorder(
-      activeItemList,
+      [...activeItemList].reverse(),  // Reverse the list before reordering
       result.source.index,
       result.destination.index
-    );
+    ).reverse();  // Reverse back to the original order
     setActiveItemList(newItems);
-
   };
   
   const deleteItem = (id) => {    
@@ -72,60 +64,58 @@ export default function LayersDisplay(props: any) {
     setActiveItemList(filteredItems);
   };
 
-
   let isDraggingBGColor = colorMode === 'dark' ? '#263B4A' : '#a8a29e';
-  let isStableBGColor = colorMode === 'dark' ? '171717' : '#d6d3d1';
+  let isStableBGColor = colorMode === 'dark' ? '#171717' : '#d6d3d1';
   let textColor = colorMode === 'dark' ? 'white' : '#171717';
-
-  
-
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-    <Droppable droppableId="droppable">
-      {(provided, snapshot) => (
-        <div
-          {...provided.droppableProps}
-          ref={provided.innerRef}
-          style={getListStyle(snapshot.isDraggingOver)}
-        >
-          {activeItemList.map(function(item, index) {
-            const itemId = `list_item_${item.id}`;
-            const itemContent = `item ${item.id} - ${item.type}`;
-            return (
-              <Draggable key={item.id} draggableId={itemId} index={index}>
-              {(provided, snapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                  style={{
-                    ...provided.draggableProps.style,
-                    margin: '8px',
-                    backgroundColor: snapshot.isDragging ? isDraggingBGColor : isStableBGColor,
-                    border: '1px solid #64748b',
-                    color: textColor,
-                    padding: '16px',
-                    borderRadius: '5px'
-                  }}
-                >
-                  {itemContent}
-                  <button
-                    onClick={() => deleteItem(item.id)}
-                    style={{ marginLeft: 'auto', marginTop: '5px', color: 'white' , float: 'right'}}
-                  >
-                    <FaTimes />
-                  </button>
-                </div>
-              )}
-            </Draggable>           
-            )
-          })}
-          {provided.placeholder}
-        </div>
-      )}
-    </Droppable>
-  </DragDropContext>
+      <Droppable droppableId="droppable">
+        {(provided, snapshot) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            style={getListStyle(snapshot.isDraggingOver)}
+          >
+            {[...activeItemList].reverse().map((item, index) => {
+              const itemId = `list_item_${item.id}`;
+              const itemContent = `item ${item.id} - ${item.type}`;
+              return (
+                <Draggable key={item.id} draggableId={itemId} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={{
+                        ...provided.draggableProps.style,
+                        margin: '8px',
+                        backgroundColor: snapshot.isDragging ? isDraggingBGColor : isStableBGColor,
+                        border: '1px solid #64748b',
+                        color: textColor,
+                        padding: '16px',
+                        borderRadius: '5px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}
+                    >
+                      {itemContent}
+                      <button
+                        onClick={() => deleteItem(item.id)}
+                        style={{ color: 'white' }}
+                      >
+                        <FaTimes />
+                      </button>
+                    </div>
+                  )}
+                </Draggable>
+              );
+            })}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
   );
-  
 }

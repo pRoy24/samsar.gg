@@ -15,7 +15,7 @@ import CommonContainer from '../common/CommonContainer.tsx';
 import ActionToolbar from './toolbar/ActionToolbar.tsx';
 import { useColorMode } from '../../contexts/ColorMode.js';
 import UploadImageDialog from './utils/UploadImageDialog.js';
-import { CURRENT_TOOLBAR_VIEW , CANVAS_ACTION } from '../../constants/Types.ts';
+import { CURRENT_TOOLBAR_VIEW, CANVAS_ACTION } from '../../constants/Types.ts';
 import { STAGE_DIMENSIONS } from '../../constants/Image.js';
 import { getHeaders } from '../../utils/web.js';
 
@@ -27,7 +27,7 @@ const PROCESSOR_API_URL = process.env.REACT_APP_PROCESSOR_API;
 const IPFS_URL_BASE = process.env.REACT_APP_IPFS_URL_BASE;
 
 export default function EditorHome(props) {
-  
+
   let { id } = useParams();
 
   const resetSession = () => {
@@ -37,7 +37,7 @@ export default function EditorHome(props) {
   }
 
   if (!id) {
-   id = props.id;
+    id = props.id;
   }
   const [promptText, setPromptText] = useState("");
   const [selectedChain, setSelectedChain] = useState('');
@@ -53,20 +53,20 @@ export default function EditorHome(props) {
 
   const [selectedGenerationModel, setSelectedGenerationModel] = useState('SDXL');
   const [selectedEditModel, setSelectedEditModel] = useState('SDXL');
-  const [ isGenerationPending , setIsGenerationPending ] = useState(false);
-  const [ isOutpaintPending, setIsOutpaintPending ] = useState(false);
-  const [ isPublicationPending, setIsPublicationPending ] = useState(false);
+  const [isGenerationPending, setIsGenerationPending] = useState(false);
+  const [isOutpaintPending, setIsOutpaintPending] = useState(false);
+  const [isPublicationPending, setIsPublicationPending] = useState(false);
 
-  const [ currentCanvasAction, setCurrentCanvasAction ] = useState(CANVAS_ACTION.DEFAULT);
+  const [currentCanvasAction, setCurrentCanvasAction] = useState(CANVAS_ACTION.DEFAULT);
 
   const { colorMode } = useColorMode();
 
-  const initFillColor = colorMode === 'dark' ?  '#030712': '#f5f5f5' ;
-  const initTextFillColor = colorMode === 'dark' ?  '#ffffff': '#000000' ;
+  const initFillColor = colorMode === 'dark' ? '#030712' : '#f5f5f5';
+  const initTextFillColor = colorMode === 'dark' ? '#ffffff' : '#000000';
 
-  const [ fillColor, setFillColor ] = useState(initFillColor);
-  const [ strokeColor, setStrokeColor ] = useState(initFillColor);
-  const [ strokeWidthValue, setStrokeWidthValue ] = useState(2);
+  const [fillColor, setFillColor] = useState(initFillColor);
+  const [strokeColor, setStrokeColor] = useState(initFillColor);
+  const [strokeWidthValue, setStrokeWidthValue] = useState(2);
 
   const [textConfig, setTextConfig] = useState({
     fontSize: 40,
@@ -108,15 +108,21 @@ export default function EditorHome(props) {
       if (activeSelectedImageName) {
         const activeSelectedImageURL = `${PROCESSOR_API_URL}/intermediates/${activeSelectedImageName}`;
         const nImageList: any = Object.assign([], activeItemList);
-        nImageList.push({ src: activeSelectedImageURL, id: nImageList.length, type: 'image' });
+        nImageList.push({ src: activeSelectedImageURL, id: `item_${nImageList.length}`, type: 'image' });
 
         setActiveItemList(nImageList);
       } else {
         const nImageList: any = Object.assign([], activeItemList);
         if (nImageList.length === 0) {
-          nImageList.push({ id: `base_rect`, type: 'shape', shape: 'rectangle', config: { 
-            x: 0, y: 0, width: STAGE_DIMENSIONS.width, height: STAGE_DIMENSIONS.height, 
-            fill: fillColor , stroke: strokeColor, strokeWidth: strokeWidthValue} });
+          nImageList.push({
+            id: `item_${nImageList.length}`,
+            type: 'shape',
+            shape: 'rectangle',
+            config: {
+              x: 0, y: 0, width: STAGE_DIMENSIONS.width, height: STAGE_DIMENSIONS.height,
+              fill: fillColor, stroke: strokeColor, strokeWidth: strokeWidthValue
+            }
+          });
           setActiveItemList(nImageList);
         }
       }
@@ -128,16 +134,11 @@ export default function EditorHome(props) {
 
   }, []);
 
- 
-
-  const [uploadedImage, setUploadedImage] = useState(null);
-
-  //const [image] = useImage(uploadedImage?.url);
 
   const setUploadURL = (data) => {
     // setUploadedImage(data);
     const nImageList: any = Object.assign([], activeItemList);
-    nImageList.push({ src: data.url, id: `upload_${nImageList.length}`, type: 'image',  });
+    nImageList.push({ src: data.url, id: `item_${nImageList.length}`, type: 'image', });
     setActiveItemList(nImageList);
     closeAlertDialog();
   };
@@ -149,26 +150,26 @@ export default function EditorHome(props) {
 
   const prevLengthRef = useRef(activeItemList.length);
 
-  const [ isIntermediateSaving, setIsIntermediateSaving ] = useState(false);
+  const [isIntermediateSaving, setIsIntermediateSaving] = useState(false);
   useEffect(() => {
     // Get the current length of activeItemList
     const currentLength = activeItemList.length;
 
     // Check if previous length is not equal to current length
     if (prevLengthRef.current !== currentLength) {
-   
+
       setTimeout(() => {
         if (!isIntermediateSaving) {
           setIsIntermediateSaving(true);
           saveIntermediateImage();
         }
       }, 5000);
-    
+
     }
 
     // Update the ref with the new length for the next render
     prevLengthRef.current = currentLength;
-  }, [activeItemList.length]);  
+  }, [activeItemList.length]);
 
 
 
@@ -207,7 +208,7 @@ export default function EditorHome(props) {
   const submitOutpaintRequest = async (evt) => {
     evt.preventDefault();
 
-    
+
 
     const baseImageData = await exportBaseGroup();
     let maskImageData;
@@ -234,7 +235,7 @@ export default function EditorHome(props) {
       numInferenceSteps: numInferenceSteps,
       strength: strength
     }
-    
+
     const outpaintStatus = await axios.post(`${PROCESSOR_API_URL}/sessions/request_outpaint`, payload);
     startOutpaintPoll();
   }
@@ -354,12 +355,12 @@ export default function EditorHome(props) {
       const generatedImageUrlName = pollStatus.data.activeGeneratedImage;
       const generatedURL = `${PROCESSOR_API_URL}/generations/${generatedImageUrlName}`;
       const nImageList: any = Object.assign([], activeItemList);
-      nImageList.push({ src: generatedURL, id: nImageList.length, type: 'image' });
+      nImageList.push({ src: generatedURL, id: `item_${nImageList.length}`, type: 'image' });
 
       setActiveItemList(nImageList);
       setSessionDetails(pollStatus.data);
       setIsGenerationPending(false);
-     // saveIntermediateImage();
+      // saveIntermediateImage();
       return;
     } else {
       setTimeout(() => {
@@ -381,15 +382,14 @@ export default function EditorHome(props) {
       const generatedURL = `${PROCESSOR_API_URL}/generations/${generatedImageUrlName}`;
 
       const nImageList: any = Object.assign([], activeItemList);
-      const currentItemId = nImageList.length;
-      nImageList.push({ src: generatedURL, id: currentItemId, type: 'image' });
+      nImageList.push({ src: generatedURL, id: `item_${nImageList.length}`, type: 'image' });
 
       setCurrentView(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
 
       setActiveItemList(nImageList);
       setSessionDetails(pollStatus.data);
       setIsOutpaintPending(false);
-    //  saveIntermediateImage();
+      //  saveIntermediateImage();
       return;
     } else {
       setTimeout(() => {
@@ -441,7 +441,7 @@ export default function EditorHome(props) {
 
         window.location.href = `${PUBLISHER_URL}/p/${publicationId}`;
 
-      }).catch(function(err) {
+      }).catch(function (err) {
         console.log(err);
         setIsPublicationPending(false);
       });
@@ -450,19 +450,8 @@ export default function EditorHome(props) {
 
   const showAttestationDialog = () => {
     const publishDialog = <PublishDialog onSubmit={onPublishDialog}
-    selectedChain={selectedChain}
-    setSelectedChain={setSelectedChain}
-  />
-  openAlertDialog(publishDialog);
-
-
-  }
-
-  const showPublishDialg = () => {
-    const publishDialog = <PublishDialog onSubmit={onPublishDialog}
       selectedChain={selectedChain}
       setSelectedChain={setSelectedChain}
-      isPublicationPending={isPublicationPending}
     />
     openAlertDialog(publishDialog);
   }
@@ -497,14 +486,14 @@ export default function EditorHome(props) {
     const templateURL = `${PROCESSOR_API_URL}/templates/mm_final/${templateOption}`;
 
     const nImageList: any = Object.assign([], activeItemList);
-    nImageList.push({ src: templateURL, id: nImageList.length, type: 'image',  });
+    nImageList.push({ src: templateURL, id: `${nImageList.length}`, type: 'image', });
     setActiveItemList(nImageList);
     setCurrentView(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
   }
 
   const addTextBoxToCanvas = (payload) => {
     const nImageList: any = Object.assign([], activeItemList);
-    const currentItemId = nImageList.length;
+    const currentItemId = `item_${nImageList.length}`;
     payload.id = currentItemId;
     nImageList.push(payload);
     setActiveItemList(nImageList);
@@ -513,7 +502,7 @@ export default function EditorHome(props) {
   const setCurrentAction = (currentAction) => {
     console.log("Setting Current Action:", currentAction);
     setCurrentCanvasAction(currentAction);
-    
+
   }
 
   const showMoveAction = () => {
@@ -529,22 +518,23 @@ export default function EditorHome(props) {
   }
 
   const showUploadAction = () => {
-    openAlertDialog(<UploadImageDialog  setUploadURL={setUploadURL}/>);
+    openAlertDialog(<UploadImageDialog setUploadURL={setUploadURL} />);
   }
 
   const setSelectedShape = (shapeKey) => {
 
     let currentLayerList: any = Object.assign([], activeItemList);
 
-    const shapeConfig = { x: 512, y: 200, width: 200, height: 200, fill: fillColor,  radius: 70,
+    const shapeConfig = {
+      x: 512, y: 200, width: 200, height: 200, fill: fillColor, radius: 70,
       stroke: strokeColor, strokeWidth: strokeWidthValue
-     }
+    }
 
     currentLayerList.push({
       'type': 'shape',
       'shape': shapeKey,
       'config': shapeConfig,
-      'id': currentLayerList.length
+      'id': `item_${currentLayerList.length}`
     });
 
     setActiveItemList(currentLayerList);
@@ -556,9 +546,9 @@ export default function EditorHome(props) {
   if (currentView === CURRENT_TOOLBAR_VIEW.SHOW_TEMPLATES_DISPLAY) {
     viewDisplay = (
       <SelectTemplate getRemoteTemplateData={getRemoteTemplateData}
-        templateOptionList={templateOptionList} addImageToCanvas={addImageToCanvas} 
+        templateOptionList={templateOptionList} addImageToCanvas={addImageToCanvas}
         resetCurrentView={resetCurrentView}
-        />
+      />
     )
   } else {
     viewDisplay = (
@@ -566,6 +556,7 @@ export default function EditorHome(props) {
         maskGroupRef={maskGroupRef}
         sessionDetails={sessionDetails}
         activeItemList={activeItemList}
+        setActiveItemList={setActiveItemList}
         editBrushWidth={editBrushWidth}
         currentView={currentView}
         editMasklines={editMasklines}
@@ -588,7 +579,7 @@ export default function EditorHome(props) {
               showResizeAction={showResizeAction}
               showSaveAction={showSaveAction}
               showUploadAction={showUploadAction}
-             
+
             />
           </div>
           <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto  mb-8 '>
