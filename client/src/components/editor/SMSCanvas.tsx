@@ -15,7 +15,8 @@ const IMAGE_BASE = `${process.env.REACT_APP_PROCESSOR_API}`;
 
 const SMSCanvas = forwardRef((props: any, ref: any) => {
   const { sessionDetails, activeItemList, setActiveItemList, currentView, editBrushWidth, maskGroupRef,
-    editMasklines, setEditMaskLines, currentCanvasAction
+    editMasklines, setEditMaskLines, currentCanvasAction,
+    setSelectedId, selectedId,  buttonPositions, setButtonPositions,
   } = props;
   const [showMask, setShowMask] = useState(false);
   const [mask, setMask] = useState(null);
@@ -23,8 +24,8 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
   const [isPainting, setIsPainting] = useState(false);
   const imageSrc = `${IMAGE_BASE}/generations/${sessionDetails?.activeSelectedImage}`;
   const [image, status] = useImage(imageSrc, 'anonymous');
-  const [selectedId, selectImage] = useState(null);
-  const [buttonPositions, setButtonPositions] = useState([]);
+
+
 
   useEffect(() => {
     if (currentCanvasAction === 'MOVE') {
@@ -46,14 +47,19 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
 
     const clickedItem = e.target.attrs.id || e.target.getParent().attrs.id;
 
-    if (clickedItem) {
-      selectImage(clickedItem);
+    console.log(clickedItem);
+
+    if (clickedItem ) {
+      setSelectedId(clickedItem);
     } else {
-      selectImage(null);
+      setSelectedId(null);
     }
   };
 
+  console.log(selectedId);
+
   useEffect(() => {
+
     const stage = ref.current.getStage();
     const positions = activeItemList.map(item => {
       const itemId = item.id.toString();
@@ -74,14 +80,19 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
 
   useEffect(() => {
     const stage = ref.current.getStage();
-    stage.on('click tap', handleLayerClick);
-    return () => {
-      stage.off('click tap', handleLayerClick);
-    };
+    // stage.on('click tap', handleLayerClick);
+    // return () => {
+    //   stage.off('click tap', handleLayerClick);
+    // };
   }, [selectedId, ref]);
 
+  const selectLayer = (item) => {
+    if (item.config && !item.config.fixed) {
+      setSelectedId(item.id);
+    }
+  }
   const setItemAsSelected = (itemId) => {
-    selectImage(itemId);
+    setSelectedId(itemId);
   }
 
   const generateCursor = (size) => {
@@ -107,8 +118,9 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
 
   useEffect(() => {
     const checkIfClickedOutside = (e) => {
+
       if (!document.getElementById('samsar-konva-stage').contains(e.target)) {
-        selectImage(null);
+       // setSelectedId(null);
       }
     };
 
@@ -149,7 +161,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
               image={item}
               isSelected={selectedId === item.id}
               onSelect={() => setItemAsSelected(item.id)}
-              onUnselect={() => selectImage(null)}
+              onUnselect={() => setSelectedId(null)}
               showMask={showMask}
             />
           </Group>
@@ -160,8 +172,8 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
             <ResizableText
               {...item}
               isSelected={selectedId === item.id}
-              onSelect={() => selectImage(item.id)}
-              onUnselect={() => selectImage(null)}
+              onSelect={() => setSelectedId(item.id)}
+              onUnselect={() => setSelectedId(null)}
             />
           </Group>
         );
@@ -172,8 +184,8 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
               <ResizableCircle
                 {...item}
                 isSelected={selectedId === item.id}
-                onSelect={() => setItemAsSelected(item.id)}
-                onUnselect={() => selectImage(null)}
+                onSelect={() => selectLayer(item)}
+                onUnselect={() => setSelectedId(null)}
               />
             </Group>
           );
@@ -184,8 +196,8 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
                 config={item.config}
                 {...item}
                 isSelected={selectedId === item.id}
-                onSelect={() => setItemAsSelected(item.id)}
-                onUnselect={() => selectImage(null)}
+                onSelect={() => selectLayer(item)}
+                onUnselect={() => setSelectedId(null)}
               />
             </Group>
           );
@@ -195,8 +207,8 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
               <ResizablePolygon
                 {...item}
                 isSelected={selectedId === item.id}
-                onSelect={() => setItemAsSelected(item.id)}
-                onUnselect={() => selectImage(null)}
+                onSelect={() => selectLayer(item)}
+                onUnselect={() => setSelectedId(null)}
               />
             </Group>
           );
@@ -260,14 +272,8 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
         </Layer>
       </Stage>
       {buttonPositions.map((pos, index) => {
-
-        console.log("CJECL SOME LOGIN");
-        console.log(pos);
-        console.log(index);
         console.log(selectedId);
-
-
-        if (selectedId && pos.id && selectedId !== pos.id) return null; // Show buttons only for the selected item
+        if (!selectedId || (selectedId && pos.id && ((selectedId !== pos.id) || (selectedId === 0 )))) return null; // Show buttons only for the selected item
 
         return (
           <div key={pos.id} style={{

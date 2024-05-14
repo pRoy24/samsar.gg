@@ -222,9 +222,9 @@ export async function publishSessionAndSetURI(userId, payload) {
 
   const sessionWitnesses = sessionDataValue.witnesses;
 
-  const witnessHashData = await uploadMetadataToIpfs(sessionWitnesses);
+  const metadataHashData = await uploadMetadataToIpfs(sessionWitnesses);
 
-  const witnessHash = witnessHashData.IpfsHash;
+  const witnessHash = metadataHashData.IpfsHash;
 
   const imageData = await uploadImageToIpfs(payload.image);
   const imageURL = `ipfs://${imageData.IpfsHash}`;

@@ -61,12 +61,17 @@ export default function EditorHome(props) {
 
   const { colorMode } = useColorMode();
 
-  const initFillColor = colorMode === 'dark' ? '#030712' : '#f5f5f5';
-  const initTextFillColor = colorMode === 'dark' ? '#ffffff' : '#000000';
+  const initialBackgroundFillColor = colorMode === 'dark' ? '#030712' : '#f5f5f5';
+  const initFillColor = colorMode === 'dark' ? '#f5f5f5' : '#030712';
+  const initTextFillColor = colorMode === 'dark' ? '#000000' : '#ffffff';
 
   const [fillColor, setFillColor] = useState(initFillColor);
   const [strokeColor, setStrokeColor] = useState(initFillColor);
   const [strokeWidthValue, setStrokeWidthValue] = useState(2);
+
+  const [buttonPositions, setButtonPositions] = useState([]);
+
+  const [selectedId, setSelectedId] = useState<any>(null);
 
   const [textConfig, setTextConfig] = useState({
     fontSize: 40,
@@ -120,7 +125,8 @@ export default function EditorHome(props) {
             shape: 'rectangle',
             config: {
               x: 0, y: 0, width: STAGE_DIMENSIONS.width, height: STAGE_DIMENSIONS.height,
-              fill: fillColor, stroke: strokeColor, strokeWidth: strokeWidthValue
+              fill: initialBackgroundFillColor, stroke: initialBackgroundFillColor, strokeWidth: strokeWidthValue,
+              fixed: true,
             }
           });
           setActiveItemList(nImageList);
@@ -133,6 +139,44 @@ export default function EditorHome(props) {
     });
 
   }, []);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+    axios.get(`${PROCESSOR_API_URL}/sessions/details?id=${id}`).then((response) => {
+
+
+      const activeSelectedImageName = response.data.activeSelectedImage;
+      if (activeSelectedImageName) {
+        const activeSelectedImageURL = `${PROCESSOR_API_URL}/intermediates/${activeSelectedImageName}`;
+        const nImageList: any = Object.assign([], activeItemList);
+        nImageList.push({ src: activeSelectedImageURL, id: `item_${nImageList.length}`, type: 'image' });
+
+        setActiveItemList(nImageList);
+      } else {
+        const nImageList: any = Object.assign([], activeItemList);
+        if (nImageList.length === 0) {
+          nImageList.push({
+            id: `item_${nImageList.length}`,
+            type: 'shape',
+            shape: 'rectangle',
+            config: {
+              x: 0, y: 0, width: STAGE_DIMENSIONS.width, height: STAGE_DIMENSIONS.height,
+              fill: initialBackgroundFillColor, stroke: initialBackgroundFillColor, strokeWidth: strokeWidthValue,
+              fixed: true,
+            }
+          });
+          setActiveItemList(nImageList);
+        }
+      }
+
+      setSessionDetails(response.data);
+    }).catch((error) => {
+
+    });
+
+  }, [id]);
 
 
   const setUploadURL = (data) => {
@@ -151,6 +195,7 @@ export default function EditorHome(props) {
   const prevLengthRef = useRef(activeItemList.length);
 
   const [isIntermediateSaving, setIsIntermediateSaving] = useState(false);
+
   useEffect(() => {
     // Get the current length of activeItemList
     const currentLength = activeItemList.length;
@@ -158,12 +203,13 @@ export default function EditorHome(props) {
     // Check if previous length is not equal to current length
     if (prevLengthRef.current !== currentLength) {
 
-      setTimeout(() => {
-        if (!isIntermediateSaving) {
-          setIsIntermediateSaving(true);
-          saveIntermediateImage();
-        }
-      }, 5000);
+
+      if (!isIntermediateSaving) {
+
+        setIsIntermediateSaving(true);
+        saveIntermediateImage();
+      }
+
 
     }
 
@@ -190,8 +236,6 @@ export default function EditorHome(props) {
     let newNftData = Object.assign({}, nftData, value);
     setNftData(newNftData);
   }
-
-
 
   const submitGenerateRequest = async () => {
     const payload = {
@@ -464,171 +508,202 @@ export default function EditorHome(props) {
         setTemplateOptionList(response.data);
     });
   }
-
   const saveIntermediateImage = () => {
     if (canvasRef.current) {
-      const canvasInstance = canvasRef.current;
-      const dataURL = canvasInstance.toDataURL();
+      // Get the original stage instance from the canvas
+      const originalStage = canvasRef.current.getStage();
+
+      // Clone the original stage
+      const clonedStage = originalStage.clone();
+
+      // Find and remove all transformers from the cloned stage
+      clonedStage.find('Transformer').forEach(transformer => {
+        transformer.destroy();
+      });
+      clonedStage.draw(); // Redraw the cloned stage to reflect changes
+
+      // Generate the data URL from the cloned stage
+      const dataURL = clonedStage.toDataURL();
+
+      // Prepare the headers and payload
       const headers = getHeaders();
       const sessionPayload = {
         image: dataURL,
         sessionId: id
+      };
+
+      // Send the data URL to the server
+      axios.post(`${PROCESSOR_API_URL}/sessions/save_intermediate`, sessionPayload, headers)
+        .then(function (dataResponse) {
+          console.log(dataResponse);
+          setIsIntermediateSaving(false);
+        });
+    }
+  };
+
+    const addImageToCanvas = (templateOption) => {
+
+      const templateURL = `${PROCESSOR_API_URL}/templates/mm_final/${templateOption}`;
+
+      const nImageList: any = Object.assign([], activeItemList);
+      nImageList.push({ src: templateURL, id: `${nImageList.length}`, type: 'image', });
+      setActiveItemList(nImageList);
+      setCurrentView(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
+    }
+
+    const addTextBoxToCanvas = (payload) => {
+      const nImageList: any = Object.assign([], activeItemList);
+      const currentItemId = `item_${nImageList.length}`;
+      payload.id = currentItemId;
+      nImageList.push(payload);
+      setActiveItemList(nImageList);
+    }
+
+    const setCurrentAction = (currentAction) => {
+      console.log("Setting Current Action:", currentAction);
+      setCurrentCanvasAction(currentAction);
+
+    }
+
+    const showMoveAction = () => {
+      console.log("Showing Move Action");
+    }
+
+    const showResizeAction = () => {
+      console.log("Showing Resize Action");
+    }
+
+    const showSaveAction = () => {
+      saveIntermediateImage();
+    }
+
+    const showUploadAction = () => {
+      openAlertDialog(<UploadImageDialog setUploadURL={setUploadURL} />);
+    }
+
+    const setSelectedShape = (shapeKey) => {
+
+      let currentLayerList: any = Object.assign([], activeItemList);
+
+      const shapeConfig = {
+        x: 512, y: 200, width: 200, height: 200, fill: fillColor, radius: 70,
+        stroke: strokeColor, strokeWidth: strokeWidthValue
       }
-      axios.post(`${PROCESSOR_API_URL}/sessions/save_intermediate`, sessionPayload, headers).then(function (dataResponse) {
-        console.log(dataResponse);
-        setIsIntermediateSaving(false);
-      });
-    }
-  }
+      const newItem = {
+        'type': 'shape',
+        'shape': shapeKey,
+        'config': shapeConfig,
+        'id': `item_${currentLayerList.length}`
+      }
 
-  const addImageToCanvas = (templateOption) => {
+      currentLayerList.push(newItem);
 
-    const templateURL = `${PROCESSOR_API_URL}/templates/mm_final/${templateOption}`;
+      setActiveItemList(currentLayerList);
 
-    const nImageList: any = Object.assign([], activeItemList);
-    nImageList.push({ src: templateURL, id: `${nImageList.length}`, type: 'image', });
-    setActiveItemList(nImageList);
-    setCurrentView(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
-  }
+      setSelectedId(newItem.id);
 
-  const addTextBoxToCanvas = (payload) => {
-    const nImageList: any = Object.assign([], activeItemList);
-    const currentItemId = `item_${nImageList.length}`;
-    payload.id = currentItemId;
-    nImageList.push(payload);
-    setActiveItemList(nImageList);
-  }
+      console.log("GG");
+      console.log(newItem.id);
 
-  const setCurrentAction = (currentAction) => {
-    console.log("Setting Current Action:", currentAction);
-    setCurrentCanvasAction(currentAction);
 
-  }
-
-  const showMoveAction = () => {
-    console.log("Showing Move Action");
-  }
-
-  const showResizeAction = () => {
-    console.log("Showing Resize Action");
-  }
-
-  const showSaveAction = () => {
-    saveIntermediateImage();
-  }
-
-  const showUploadAction = () => {
-    openAlertDialog(<UploadImageDialog setUploadURL={setUploadURL} />);
-  }
-
-  const setSelectedShape = (shapeKey) => {
-
-    let currentLayerList: any = Object.assign([], activeItemList);
-
-    const shapeConfig = {
-      x: 512, y: 200, width: 200, height: 200, fill: fillColor, radius: 70,
-      stroke: strokeColor, strokeWidth: strokeWidthValue
     }
 
-    currentLayerList.push({
-      'type': 'shape',
-      'shape': shapeKey,
-      'config': shapeConfig,
-      'id': `item_${currentLayerList.length}`
-    });
+    let viewDisplay = <span />;
 
-    setActiveItemList(currentLayerList);
+    console.log(selectedId + "EEEEEE");
 
-  }
 
-  let viewDisplay = <span />;
+    if (currentView === CURRENT_TOOLBAR_VIEW.SHOW_TEMPLATES_DISPLAY) {
+      viewDisplay = (
+        <SelectTemplate getRemoteTemplateData={getRemoteTemplateData}
+          templateOptionList={templateOptionList} addImageToCanvas={addImageToCanvas}
+          resetCurrentView={resetCurrentView}
+        />
+      )
+    } else {
+      viewDisplay = (
+        <SMSCanvas ref={canvasRef}
+          maskGroupRef={maskGroupRef}
+          sessionDetails={sessionDetails}
+          activeItemList={activeItemList}
+          setActiveItemList={setActiveItemList}
+          editBrushWidth={editBrushWidth}
+          currentView={currentView}
+          editMasklines={editMasklines}
+          setEditMaskLines={setEditMaskLines}
+          currentCanvasAction={currentCanvasAction}
+          fillColor={fillColor}
+          strokeColor={strokeColor}
+          selectedId={selectedId}
+          setSelectedId={setSelectedId}
+          buttonPositions={buttonPositions}
+          setButtonPositions={setButtonPositions}
 
-  if (currentView === CURRENT_TOOLBAR_VIEW.SHOW_TEMPLATES_DISPLAY) {
-    viewDisplay = (
-      <SelectTemplate getRemoteTemplateData={getRemoteTemplateData}
-        templateOptionList={templateOptionList} addImageToCanvas={addImageToCanvas}
-        resetCurrentView={resetCurrentView}
-      />
-    )
-  } else {
-    viewDisplay = (
-      <SMSCanvas ref={canvasRef}
-        maskGroupRef={maskGroupRef}
-        sessionDetails={sessionDetails}
-        activeItemList={activeItemList}
-        setActiveItemList={setActiveItemList}
-        editBrushWidth={editBrushWidth}
-        currentView={currentView}
-        editMasklines={editMasklines}
-        setEditMaskLines={setEditMaskLines}
-        currentCanvasAction={currentCanvasAction}
-        fillColor={fillColor}
-        strokeColor={strokeColor}
-      />
-    )
-  }
-  return (
-    <CommonContainer resetSession={resetSession}>
-      <div className='m-auto'>
-        <div className='block'>
-          <div className='w-[5%] bg-cyber-black inline-block'>
-            <ActionToolbar
-              setCurrentAction={setCurrentAction}
-              setCurrentViewDisplay={setCurrentViewDisplay}
-              showMoveAction={showMoveAction}
-              showResizeAction={showResizeAction}
-              showSaveAction={showSaveAction}
-              showUploadAction={showUploadAction}
+        />
+      )
+    }
+    return (
+      <CommonContainer resetSession={resetSession}>
+        <div className='m-auto'>
+          <div className='block'>
+            <div className='w-[5%] bg-cyber-black inline-block'>
+              <ActionToolbar
+                setCurrentAction={setCurrentAction}
+                setCurrentViewDisplay={setCurrentViewDisplay}
+                showMoveAction={showMoveAction}
+                showResizeAction={showResizeAction}
+                showSaveAction={showSaveAction}
+                showUploadAction={showUploadAction}
 
-            />
-          </div>
-          <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto  mb-8 '>
-            {viewDisplay}
-          </div>
-          <div className='w-[17%] inline-block bg-cyber-black '>
-            <EditorToolbar promptText={promptText} setPromptText={setPromptText}
-              submitGenerateRequest={submitGenerateRequest}
-              submitOutpaintRequest={submitOutpaintRequest}
-              saveIntermediateImage={saveIntermediateImage}
-              showAttestationDialog={showAttestationDialog} sessionDetails={sessionDetails}
-              updateNFTData={updateNFTData}
-              setNftData={setNftData}
-              nftData={nftData}
-              selectedChain={selectedChain}
-              setSelectedChain={setSelectedChain}
-              selectedAllocation={selectedAllocation}
-              setSelectedAllocation={setSelectedAllocation}
-              showTemplatesSelect={showTemplatesSelect}
-              addTextBoxToCanvas={addTextBoxToCanvas}
-              showMask={showMask}
-              setShowMask={setShowMask}
-              editBrushWidth={editBrushWidth}
-              setEditBrushWidth={setEditBrushWidth}
-              setCurrentViewDisplay={setCurrentViewDisplay}
-              currentViewDisplay={currentView}
-              textConfig={textConfig}
-              setTextConfig={setTextConfig}
-              activeItemList={activeItemList}
-              setActiveItemList={setActiveItemList}
-              selectedGenerationModel={selectedGenerationModel}
-              setSelectedGenerationModel={setSelectedGenerationModel}
-              selectedEditModel={selectedEditModel}
-              setSelectedEditModel={setSelectedEditModel}
-              isGenerationPending={isGenerationPending}
-              isOutpaintPending={isOutpaintPending}
-              isPublicationPending={isPublicationPending}
-              setSelectedShape={setSelectedShape}
-              fillColor={fillColor}
-              setFillColor={setFillColor}
-              strokeColor={strokeColor}
-              setStrokeColor={setStrokeColor}
-              strokeWidthValue={strokeWidthValue}
-              setStrokeWidthValue={setStrokeWidthValue}
+              />
+            </div>
+            <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto  mb-8 '>
+              {viewDisplay}
+            </div>
+            <div className='w-[17%] inline-block bg-cyber-black '>
+              <EditorToolbar promptText={promptText} setPromptText={setPromptText}
+                submitGenerateRequest={submitGenerateRequest}
+                submitOutpaintRequest={submitOutpaintRequest}
+                saveIntermediateImage={saveIntermediateImage}
+                showAttestationDialog={showAttestationDialog} sessionDetails={sessionDetails}
+                updateNFTData={updateNFTData}
+                setNftData={setNftData}
+                nftData={nftData}
+                selectedChain={selectedChain}
+                setSelectedChain={setSelectedChain}
+                selectedAllocation={selectedAllocation}
+                setSelectedAllocation={setSelectedAllocation}
+                showTemplatesSelect={showTemplatesSelect}
+                addTextBoxToCanvas={addTextBoxToCanvas}
+                showMask={showMask}
+                setShowMask={setShowMask}
+                editBrushWidth={editBrushWidth}
+                setEditBrushWidth={setEditBrushWidth}
+                setCurrentViewDisplay={setCurrentViewDisplay}
+                currentViewDisplay={currentView}
+                textConfig={textConfig}
+                setTextConfig={setTextConfig}
+                activeItemList={activeItemList}
+                setActiveItemList={setActiveItemList}
+                selectedGenerationModel={selectedGenerationModel}
+                setSelectedGenerationModel={setSelectedGenerationModel}
+                selectedEditModel={selectedEditModel}
+                setSelectedEditModel={setSelectedEditModel}
+                isGenerationPending={isGenerationPending}
+                isOutpaintPending={isOutpaintPending}
+                isPublicationPending={isPublicationPending}
+                setSelectedShape={setSelectedShape}
+                fillColor={fillColor}
+                setFillColor={setFillColor}
+                strokeColor={strokeColor}
+                setStrokeColor={setStrokeColor}
+                strokeWidthValue={strokeWidthValue}
+                setStrokeWidthValue={setStrokeWidthValue}
 
-            />
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </CommonContainer>
-  )
-}
+      </CommonContainer>
+    )
+  }

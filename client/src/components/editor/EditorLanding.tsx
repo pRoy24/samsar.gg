@@ -22,16 +22,11 @@ export default function EditorLanding() {
   }, []);
 
   const resetCurrentSession = () => {
-    console.log("RESETTTING CURRENT SESSION");
-    
     localStorage.removeItem("sessionID");
-
     const newUUID = (ObjectId()).toString();
     localStorage.setItem("sessionID", newUUID);
     const sessionID = newUUID;
-
     setSessionID(sessionID);
-
   }
 
   if (!sessionID) {
