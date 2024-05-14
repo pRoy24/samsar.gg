@@ -41,8 +41,8 @@ export async function uploadImageToIpfs(fileData) {
 }
 
 export async function generateTwitterOgImage(payload) {
-  const RESIZE_WIDTH = 1080;  // Set new resize dimensions
-  const RESIZE_HEIGHT = 1080;
+  const RESIZE_WIDTH = 750;  // Set new resize dimensions
+  const RESIZE_HEIGHT = 750;
 
   const imageData = decodeBase64Image(payload.image);
   const imageBaseDirectory = `./assets/twitter/`;
