@@ -208,15 +208,10 @@ export async function publishSessionAndSetURI(userId, payload) {
 
   const sessionId = payload.sessionId;
   const sessionDataValue = await Session.findOne({ _id: sessionId });
-
   const userDataValue = await User.findOne({ '_id': sessionDataValue.userId });
-
   sessionDataValue.publishStatus = "COMPLETED";
-
   const sessionWitnesses = sessionDataValue.witnesses;
-
   const metadataHashData = await uploadMetadataToIpfs(sessionWitnesses);
-
   const witnessHash = metadataHashData.IpfsHash;
 
   const imageData = await uploadImageToIpfs(payload.image);

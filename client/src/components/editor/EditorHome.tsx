@@ -477,10 +477,6 @@ export default function EditorHome(props) {
       // Generate the data URL from the cloned stage
       const dataURL = clonedStage.toDataURL();
 
-
-
-
-
       let sessionPayload: any = {
         image: dataURL,
         sessionId: id
