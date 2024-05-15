@@ -58,11 +58,8 @@ export async function requestOutpaintImage(payload) {
 
   sessionDataValue.outpaintStatus = "PENDING";
   sessionDataValue.prompt = payload.prompt;
-
   await addImageOutpaintRequest(payload);
-
   const saveRes = await sessionDataValue.save();
-
   return saveRes;
 
 }
@@ -73,8 +70,6 @@ export async function getSessionGenerationStatus(sessionId) {
   const sessionDataValue = await Session.findOne({ _id: sessionId });
   return sessionDataValue;
 }
-
-
 
 export async function publishSession(payload) {
 
@@ -106,8 +101,6 @@ export async function saveIntermediate(payload) {
   await getDBConnectionString();
   const sessionId = payload.sessionId;
   const sessionDataValue = await Session.findOne({ _id: sessionId });
-
-
 
   // Retrieve the intermediates array or initialize as empty if it doesn't exist
   let intermediates = sessionDataValue.intermediates || [];
@@ -263,8 +256,6 @@ export async function publishSessionAndSetURI(userId, payload) {
   const nftName = nftPayload.name;
   const userData = await User.findOne({ _id: userId });
 
-
-
   const publicationsPayload = new Publication({
     slug: tokenId,
     sessionId: sessionId,
@@ -281,8 +272,6 @@ export async function publishSessionAndSetURI(userId, payload) {
     witnessList: sessionWitnesses,
     witnessHash: witnessHash,
   });
-
-
 
   const publicationRes = await publicationsPayload.save({});
   const uri = `https://gateway.ipfs.io/ipfs/${imageHash}`;

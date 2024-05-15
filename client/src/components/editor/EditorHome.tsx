@@ -72,6 +72,8 @@ export default function EditorHome(props) {
   const [buttonPositions, setButtonPositions] = useState([]);
 
   const [selectedId, setSelectedId] = useState<any>(null);
+  const [selectedLayerType, setSelectedLayerType] = useState<any>(null);
+
 
   const [textConfig, setTextConfig] = useState({
     fontSize: 40,
@@ -411,7 +413,6 @@ export default function EditorHome(props) {
         startGenerationPoll();
       }, 1000);
     }
-
   }
 
   async function startOutpaintPoll() {
@@ -420,7 +421,6 @@ export default function EditorHome(props) {
     const pollStatus = await axios.get(`${PROCESSOR_API_URL}/sessions/generate_status?id=${id}`);
 
     const pollStatusData = pollStatus.data;
-
     if (pollStatus.data.outpaintStatus === 'COMPLETED') {
       const generatedImageUrlName = pollStatus.data.activeOutpaintedImage;
       const generatedURL = `${PROCESSOR_API_URL}/generations/${generatedImageUrlName}`;
@@ -462,8 +462,24 @@ export default function EditorHome(props) {
     const selectedChain = process.env.REACT_APP_SELECTED_CHAIN;
 
     if (canvasRef.current) {
-      const canvasInstance = canvasRef.current;
-      const dataURL = canvasInstance.toDataURL();
+
+      const originalStage = canvasRef.current.getStage();
+
+      // Clone the original stage
+      const clonedStage = originalStage.clone();
+
+      // Find and remove all transformers from the cloned stage
+      clonedStage.find('Transformer').forEach(transformer => {
+        transformer.destroy();
+      });
+      clonedStage.draw(); // Redraw the cloned stage to reflect changes
+
+      // Generate the data URL from the cloned stage
+      const dataURL = clonedStage.toDataURL();
+
+
+
+
 
       let sessionPayload: any = {
         image: dataURL,
@@ -541,169 +557,203 @@ export default function EditorHome(props) {
     }
   };
 
-    const addImageToCanvas = (templateOption) => {
+  const addImageToCanvas = (templateOption) => {
 
-      const templateURL = `${PROCESSOR_API_URL}/templates/mm_final/${templateOption}`;
+    const templateURL = `${PROCESSOR_API_URL}/templates/mm_final/${templateOption}`;
 
-      const nImageList: any = Object.assign([], activeItemList);
-      nImageList.push({ src: templateURL, id: `${nImageList.length}`, type: 'image', });
-      setActiveItemList(nImageList);
-      setCurrentView(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
+    const nImageList: any = Object.assign([], activeItemList);
+    nImageList.push({ src: templateURL, id: `${nImageList.length}`, type: 'image', });
+    setActiveItemList(nImageList);
+    setCurrentView(CURRENT_TOOLBAR_VIEW.SHOW_DEFAULT_DISPLAY);
+  }
+
+  const addTextBoxToCanvas = (payload) => {
+    const nImageList: any = Object.assign([], activeItemList);
+    const currentItemId = `item_${nImageList.length}`;
+    payload.id = currentItemId;
+    nImageList.push(payload);
+    setActiveItemList(nImageList);
+  }
+
+  const setCurrentAction = (currentAction) => {
+    console.log("Setting Current Action:", currentAction);
+    setCurrentCanvasAction(currentAction);
+
+  }
+
+  const showMoveAction = () => {
+    console.log("Showing Move Action");
+  }
+
+  const showResizeAction = () => {
+    console.log("Showing Resize Action");
+  }
+
+  const showSaveAction = () => {
+    saveIntermediateImage();
+  }
+
+  const showUploadAction = () => {
+    openAlertDialog(<UploadImageDialog setUploadURL={setUploadURL} />);
+  }
+
+  const setSelectedShape = (shapeKey) => {
+
+    let currentLayerList: any = Object.assign([], activeItemList);
+
+    const shapeConfig = {
+      x: 512, y: 200, width: 200, height: 200, fill: fillColor, radius: 70,
+      stroke: strokeColor, strokeWidth: strokeWidthValue
+    }
+    const newItem = {
+      'type': 'shape',
+      'shape': shapeKey,
+      'config': shapeConfig,
+      'id': `item_${currentLayerList.length}`
     }
 
-    const addTextBoxToCanvas = (payload) => {
-      const nImageList: any = Object.assign([], activeItemList);
-      const currentItemId = `item_${nImageList.length}`;
-      payload.id = currentItemId;
-      nImageList.push(payload);
-      setActiveItemList(nImageList);
+    currentLayerList.push(newItem);
+    setActiveItemList(currentLayerList);
+    setSelectedId(newItem.id);
+  }
+
+
+  const applyFilter = (index, filter, value) => {
+    const nodeId = `item_${index}`;
+    const stage = canvasRef.current.getStage();
+    const imageNode = stage.findOne(`#${nodeId}`);
+    if (!imageNode) {
+      return;
     }
 
-    const setCurrentAction = (currentAction) => {
-      console.log("Setting Current Action:", currentAction);
-      setCurrentCanvasAction(currentAction);
+    imageNode.cache();
+    imageNode.filters([filter]);
 
+    if (filter === Konva.Filters.Blur) {
+      imageNode.blurRadius(value);
+    } else if (filter === Konva.Filters.Brighten) {
+      imageNode.brightness(value);
+    } else if (filter === Konva.Filters.Contrast) {
+      imageNode.contrast(value);
+    } else if (filter === Konva.Filters.Grayscale) {
+      // No value needed for grayscale
+    } else if (filter === Konva.Filters.HSL) {
+      imageNode.hue(value * 360); // Example adjustment for HSL filter
+    } else if (filter === Konva.Filters.Invert) {
+      // No value needed for invert
+    } else if (filter === Konva.Filters.Pixelate) {
+      imageNode.pixelSize(Math.round(value));
+    } else if (filter === Konva.Filters.Posterize) {
+      imageNode.levels(Math.round(value));
+    } else if (filter === Konva.Filters.Sepia) {
+      // No value needed for sepia
+    } else if (filter === Konva.Filters.Solarize) {
+      // No value needed for solarize
+    } else if (filter === Konva.Filters.RGBA) {
+      // Assuming the slider controls alpha for RGBA
+      imageNode.alpha(value);
     }
 
-    const showMoveAction = () => {
-      console.log("Showing Move Action");
-    }
-
-    const showResizeAction = () => {
-      console.log("Showing Resize Action");
-    }
-
-    const showSaveAction = () => {
-      saveIntermediateImage();
-    }
-
-    const showUploadAction = () => {
-      openAlertDialog(<UploadImageDialog setUploadURL={setUploadURL} />);
-    }
-
-    const setSelectedShape = (shapeKey) => {
-
-      let currentLayerList: any = Object.assign([], activeItemList);
-
-      const shapeConfig = {
-        x: 512, y: 200, width: 200, height: 200, fill: fillColor, radius: 70,
-        stroke: strokeColor, strokeWidth: strokeWidthValue
-      }
-      const newItem = {
-        'type': 'shape',
-        'shape': shapeKey,
-        'config': shapeConfig,
-        'id': `item_${currentLayerList.length}`
-      }
-
-      currentLayerList.push(newItem);
-
-      setActiveItemList(currentLayerList);
-
-      setSelectedId(newItem.id);
-
-      console.log("GG");
-      console.log(newItem.id);
+    stage.batchDraw();
+  };
 
 
-    }
 
-    let viewDisplay = <span />;
+  let viewDisplay = <span />;
 
-    console.log(selectedId + "EEEEEE");
+  if (currentView === CURRENT_TOOLBAR_VIEW.SHOW_TEMPLATES_DISPLAY) {
+    viewDisplay = (
+      <SelectTemplate getRemoteTemplateData={getRemoteTemplateData}
+        templateOptionList={templateOptionList} addImageToCanvas={addImageToCanvas}
+        resetCurrentView={resetCurrentView}
+      />
+    )
+  } else {
+    viewDisplay = (
+      <SMSCanvas ref={canvasRef}
+        maskGroupRef={maskGroupRef}
+        sessionDetails={sessionDetails}
+        activeItemList={activeItemList}
+        setActiveItemList={setActiveItemList}
+        editBrushWidth={editBrushWidth}
+        currentView={currentView}
+        editMasklines={editMasklines}
+        setEditMaskLines={setEditMaskLines}
+        currentCanvasAction={currentCanvasAction}
+        fillColor={fillColor}
+        strokeColor={strokeColor}
+        selectedId={selectedId}
+        setSelectedId={setSelectedId}
+        buttonPositions={buttonPositions}
+        setButtonPositions={setButtonPositions}
+        selectedLayerType={selectedLayerType}
+        setSelectedLayerType={setSelectedLayerType}
+        applyFilter={applyFilter}
 
-
-    if (currentView === CURRENT_TOOLBAR_VIEW.SHOW_TEMPLATES_DISPLAY) {
-      viewDisplay = (
-        <SelectTemplate getRemoteTemplateData={getRemoteTemplateData}
-          templateOptionList={templateOptionList} addImageToCanvas={addImageToCanvas}
-          resetCurrentView={resetCurrentView}
-        />
-      )
-    } else {
-      viewDisplay = (
-        <SMSCanvas ref={canvasRef}
-          maskGroupRef={maskGroupRef}
-          sessionDetails={sessionDetails}
-          activeItemList={activeItemList}
-          setActiveItemList={setActiveItemList}
-          editBrushWidth={editBrushWidth}
-          currentView={currentView}
-          editMasklines={editMasklines}
-          setEditMaskLines={setEditMaskLines}
-          currentCanvasAction={currentCanvasAction}
-          fillColor={fillColor}
-          strokeColor={strokeColor}
-          selectedId={selectedId}
-          setSelectedId={setSelectedId}
-          buttonPositions={buttonPositions}
-          setButtonPositions={setButtonPositions}
-
-        />
-      )
-    }
-    return (
-      <CommonContainer resetSession={resetSession}>
-        <div className='m-auto'>
-          <div className='block'>
-            <div className='w-[5%] bg-cyber-black inline-block'>
-              <ActionToolbar
-                setCurrentAction={setCurrentAction}
-                setCurrentViewDisplay={setCurrentViewDisplay}
-                showMoveAction={showMoveAction}
-                showResizeAction={showResizeAction}
-                showSaveAction={showSaveAction}
-                showUploadAction={showUploadAction}
-
-              />
-            </div>
-            <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto  mb-8 '>
-              {viewDisplay}
-            </div>
-            <div className='w-[17%] inline-block bg-cyber-black '>
-              <EditorToolbar promptText={promptText} setPromptText={setPromptText}
-                submitGenerateRequest={submitGenerateRequest}
-                submitOutpaintRequest={submitOutpaintRequest}
-                saveIntermediateImage={saveIntermediateImage}
-                showAttestationDialog={showAttestationDialog} sessionDetails={sessionDetails}
-                updateNFTData={updateNFTData}
-                setNftData={setNftData}
-                nftData={nftData}
-                selectedChain={selectedChain}
-                setSelectedChain={setSelectedChain}
-                selectedAllocation={selectedAllocation}
-                setSelectedAllocation={setSelectedAllocation}
-                showTemplatesSelect={showTemplatesSelect}
-                addTextBoxToCanvas={addTextBoxToCanvas}
-                showMask={showMask}
-                setShowMask={setShowMask}
-                editBrushWidth={editBrushWidth}
-                setEditBrushWidth={setEditBrushWidth}
-                setCurrentViewDisplay={setCurrentViewDisplay}
-                currentViewDisplay={currentView}
-                textConfig={textConfig}
-                setTextConfig={setTextConfig}
-                activeItemList={activeItemList}
-                setActiveItemList={setActiveItemList}
-                selectedGenerationModel={selectedGenerationModel}
-                setSelectedGenerationModel={setSelectedGenerationModel}
-                selectedEditModel={selectedEditModel}
-                setSelectedEditModel={setSelectedEditModel}
-                isGenerationPending={isGenerationPending}
-                isOutpaintPending={isOutpaintPending}
-                isPublicationPending={isPublicationPending}
-                setSelectedShape={setSelectedShape}
-                fillColor={fillColor}
-                setFillColor={setFillColor}
-                strokeColor={strokeColor}
-                setStrokeColor={setStrokeColor}
-                strokeWidthValue={strokeWidthValue}
-                setStrokeWidthValue={setStrokeWidthValue}
-
-              />
-            </div>
-          </div>
-        </div>
-      </CommonContainer>
+      />
     )
   }
+  return (
+    <CommonContainer resetSession={resetSession}>
+      <div className='m-auto'>
+        <div className='block'>
+          <div className='w-[5%] bg-cyber-black inline-block'>
+            <ActionToolbar
+              setCurrentAction={setCurrentAction}
+              setCurrentViewDisplay={setCurrentViewDisplay}
+              showMoveAction={showMoveAction}
+              showResizeAction={showResizeAction}
+              showSaveAction={showSaveAction}
+              showUploadAction={showUploadAction}
+
+            />
+          </div>
+          <div className='text-center w-[78%] inline-block h-[100vh] overflow-scroll m-auto  mb-8 '>
+            {viewDisplay}
+          </div>
+          <div className='w-[17%] inline-block bg-cyber-black '>
+            <EditorToolbar promptText={promptText} setPromptText={setPromptText}
+              submitGenerateRequest={submitGenerateRequest}
+              submitOutpaintRequest={submitOutpaintRequest}
+              saveIntermediateImage={saveIntermediateImage}
+              showAttestationDialog={showAttestationDialog} sessionDetails={sessionDetails}
+              updateNFTData={updateNFTData}
+              setNftData={setNftData}
+              nftData={nftData}
+              selectedChain={selectedChain}
+              setSelectedChain={setSelectedChain}
+              selectedAllocation={selectedAllocation}
+              setSelectedAllocation={setSelectedAllocation}
+              showTemplatesSelect={showTemplatesSelect}
+              addTextBoxToCanvas={addTextBoxToCanvas}
+              showMask={showMask}
+              setShowMask={setShowMask}
+              editBrushWidth={editBrushWidth}
+              setEditBrushWidth={setEditBrushWidth}
+              setCurrentViewDisplay={setCurrentViewDisplay}
+              currentViewDisplay={currentView}
+              textConfig={textConfig}
+              setTextConfig={setTextConfig}
+              activeItemList={activeItemList}
+              setActiveItemList={setActiveItemList}
+              selectedGenerationModel={selectedGenerationModel}
+              setSelectedGenerationModel={setSelectedGenerationModel}
+              selectedEditModel={selectedEditModel}
+              setSelectedEditModel={setSelectedEditModel}
+              isGenerationPending={isGenerationPending}
+              isOutpaintPending={isOutpaintPending}
+              isPublicationPending={isPublicationPending}
+              setSelectedShape={setSelectedShape}
+              fillColor={fillColor}
+              setFillColor={setFillColor}
+              strokeColor={strokeColor}
+              setStrokeColor={setStrokeColor}
+              strokeWidthValue={strokeWidthValue}
+              setStrokeWidthValue={setStrokeWidthValue}
+            />
+          </div>
+        </div>
+      </div>
+    </CommonContainer>
+  )
+}

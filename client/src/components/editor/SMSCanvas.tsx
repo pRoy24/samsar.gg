@@ -10,13 +10,17 @@ import ResizablePolygon from "./shapes/ResizablePolygon.tsx";
 import ResizableCircle from "./shapes/ResizableCircle.tsx";
 import { useColorMode } from '../../contexts/ColorMode.js';
 import { FaChevronCircleDown, FaChevronCircleUp } from "react-icons/fa";
+import ImageToolbar from './utils/LayerToolbar/ImageToolbar.js'
+import TextToolbar from './utils/LayerToolbar/TextToolbar.js'
+import ShapeToolbar from './utils/LayerToolbar/ShapeToolbar.js'
 
 const IMAGE_BASE = `${process.env.REACT_APP_PROCESSOR_API}`;
 
 const SMSCanvas = forwardRef((props: any, ref: any) => {
   const { sessionDetails, activeItemList, setActiveItemList, currentView, editBrushWidth, maskGroupRef,
     editMasklines, setEditMaskLines, currentCanvasAction,
-    setSelectedId, selectedId,  buttonPositions, setButtonPositions,
+    setSelectedId, selectedId, buttonPositions, setButtonPositions,
+    selectedLayerType, setSelectedLayerType, applyFilter
   } = props;
   const [showMask, setShowMask] = useState(false);
   const [mask, setMask] = useState(null);
@@ -44,19 +48,14 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
   }, [currentCanvasAction]);
 
   const handleLayerClick = (e) => {
-
     const clickedItem = e.target.attrs.id || e.target.getParent().attrs.id;
 
-    console.log(clickedItem);
-
-    if (clickedItem ) {
+    if (clickedItem) {
       setSelectedId(clickedItem);
     } else {
       setSelectedId(null);
     }
   };
-
-  console.log(selectedId);
 
   useEffect(() => {
 
@@ -91,9 +90,6 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
       setSelectedId(item.id);
     }
   }
-  const setItemAsSelected = (itemId) => {
-    setSelectedId(itemId);
-  }
 
   const generateCursor = (size) => {
     return `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'><circle cx='${size / 2}' cy='${size / 2}' r='${size / 2 - 1}' fill='%23000' /></svg>") ${size / 2} ${size / 2}, auto`;
@@ -120,7 +116,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
     const checkIfClickedOutside = (e) => {
 
       if (!document.getElementById('samsar-konva-stage').contains(e.target)) {
-       // setSelectedId(null);
+        // setSelectedId(null);
       }
     };
 
@@ -141,15 +137,27 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
     if (newIndex < 0 || newIndex >= activeItemList.length) {
       return; // Out of bounds, do nothing
     }
-  
+
     const newList = [...activeItemList];
     const [item] = newList.splice(index, 1);
     newList.splice(newIndex, 0, item);
     setActiveItemList(newList);
   };
-  
+
 
   let imageStackList = <span />;
+
+  const setSelectedLayer = (item) => {
+    setSelectedId(item.id);
+
+    if (item.type === 'image') {
+      setSelectedLayerType('image');
+    } else if (item.type === 'text') {
+      setSelectedLayerType('text');
+    } else if (item.type === 'shape') {
+      setSelectedLayerType('shape');
+    }
+  }
 
   if (activeItemList && activeItemList.length > 0) {
     imageStackList = activeItemList.map((item, index) => {
@@ -160,7 +168,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
               {...item}
               image={item}
               isSelected={selectedId === item.id}
-              onSelect={() => setItemAsSelected(item.id)}
+              onSelect={() => setSelectedLayer(item)}
               onUnselect={() => setSelectedId(null)}
               showMask={showMask}
             />
@@ -172,7 +180,7 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
             <ResizableText
               {...item}
               isSelected={selectedId === item.id}
-              onSelect={() => setSelectedId(item.id)}
+              onSelect={() => setSelectedLayer(item)}
               onUnselect={() => setSelectedId(null)}
             />
           </Group>
@@ -272,9 +280,13 @@ const SMSCanvas = forwardRef((props: any, ref: any) => {
         </Layer>
       </Stage>
       {buttonPositions.map((pos, index) => {
-        console.log(selectedId);
-        if (!selectedId || (selectedId && pos.id && ((selectedId !== pos.id) || (selectedId === 0 )))) return null; // Show buttons only for the selected item
 
+        if (!selectedId || (selectedId && pos.id && ((selectedId !== pos.id)))) return null; // Show buttons only for the selected item
+
+        if (selectedLayerType === 'image') {
+          return <ImageToolbar key={pos.id} pos={pos} index={index}
+            moveItem={moveItem} applyFilter={applyFilter} />;
+        }
         return (
           <div key={pos.id} style={{
             position: 'absolute', left: pos.x, top: pos.y, background: "#030712",
