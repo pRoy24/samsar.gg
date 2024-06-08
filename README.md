@@ -1,6 +1,9 @@
+
 ## SAMSAR.GG
+## This repo is now archived. Visit https://github.com/pRoy24/samsar for latest client code.
 
 ## Open-source AI enabled image-editor with tokenized incentives and on-chain verifiability of original-content.
+
 
 
 Contract Addresses-
